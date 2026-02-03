@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:graville_operations/screens/login/login_screen.dart';
 
 class Signup extends StatefulWidget {
   const Signup({super.key});
@@ -270,11 +271,14 @@ class _SignupState extends State<Signup> {
                         'Have an account?',
                         style: TextStyle(color: Colors.white),
                       ),
-                      Text(
-                        ' Sign in',
-                        style: TextStyle(
-                          color: Colors.blue[500],
-                          fontWeight: FontWeight.bold,
+                      TextButton(
+                        onPressed: ()=>Navigator.of(context).push(MaterialPageRoute(builder: (context)=>LoginScreen())),
+                        child: Text(
+                          ' Sign in',
+                          style: TextStyle(
+                            color: Colors.blue[500],
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ],
