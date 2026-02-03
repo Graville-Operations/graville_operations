@@ -69,6 +69,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 TextFormField(
                   controller: _emailController,
                   style: const TextStyle(color: Colors.white),
+
                   decoration: const InputDecoration(
                     labelText: 'Email Address',
                     labelStyle: TextStyle(color: Colors.white),
