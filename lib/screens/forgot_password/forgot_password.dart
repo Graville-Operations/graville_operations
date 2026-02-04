@@ -1,4 +1,6 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:graville_operations/screens/forgot_password/otp_verification_screen.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -11,16 +13,34 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
 
+  String? generatedOtp;
+
   @override
   void dispose() {
     _emailController.dispose();
     super.dispose();
   }
 
-  void _sendResetLink() {
+  String _generateOtp() {
+    final random = Random();
+    return (100000 + random.nextInt(900000)).toString();
+  }
+
+  void _sendOtp() {
     if (_formKey.currentState!.validate()) {
+      generatedOtp = _generateOtp();
+
+      debugPrint('OTP sent to email: $generatedOtp');
+
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Password reset link sent to your email')),
+        const SnackBar(content: Text('OTP has been sent to your email')),
+      );
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => OtpVerificationScreen(generatedOtp: generatedOtp!),
+        ),
       );
     }
   }
@@ -46,11 +66,15 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.lock_reset, size: 80, color: Colors.red),
+                const Icon(
+                  Icons.lock_reset,
+                  size: 80,
+                  color: Colors.blueAccent,
+                ),
                 const SizedBox(height: 20),
 
                 const Text(
-                  'Reset Your Password',
+                  'Reset Password',
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -60,7 +84,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 const SizedBox(height: 10),
 
                 const Text(
-                  'Enter your email and we will send you a reset link.',
+                  'Enter your email to receive a one-time password (OTP).',
                   textAlign: TextAlign.center,
                   style: TextStyle(color: Colors.white70),
                 ),
@@ -69,6 +93,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 TextFormField(
                   controller: _emailController,
                   style: const TextStyle(color: Colors.white),
+                  keyboardType: TextInputType.emailAddress,
 
                   decoration: const InputDecoration(
                     labelText: 'Email Address',
@@ -83,11 +108,15 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                       borderSide: BorderSide(color: Colors.white),
                     ),
                   ),
+
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Email is required';
                     }
-                    if (!value.contains('@')) {
+                    final emailRegex = RegExp(
+                      r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                    );
+                    if (!emailRegex.hasMatch(value)) {
                       return 'Enter a valid email';
                     }
                     return null;
@@ -98,8 +127,15 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: _sendResetLink,
-                    child: const Text('Send Reset Link'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blueAccent,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                    ),
+                    onPressed: _sendOtp,
+                    child: const Text(
+                      'Send OTP',
+                      style: TextStyle(fontSize: 16),
+                    ),
                   ),
                 ),
               ],
