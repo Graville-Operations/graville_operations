@@ -31,7 +31,7 @@ class _SignupState extends State<Signup> {
         child: CircleAvatar(
           radius: 22,
           backgroundColor: Colors.grey[200],
-          child: Icon(icon, color: color, size: 20),
+          child: FaIcon(icon, color: color, size: 20),
         ),
       ),
     );
