@@ -49,15 +49,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
-
-      appBar: AppBar(
-        backgroundColor: Colors.black,
-        title: const Text(
-          'Forgot Password',
-          style: TextStyle(color: Colors.white),
-        ),
-      ),
-
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
@@ -66,15 +57,16 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(
-                  Icons.lock_reset,
-                  size: 80,
-                  color: Colors.blueAccent,
+                /// 🔽 IMAGE REPLACING THE LOCK ICON
+                Image.asset(
+                  'assets/images/forgotpassword.png',
+                  height: 120,
+                  fit: BoxFit.contain,
                 ),
                 const SizedBox(height: 20),
 
                 const Text(
-                  'Reset Password',
+                  'Forgot Password',
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -94,7 +86,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   controller: _emailController,
                   style: const TextStyle(color: Colors.white),
                   keyboardType: TextInputType.emailAddress,
-
                   decoration: const InputDecoration(
                     labelText: 'Email Address',
                     labelStyle: TextStyle(color: Colors.white),
@@ -108,7 +99,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                       borderSide: BorderSide(color: Colors.white),
                     ),
                   ),
-
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Email is required';

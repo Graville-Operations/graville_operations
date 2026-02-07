@@ -50,13 +50,6 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
-      appBar: AppBar(
-        backgroundColor: Colors.black,
-        title: const Text(
-          'Reset Password',
-          style: TextStyle(color: Colors.white),
-        ),
-      ),
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
@@ -65,7 +58,11 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.lock, size: 80, color: Colors.blueAccent),
+                Image.asset(
+                  'assets/images/resetpassword.png',
+                  height: 120,
+                  fit: BoxFit.contain,
+                ),
                 const SizedBox(height: 20),
 
                 const Text(
@@ -84,6 +81,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                   style: TextStyle(color: Colors.white70),
                 ),
                 const SizedBox(height: 30),
+
                 TextFormField(
                   controller: _passwordController,
                   obscureText: _obscurePassword,
@@ -122,6 +120,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                 ),
 
                 const SizedBox(height: 20),
+
                 TextFormField(
                   controller: _confirmPasswordController,
                   obscureText: _obscureConfirmPassword,

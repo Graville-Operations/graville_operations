@@ -54,11 +54,8 @@ class CustomTextInput extends StatelessWidget {
           borderSide: BorderSide(color: Colors.black),
         ),
         suffixIcon: IconButton(
-          icon: Icon(
-            suffixIcon,
-            color: Colors.grey,
-          ),
-          onPressed:onVisibilityPressed,
+          icon: Icon(suffixIcon, color: Colors.grey),
+          onPressed: onVisibilityPressed,
         ),
       ),
     );
