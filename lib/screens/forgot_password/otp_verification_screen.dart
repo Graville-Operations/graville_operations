@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:pinput/pinput.dart';
+
 import 'package:graville_operations/screens/forgot_password/reset_password_screen.dart';
 
 class OtpVerificationScreen extends StatefulWidget {
@@ -108,12 +110,6 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
-
-      appBar: AppBar(
-        backgroundColor: Colors.black,
-        title: const Text('Verify OTP', style: TextStyle(color: Colors.white)),
-      ),
-
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
@@ -122,10 +118,10 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(
-                  Icons.verified_user,
-                  size: 80,
-                  color: Colors.blueAccent,
+                Image.asset(
+                  'assets/images/otpverification.png',
+                  height: 120,
+                  fit: BoxFit.contain,
                 ),
                 const SizedBox(height: 20),
 
@@ -149,21 +145,53 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                 ),
                 const SizedBox(height: 30),
 
-                TextFormField(
+                Pinput(
                   controller: _otpController,
+                  length: 6,
                   keyboardType: TextInputType.number,
-                  maxLength: 6,
-                  style: const TextStyle(color: Colors.white),
 
-                  decoration: const InputDecoration(
-                    labelText: 'OTP',
-                    labelStyle: TextStyle(color: Colors.white),
-                    prefixIcon: Icon(Icons.lock, color: Colors.white),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.white54),
+                  defaultPinTheme: PinTheme(
+                    width: 56,
+                    height: 56,
+                    textStyle: const TextStyle(
+                      fontSize: 20,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
                     ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.white),
+                    decoration: BoxDecoration(
+                      color: Colors.black,
+                      border: Border.all(color: Colors.white54),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+
+                  focusedPinTheme: PinTheme(
+                    width: 56,
+                    height: 56,
+                    textStyle: const TextStyle(
+                      fontSize: 20,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.black,
+                      border: Border.all(color: Colors.white),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+
+                  submittedPinTheme: PinTheme(
+                    width: 56,
+                    height: 56,
+                    textStyle: const TextStyle(
+                      fontSize: 20,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.black,
+                      border: Border.all(color: Colors.blueAccent),
+                      borderRadius: BorderRadius.circular(8),
                     ),
                   ),
 
@@ -176,7 +204,12 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                     }
                     return null;
                   },
+
+                  onCompleted: (pin) {
+                    _verifyOtp();
+                  },
                 ),
+
                 const SizedBox(height: 20),
 
                 SizedBox(
