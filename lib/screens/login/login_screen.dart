@@ -70,15 +70,32 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.person, size: 70, color: Colors.blue),
+                SizedBox(height: 20),
+                    Image.asset(
+                      'assets/images/logo.png',
+                      height: 100,
+                      width: 500,
+                    ),
 
-                const SizedBox(height: 20),
-
-                const Text(
-                  "Sign In",
-                  style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 30),
+                    SizedBox(height: 10),
+                    Text(
+                      'Welcome to Graville Enterprises Limited!',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                      ),
+                    ),
+                    Text(
+                      'Please enter your credentials',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Colors.blueGrey,
+                        fontSize: 18,
+                      ),
+                    ),
+                const SizedBox(height: 8),
                 const Text(
                   "Log in to your account",
                   style: TextStyle(
@@ -87,7 +104,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     color: Colors.blue,
                   ),
                 ),
-                const SizedBox(height: 26),
+                const SizedBox(height: 10),
 
                 CustomTextInput(
                   controller: emailController,
@@ -165,7 +182,13 @@ class _LoginScreenState extends State<LoginScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text("Don't have an account? "),
+                    Text(
+                      "Don't have an account? ",
+                      style: TextStyle(
+                          color: Colors.blue,
+                      ),
+                    ),
+
                     TextButton(
                       onPressed: () => Navigator.of(
                         context,
