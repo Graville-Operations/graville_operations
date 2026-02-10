@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:graville_operations/screens/account_screen/account_screen.dart';
 import 'package:graville_operations/screens/login/login_screen.dart';
 
 void main() {
@@ -14,10 +15,8 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Forgot Password Demo',
       themeMode: ThemeMode.light,
-      theme: ThemeData(
-        useMaterial3: true,
-      ),
-      home: const LoginScreen(),
+      theme: ThemeData(useMaterial3: true),
+      home: const AccountScreen(),
     );
   }
 }

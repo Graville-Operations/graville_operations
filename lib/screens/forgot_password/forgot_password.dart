@@ -47,8 +47,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
-      backgroundColor: Colors.black,
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
@@ -57,47 +58,38 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                /// 🔽 IMAGE REPLACING THE LOCK ICON
                 Image.asset(
                   'assets/images/forgotpassword.png',
                   height: 120,
                   fit: BoxFit.contain,
                 ),
+
                 const SizedBox(height: 20),
 
-                const Text(
+                Text(
                   'Forgot Password',
-                  style: TextStyle(
-                    fontSize: 24,
+                  style: theme.textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
                   ),
                 ),
-                const SizedBox(height: 10),
 
-                const Text(
+                const SizedBox(height: 8),
+
+                Text(
                   'Enter your email to receive a one-time password (OTP).',
                   textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.white70),
+                  style: theme.textTheme.bodyMedium,
                 ),
+
                 const SizedBox(height: 30),
 
                 TextFormField(
                   controller: _emailController,
-                  style: const TextStyle(color: Colors.white),
                   keyboardType: TextInputType.emailAddress,
                   decoration: const InputDecoration(
                     labelText: 'Email Address',
-                    labelStyle: TextStyle(color: Colors.white),
                     hintText: 'example@gmail.com',
-                    hintStyle: TextStyle(color: Colors.white54),
-                    prefixIcon: Icon(Icons.email, color: Colors.white),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.white54),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.white),
-                    ),
+                    prefixIcon: Icon(Icons.email),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -112,20 +104,14 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     return null;
                   },
                 ),
-                const SizedBox(height: 20),
+
+                const SizedBox(height: 24),
 
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blueAccent,
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                    ),
                     onPressed: _sendOtp,
-                    child: const Text(
-                      'Send OTP',
-                      style: TextStyle(fontSize: 16),
-                    ),
+                    child: const Text('Send OTP'),
                   ),
                 ),
               ],
