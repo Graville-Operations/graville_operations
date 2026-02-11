@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:graville_operations/screens/commons/utils.dart';
+import 'package:graville_operations/screens/commons/assets/images.dart';
+import 'package:graville_operations/screens/commons/widgets/custom_button.dart';
 import 'package:graville_operations/screens/commons/widgets/custom_text_input.dart';
 import 'package:graville_operations/screens/login/login_screen.dart';
 import 'package:flutter/services.dart';
@@ -38,13 +39,13 @@ class _SignupState extends State<Signup> {
     );
   }
 
-  @override
-  void initState() {
-    super.initState();
-    emailController = TextEditingController();
-    passwordController = TextEditingController();
-    confirmpasswordController = TextEditingController();
-  }
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   emailController = TextEditingController();
+  //   passwordController = TextEditingController();
+  //   confirmpasswordController = TextEditingController();
+  // }
 
   bool isValidEmail(String email) {
     final emailRegex = RegExp(
@@ -61,18 +62,26 @@ class _SignupState extends State<Signup> {
     super.dispose();
   }
 
+  void signUpUser() {
+    if (_formKey.currentState!.validate()) {
+      print("Signup Successful");
+
+      print("First Name: ${firstNameController.text}");
+      print("Last Name: ${lastNameController.text}");
+      print("Email: ${emailController.text}");
+      print("Password: ${passwordController.text}");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      // backgroundColor: Colors.grey[500],
+      backgroundColor: Colors.grey[500],
       body: Stack(
         children: [
           SizedBox.expand(
-            child: Image.asset(
-              'assets/images/background.png',
-              fit: BoxFit.cover,
-            ),
+            child: Image.asset(CommonImages.background, fit: BoxFit.cover),
           ),
           Positioned.fill(
             child: BackdropFilter(
@@ -90,11 +99,7 @@ class _SignupState extends State<Signup> {
 
                   children: [
                     SizedBox(height: 10),
-                    Image.asset(
-                      'assets/images/logo.png',
-                      height: 50,
-                      width: 500,
-                    ),
+                    Image.asset(CommonImages.logo, height: 50, width: 500),
                     //SizedBox(height: 20),
                     //welcome text
                     Text(
@@ -106,6 +111,7 @@ class _SignupState extends State<Signup> {
                         fontSize: 25,
                       ),
                     ),
+                    //SizedBox(height: 10),
                     Text(
                       'Please enter your details below',
                       style: TextStyle(
@@ -114,18 +120,29 @@ class _SignupState extends State<Signup> {
                         fontSize: 19,
                       ),
                     ),
-                    CustomTextInput(
-                      controller: firstNameController,
-                      labelText: "First Name",
-                      hintText: "John",
-                      prefixIcon: Icons.person,
+                    Row(
+                      children: [
+                        Expanded(
+                          child: CustomTextInput(
+                            controller: firstNameController,
+                            labelText: "First Name",
+                            hintText: "John",
+                            prefixIcon: Icons.person,
+                          ),
+                        ),
+                        SizedBox(width: 8),
+                        Expanded(
+                          child: CustomTextInput(
+                            controller: firstNameController,
+                            labelText: "Last Name",
+                            hintText: "Doe",
+                            prefixIcon: Icons.person,
+                          ),
+                        ),
+                      ],
                     ),
-                    CustomTextInput(
-                      controller: lastNameController,
-                      labelText: "Last Name",
-                      hintText: "Doe",
-                      prefixIcon: Icons.person,
-                    ),
+                    //Email
+                    SizedBox(height: 20),
 
                     CustomTextInput(
                       controller: emailController,
@@ -133,10 +150,12 @@ class _SignupState extends State<Signup> {
                       hintText: "example@gmail.com",
                       prefixIcon: Icons.email,
                     ),
+                    //password textfield
+                    SizedBox(height: 20),
                     CustomTextInput(
                       controller: passwordController,
-                      isPassword: !_isPasswordVisible,
-                      isObscure: _isPasswordVisible,
+                      isPassword: _isPasswordVisible,
+                      isObscure: !_isPasswordVisible,
                       onSuffixIconPressed: () {
                         setState(() {
                           _isPasswordVisible = !_isPasswordVisible;
@@ -148,13 +167,13 @@ class _SignupState extends State<Signup> {
                       suffixIcon: _isPasswordVisible
                           ? Icons.visibility
                           : Icons.visibility_off,
-                      validator: (value) =>
-                          InputValidation().validatePassword(value),
                     ),
+
+                    SizedBox(height: 20),
                     CustomTextInput(
                       controller: confirmpasswordController,
-                      isPassword: !_isConfirmpasswordVisible,
-                      isObscure: _isConfirmpasswordVisible,
+                      isPassword: _isConfirmpasswordVisible,
+                      isObscure: !_isConfirmpasswordVisible,
                       onSuffixIconPressed: () {
                         setState(() {
                           _isConfirmpasswordVisible =
@@ -167,36 +186,15 @@ class _SignupState extends State<Signup> {
                       suffixIcon: _isConfirmpasswordVisible
                           ? Icons.visibility
                           : Icons.visibility_off,
-                      validator: (value) {
-
-                      }
-
                     ),
-                    GestureDetector(
-                      onTap: () {
-                        if (_formKey.currentState!.validate()) {
-                          print("Sign up succeful");
-                        }
-                      },
-                      child: Center(
-                        child: Container(
-                          width: double.infinity,
-                          padding: EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: Colors.green,
-                            borderRadius: BorderRadius.circular(25),
-                          ),
-                          child: Text(
-                            'Sign Up',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                            ),
-                          ),
-                        ),
-                      ),
+
+                    //signup button
+                    SizedBox(height: 20),
+                    CustomButton(
+                      label: "Sign up",
+                      backgroundColor: Colors.green,
+                      textColor: Colors.black,
+                      onPressed: signUpUser,
                     ),
                     SizedBox(height: 20),
                     Text(
