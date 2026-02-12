@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:graville_operations/navigation/navigation.dart';
 import 'package:graville_operations/screens/commons/widgets/custom_button.dart';
 import 'package:graville_operations/screens/commons/widgets/custom_text_input.dart';
 import 'package:graville_operations/screens/forgot_password/forgot_password.dart';
@@ -181,7 +182,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 CustomButton(label: "log in", 
               backgroundColor: Colors.green,
                       textColor: Colors.black,
-                    onPressed: () => Navigator(),
+                    onPressed: () => Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>MainNavigationScreen())),
                 ),
 
                 const SizedBox(height: 20),

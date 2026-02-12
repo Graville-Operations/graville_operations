@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:graville_operations/screens/account_screen/account_screen.dart';
 import 'package:graville_operations/screens/home/home_screen.dart';
 import 'package:graville_operations/screens/inventory/InventoryScreen.dart';
 import 'package:graville_operations/screens/workers/WorkersScreen.dart';
@@ -59,14 +60,3 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     );
   }
 }
-
-class AccountScreen extends StatelessWidget {
-  const AccountScreen({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Text("Account Screen"),
-    );
-  }
-}
-
