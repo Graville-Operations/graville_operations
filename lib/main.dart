@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Forgot Password Demo',
+      title: 'graville operations',
       themeMode: ThemeMode.light,
       theme: ThemeData(useMaterial3: true),
       home: const LoginScreen(),
