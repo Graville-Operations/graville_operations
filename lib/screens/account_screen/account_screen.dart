@@ -5,8 +5,6 @@ class AccountScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final items = _accountItems;
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Account'),
@@ -30,10 +28,10 @@ class AccountScreen extends StatelessWidget {
             Card(
               child: Column(
                 children: List.generate(
-                  items.length,
+                  accountItems.length,
                   (index) => _AccountItemTile(
-                    item: items[index],
-                    showDivider: index != items.length - 1,
+                    item: accountItems[index],
+                    showDivider: index != accountItems.length - 1,
                   ),
                 ),
               ),
@@ -45,12 +43,24 @@ class AccountScreen extends StatelessWidget {
   }
 }
 
-final List<_AccountItem> _accountItems = [
-  _AccountItem(icon: Icons.person, title: 'Profile'),
-  _AccountItem(icon: Icons.settings, title: 'Settings'),
-  _AccountItem(icon: Icons.support_agent, title: 'Contact Support'),
-  _AccountItem(icon: Icons.description, title: 'Terms & Policies'),
-  _AccountItem(icon: Icons.language, title: 'Visit Our Website'),
+class AccountItem {
+  final IconData icon;
+  final String title;
+  final Widget? destination;
+
+  const AccountItem({
+    required this.icon,
+    required this.title,
+    this.destination,
+  });
+}
+
+final List<AccountItem> accountItems = [
+  const AccountItem(icon: Icons.person, title: 'Profile'),
+  const AccountItem(icon: Icons.settings, title: 'Settings'),
+  const AccountItem(icon: Icons.support_agent, title: 'Contact Support'),
+  const AccountItem(icon: Icons.description, title: 'Terms & Policies'),
+  const AccountItem(icon: Icons.language, title: 'Visit Our Website'),
 ];
 
 class _ProfileCard extends StatelessWidget {
@@ -101,15 +111,8 @@ class _ProfileCard extends StatelessWidget {
   }
 }
 
-class _AccountItem {
-  final IconData icon;
-  final String title;
-
-  const _AccountItem({required this.icon, required this.title});
-}
-
 class _AccountItemTile extends StatelessWidget {
-  final _AccountItem item;
+  final AccountItem item;
   final bool showDivider;
 
   const _AccountItemTile({required this.item, required this.showDivider});
@@ -122,7 +125,13 @@ class _AccountItemTile extends StatelessWidget {
       children: [
         InkWell(
           onTap: () {
-            debugPrint('${item.title} tapped');
+            if (item.destination != null) {
+              Navigator.of(
+                context,
+              ).push(MaterialPageRoute(builder: (_) => item.destination!));
+            } else {
+              debugPrint('${item.title} tapped');
+            }
           },
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
