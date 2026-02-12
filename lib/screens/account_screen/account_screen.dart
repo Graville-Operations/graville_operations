@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
+//import 'package:graville_operations/screens/settings_screen/settings_screen.dart';
+//import 'package:graville_operations/screens/support/support_screen.dart';
 
 class AccountScreen extends StatelessWidget {
   const AccountScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final items = _accountItems;
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Account'),
@@ -30,10 +30,10 @@ class AccountScreen extends StatelessWidget {
             Card(
               child: Column(
                 children: List.generate(
-                  items.length,
+                  _accountItems.length,
                   (index) => _AccountItemTile(
-                    item: items[index],
-                    showDivider: index != items.length - 1,
+                    item: _accountItems[index],
+                    showDivider: index != _accountItems.length - 1,
                   ),
                 ),
               ),
@@ -46,11 +46,19 @@ class AccountScreen extends StatelessWidget {
 }
 
 final List<_AccountItem> _accountItems = [
-  _AccountItem(icon: Icons.person, title: 'Profile'),
-  _AccountItem(icon: Icons.settings, title: 'Settings'),
-  _AccountItem(icon: Icons.support_agent, title: 'Contact Support'),
-  _AccountItem(icon: Icons.description, title: 'Terms & Policies'),
-  _AccountItem(icon: Icons.language, title: 'Visit Our Website'),
+  const _AccountItem(icon: Icons.person, title: 'Profile'),
+  const _AccountItem(
+    icon: Icons.settings,
+    title: 'Settings',
+    destination: null,
+  ),
+  const _AccountItem(
+    icon: Icons.support_agent,
+    title: 'Contact Support',
+    destination: null,
+  ),
+  const _AccountItem(icon: Icons.description, title: 'Terms & Policies'),
+  const _AccountItem(icon: Icons.language, title: 'Visit Our Website'),
 ];
 
 class _ProfileCard extends StatelessWidget {
@@ -104,8 +112,13 @@ class _ProfileCard extends StatelessWidget {
 class _AccountItem {
   final IconData icon;
   final String title;
+  final Widget? destination;
 
-  const _AccountItem({required this.icon, required this.title});
+  const _AccountItem({
+    required this.icon,
+    required this.title,
+    this.destination,
+  });
 }
 
 class _AccountItemTile extends StatelessWidget {
@@ -120,23 +133,30 @@ class _AccountItemTile extends StatelessWidget {
 
     return Column(
       children: [
-        InkWell(
-          onTap: () {
-            debugPrint('${item.title} tapped');
-          },
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-            child: Row(
-              children: [
-                Icon(item.icon, size: 22),
-                const SizedBox(width: 16),
-                Text(
-                  item.title,
-                  style: theme.textTheme.bodyLarge?.copyWith(
-                    fontWeight: FontWeight.w600,
+        Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () {
+              if (item.destination != null) {
+                Navigator.of(
+                  context,
+                ).push(MaterialPageRoute(builder: (_) => item.destination!));
+              }
+            },
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              child: Row(
+                children: [
+                  Icon(item.icon, size: 22),
+                  const SizedBox(width: 16),
+                  Text(
+                    item.title,
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

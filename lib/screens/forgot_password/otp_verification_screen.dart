@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:graville_operations/screens/commons/assets/images.dart';
 import 'package:pinput/pinput.dart';
+import 'package:graville_operations/screens/commons/widgets/custom_button.dart';
 import 'package:graville_operations/screens/forgot_password/reset_password_screen.dart';
 
 class OtpVerificationScreen extends StatefulWidget {
@@ -75,7 +77,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
       _otpController.clear();
     });
 
-    debugPrint('Resent OTP: $currentOtp');
+    debugPrint('Resend OTP: $currentOtp');
 
     ScaffoldMessenger.of(
       context,
@@ -118,7 +120,12 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Image.asset('assets/images/otpverification.png', height: 120),
+                SizedBox.expand(
+                  child: Image.asset(
+                    CommonImages.otpverification,
+                    fit: BoxFit.cover,
+                  ),
+                ),
 
                 const SizedBox(height: 20),
 
@@ -162,19 +169,20 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
 
                 const SizedBox(height: 24),
 
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: _verifyOtp,
-                    child: const Text('Verify OTP'),
-                  ),
+                CustomButton(
+                  label: "Verify OTP",
+                  //backgroundColor: Colors.green,
+                  textColor: Colors.black,
+                  onPressed: _verifyOtp,
                 ),
 
                 const SizedBox(height: 12),
 
-                TextButton(
-                  onPressed: _isExpired ? _resendOtp : null,
-                  child: const Text('Resend OTP'),
+                CustomButton(
+                  label: "Resend OTP",
+                  //backgroundColor: Colors.green,
+                  textColor: Colors.black,
+                  onPressed: _resendOtp,
                 ),
               ],
             ),

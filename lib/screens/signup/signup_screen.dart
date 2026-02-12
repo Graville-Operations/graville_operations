@@ -77,7 +77,7 @@ class _SignupState extends State<Signup> {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      backgroundColor: Colors.grey[500],
+      backgroundColor: const Color.fromRGBO(158, 158, 158, 1),
       body: Stack(
         children: [
           SizedBox.expand(

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:graville_operations/screens/commons/assets/images.dart';
+import 'package:graville_operations/screens/commons/widgets/custom_button.dart';
 
 class ResetPasswordScreen extends StatefulWidget {
   const ResetPasswordScreen({super.key});
@@ -49,10 +51,11 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Image.asset(
-                  'assets/images/resetpassword.png',
-                  height: 120,
-                  fit: BoxFit.contain,
+                SizedBox.expand(
+                  child: Image.asset(
+                    CommonImages.resetpassword,
+                    fit: BoxFit.cover,
+                  ),
                 ),
 
                 const SizedBox(height: 20),
@@ -138,12 +141,11 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
 
                 const SizedBox(height: 30),
 
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: _resetPassword,
-                    child: const Text('Reset Password'),
-                  ),
+                CustomButton(
+                  label: "Reset Password",
+                  backgroundColor: Colors.green,
+                  textColor: Colors.black,
+                  onPressed: _resetPassword,
                 ),
               ],
             ),

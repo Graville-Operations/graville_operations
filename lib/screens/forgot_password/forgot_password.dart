@@ -1,6 +1,9 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:graville_operations/screens/forgot_password/otp_verification_screen.dart';
+import 'package:graville_operations/screens/commons/assets/images.dart';
+//import 'package:graville_operations/screens/forgot_password/otp_verification_screen.dart';
+import 'package:graville_operations/screens/commons/widgets/custom_button.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -10,7 +13,7 @@ class ForgotPasswordScreen extends StatefulWidget {
 }
 
 class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
-  final _formKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
 
   String? generatedOtp;
@@ -32,10 +35,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
       debugPrint('OTP sent to email: $generatedOtp');
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('OTP has been sent to your email')),
-      );
-
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -50,20 +49,26 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      body: Center(
+      resizeToAvoidBottomInset: true,
+      body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Form(
             key: _formKey,
             child: Column(
-              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Image.asset(
-                  'assets/images/forgotpassword.png',
-                  height: 120,
-                  fit: BoxFit.contain,
-                ),
+                const SizedBox(height: 40),
 
+                Container(
+                  height: 50,
+                  width: 50,
+                  decoration: BoxDecoration(shape: BoxShape.circle),
+                  child: Image.asset(
+                    CommonImages.forgotpassword,
+                    fit: BoxFit.cover,
+                  ),
+                ),
                 const SizedBox(height: 20),
 
                 Text(
@@ -95,9 +100,11 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     if (value == null || value.isEmpty) {
                       return 'Email is required';
                     }
+
                     final emailRegex = RegExp(
                       r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
                     );
+
                     if (!emailRegex.hasMatch(value)) {
                       return 'Enter a valid email';
                     }
@@ -105,14 +112,13 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   },
                 ),
 
-                const SizedBox(height: 24),
+                const SizedBox(height: 30),
 
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: _sendOtp,
-                    child: const Text('Send OTP'),
-                  ),
+                CustomButton(
+                  label: "Send OTP",
+                  //backgroundColor: Colors.green,
+                  textColor: Colors.black,
+                  onPressed: _sendOtp,
                 ),
               ],
             ),
