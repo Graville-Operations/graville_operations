@@ -196,6 +196,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
 
                     const SizedBox(height: 19),
+                    // signup using gesturedetector
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -204,11 +205,12 @@ class _LoginScreenState extends State<LoginScreen> {
                           style: TextStyle(color: Colors.white),
                         ),
 
-                        TextButton(
-                          onPressed: () => Navigator.of(context).push(
+                        GestureDetector(
+                          onTap: () => Navigator.push(
+                            context,
                             MaterialPageRoute(builder: (context) => Signup()),
                           ),
-                          child: Text(
+                          child: const Text(
                             "Sign Up",
                             style: TextStyle(
                               color: Colors.blue,
