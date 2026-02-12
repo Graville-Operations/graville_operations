@@ -5,6 +5,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:graville_operations/screens/commons/widgets/custom_text_input.dart';
 import 'package:graville_operations/screens/forgot_password/forgot_password.dart';
 import 'package:graville_operations/screens/signup/signup_screen.dart';
+import 'package:graville_operations/screens/commons/widgets/custom_button.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -34,6 +35,14 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       ),
     );
+  }
+    void signUpUser() {
+    if (_formKey.currentState!.validate()) {
+      print("Signin Successful");
+
+      print("Email: ${emailController.text}");
+      print("Password: ${passwordController.text}");
+    }
   }
 
   String? passwordErrorMessage;
@@ -91,7 +100,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       'Please enter your credentials',
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        color: Colors.blueGrey,
+                        color: Colors.blue,
                         fontSize: 18,
                       ),
                     ),
@@ -145,27 +154,12 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
                 const SizedBox(height: 8),
-
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      if (_formKey.currentState!.validate()) {
-                        ElevatedButton.styleFrom(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        );
-                      }
-                    },
-                    child: const Text(
-                      "Log In",
-                      style: TextStyle(fontSize: 22),
-                      selectionColor: Color.fromRGBO(47, 33, 243, 1),
+                    CustomButton(
+                      label: "Login",
+                      backgroundColor: Colors.grey,
+                      textColor: Colors.black,
+                      onPressed: signUpUser,
                     ),
-                  ),
-                ),
                 const SizedBox(height: 20),
                 Row(
                   children: [
