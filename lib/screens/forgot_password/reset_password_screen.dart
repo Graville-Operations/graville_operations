@@ -21,16 +21,6 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$',
   );
 
-  final OutlineInputBorder _border = OutlineInputBorder(
-    borderRadius: BorderRadius.circular(12),
-    borderSide: const BorderSide(color: Colors.white54),
-  );
-
-  final OutlineInputBorder _focusedBorder = OutlineInputBorder(
-    borderRadius: BorderRadius.circular(12),
-    borderSide: const BorderSide(color: Colors.white),
-  );
-
   @override
   void dispose() {
     _passwordController.dispose();
@@ -48,8 +38,9 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
-      backgroundColor: Colors.black,
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
@@ -63,39 +54,37 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                   height: 120,
                   fit: BoxFit.contain,
                 ),
+
                 const SizedBox(height: 20),
 
-                const Text(
+                Text(
                   'Create New Password',
-                  style: TextStyle(
-                    fontSize: 24,
+                  style: theme.textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
                   ),
                 ),
-                const SizedBox(height: 10),
 
-                const Text(
+                const SizedBox(height: 8),
+
+                Text(
                   'Your new password must be strong and secure.',
                   textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.white70),
+                  style: theme.textTheme.bodyMedium,
                 ),
+
                 const SizedBox(height: 30),
 
                 TextFormField(
                   controller: _passwordController,
                   obscureText: _obscurePassword,
-                  style: const TextStyle(color: Colors.white),
                   decoration: InputDecoration(
                     labelText: 'New Password',
-                    labelStyle: const TextStyle(color: Colors.white),
-                    prefixIcon: const Icon(Icons.lock, color: Colors.white),
+                    prefixIcon: const Icon(Icons.lock),
                     suffixIcon: IconButton(
                       icon: Icon(
                         _obscurePassword
                             ? Icons.visibility_off
                             : Icons.visibility,
-                        color: Colors.white,
                       ),
                       onPressed: () {
                         setState(() {
@@ -103,10 +92,6 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                         });
                       },
                     ),
-                    filled: true,
-                    fillColor: Colors.black,
-                    enabledBorder: _border,
-                    focusedBorder: _focusedBorder,
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -124,20 +109,14 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                 TextFormField(
                   controller: _confirmPasswordController,
                   obscureText: _obscureConfirmPassword,
-                  style: const TextStyle(color: Colors.white),
                   decoration: InputDecoration(
                     labelText: 'Confirm Password',
-                    labelStyle: const TextStyle(color: Colors.white),
-                    prefixIcon: const Icon(
-                      Icons.lock_outline,
-                      color: Colors.white,
-                    ),
+                    prefixIcon: const Icon(Icons.lock_outline),
                     suffixIcon: IconButton(
                       icon: Icon(
                         _obscureConfirmPassword
                             ? Icons.visibility_off
                             : Icons.visibility,
-                        color: Colors.white,
                       ),
                       onPressed: () {
                         setState(() {
@@ -145,10 +124,6 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                         });
                       },
                     ),
-                    filled: true,
-                    fillColor: Colors.black,
-                    enabledBorder: _border,
-                    focusedBorder: _focusedBorder,
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -166,15 +141,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blueAccent,
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                    ),
                     onPressed: _resetPassword,
-                    child: const Text(
-                      'Reset Password',
-                      style: TextStyle(fontSize: 16),
-                    ),
+                    child: const Text('Reset Password'),
                   ),
                 ),
               ],
