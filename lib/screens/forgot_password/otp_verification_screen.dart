@@ -121,8 +121,8 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Container(
-                  height: 50,
-                  width: 50,
+                  height: 80,
+                  width: 80,
                   child: Image.asset(
                     CommonImages.otpverification,
                     fit: BoxFit.cover,
@@ -130,13 +130,6 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                 ),
 
                 const SizedBox(height: 20),
-
-                Text(
-                  'OTP Verification',
-                  style: theme.textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
 
                 Text(
                   'OTP Verification',
@@ -173,38 +166,21 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                   submittedPinTheme: basePinTheme,
                   validator: (value) =>
                       value?.length == 6 ? null : 'Enter a valid 6-digit OTP',
-                  onCompleted: (_) => _verifyOtp(),
+                  //onCompleted: (_) => _verifyOtp(),
                 ),
 
                 const SizedBox(height: 24),
 
-                CustomButton(
-                  label: "Verify OTP",
-                  backgroundColor: Colors.green,
-                  textColor: Colors.black,
-                  onPressed: _verifyOtp,
-                ),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: _verifyOtp,
-                    child: const Text('Verify OTP'),
-                  ),
-                ),
+                CustomButton(label: "Verify OTP", onPressed: _verifyOtp),
 
                 const SizedBox(height: 12),
 
-                CustomButton(
-                  label: "Resend OTP",
-                  //backgroundColor: Colors.green,
-                  textColor: Colors.black,
-                  onPressed: _resendOtp,
-                ),
+                CustomButton(label: "Resend OTP", onPressed: _resendOtp),
 
-                TextButton(
-                  onPressed: _isExpired ? _resendOtp : null,
-                  child: const Text('Resend OTP'),
-                ),
+                // TextButton(
+                //   onPressed: _isExpired ? _resendOtp : null,
+                //   child: const Text('Resend OTP'),
+                // ),
               ],
             ),
           ),

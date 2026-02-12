@@ -61,8 +61,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   const SizedBox(height: 40),
 
                   Container(
-                    height: 50,
-                    width: 50,
+                    height: 80,
+                    width: 80,
                     decoration: const BoxDecoration(shape: BoxShape.circle),
                     child: Image.asset(
                       CommonImages.forgotpassword,
@@ -117,7 +117,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
                   CustomButton(
                     label: 'Send OTP',
-                    textColor: Colors.black,
+                    //textColor: Colors.black,
                     onPressed: _sendOtp,
                   ),
 
