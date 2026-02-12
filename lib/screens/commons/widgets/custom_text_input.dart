@@ -21,7 +21,7 @@ class CustomTextInput extends StatelessWidget {
     required this.labelText,
     required this.hintText,
     required this.prefixIcon,
-    this.suffixIcon,
+    this.suffixIcon, required Null Function() onSuffixIconPressed,
     // required this.validator,
   });
 
