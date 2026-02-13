@@ -1,7 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:graville_operations/screens/commons/assets/images.dart';
 import 'package:pinput/pinput.dart';
-
+import 'package:graville_operations/screens/commons/widgets/custom_button.dart';
 import 'package:graville_operations/screens/forgot_password/reset_password_screen.dart';
 
 class OtpVerificationScreen extends StatefulWidget {
@@ -37,13 +38,9 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (_secondsRemaining == 0) {
         timer.cancel();
-        setState(() {
-          _isExpired = true;
-        });
+        setState(() => _isExpired = true);
       } else {
-        setState(() {
-          _secondsRemaining--;
-        });
+        setState(() => _secondsRemaining--);
       }
     });
   }
@@ -51,10 +48,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
   void _verifyOtp() {
     if (_isExpired) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('OTP has expired. Please resend.'),
-          backgroundColor: Colors.blueAccent,
-        ),
+        const SnackBar(content: Text('OTP has expired. Please resend.')),
       );
       return;
     }
@@ -70,12 +64,9 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
           MaterialPageRoute(builder: (_) => const ResetPasswordScreen()),
         );
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Invalid OTP'),
-            backgroundColor: Colors.blueAccent,
-          ),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Invalid OTP')));
       }
     }
   }
@@ -86,7 +77,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
       _otpController.clear();
     });
 
-    debugPrint('Resent OTP: $currentOtp');
+    debugPrint('Resend OTP: $currentOtp');
 
     ScaffoldMessenger.of(
       context,
@@ -108,8 +99,19 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    final basePinTheme = PinTheme(
+      width: 56,
+      height: 56,
+      textStyle: theme.textTheme.titleLarge,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: theme.dividerColor),
+      ),
+    );
+
     return Scaffold(
-      backgroundColor: Colors.black,
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
@@ -118,121 +120,67 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Image.asset(
-                  'assets/images/otpverification.png',
-                  height: 120,
-                  fit: BoxFit.contain,
-                ),
-                const SizedBox(height: 20),
-
-                const Text(
-                  'OTP Verification',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                Container(
+                  height: 80,
+                  width: 80,
+                  child: Image.asset(
+                    CommonImages.otpverification,
+                    fit: BoxFit.cover,
                   ),
                 ),
-                const SizedBox(height: 10),
+
+                const SizedBox(height: 20),
+
+                Text(
+                  'OTP Verification',
+                  style: theme.textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+
+                const SizedBox(height: 8),
 
                 Text(
                   _isExpired
                       ? 'OTP expired'
                       : 'OTP expires in $_secondsRemaining seconds',
-                  style: TextStyle(
-                    color: _isExpired ? Colors.blueAccent : Colors.white70,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: _isExpired
+                        ? theme.colorScheme.error
+                        : theme.hintColor,
                   ),
                 ),
+
                 const SizedBox(height: 30),
 
                 Pinput(
                   controller: _otpController,
                   length: 6,
                   keyboardType: TextInputType.number,
-
-                  defaultPinTheme: PinTheme(
-                    width: 56,
-                    height: 56,
-                    textStyle: const TextStyle(
-                      fontSize: 20,
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.black,
-                      border: Border.all(color: Colors.white54),
-                      borderRadius: BorderRadius.circular(8),
+                  defaultPinTheme: basePinTheme,
+                  focusedPinTheme: basePinTheme.copyWith(
+                    decoration: basePinTheme.decoration!.copyWith(
+                      border: Border.all(color: theme.colorScheme.primary),
                     ),
                   ),
-
-                  focusedPinTheme: PinTheme(
-                    width: 56,
-                    height: 56,
-                    textStyle: const TextStyle(
-                      fontSize: 20,
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.black,
-                      border: Border.all(color: Colors.white),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-
-                  submittedPinTheme: PinTheme(
-                    width: 56,
-                    height: 56,
-                    textStyle: const TextStyle(
-                      fontSize: 20,
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.black,
-                      border: Border.all(color: Colors.blueAccent),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'OTP is required';
-                    }
-                    if (value.length != 6) {
-                      return 'Enter a valid 6-digit OTP';
-                    }
-                    return null;
-                  },
-
-                  onCompleted: (pin) {
-                    _verifyOtp();
-                  },
+                  submittedPinTheme: basePinTheme,
+                  validator: (value) =>
+                      value?.length == 6 ? null : 'Enter a valid 6-digit OTP',
+                  //onCompleted: (_) => _verifyOtp(),
                 ),
 
-                const SizedBox(height: 20),
+                const SizedBox(height: 24),
 
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blueAccent,
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                    ),
-                    onPressed: _verifyOtp,
-                    child: const Text('Verify OTP'),
-                  ),
-                ),
+                CustomButton(label: "Verify OTP", onPressed: _verifyOtp),
 
-                const SizedBox(height: 10),
+                const SizedBox(height: 12),
 
-                TextButton(
-                  onPressed: _isExpired ? _resendOtp : null,
-                  child: const Text(
-                    'Resend OTP',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
+                CustomButton(label: "Resend OTP", onPressed: _resendOtp),
+
+                // TextButton(
+                //   onPressed: _isExpired ? _resendOtp : null,
+                //   child: const Text('Resend OTP'),
+                // ),
               ],
             ),
           ),
