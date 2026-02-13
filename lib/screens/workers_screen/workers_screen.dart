@@ -10,6 +10,8 @@ class WorkersScreen extends StatefulWidget {
 class _WorkersScreenState extends State<WorkersScreen> {
   String? selectedSite;
 
+  final TextEditingController searchController = TextEditingController();
+
   final List<String> sites = [
     'Mabatini',
     'Mishi Mboko',
@@ -25,6 +27,9 @@ class _WorkersScreenState extends State<WorkersScreen> {
     ["Maria Garcia", "W003", "Skilled", "+1 555-0125", "Electrical", "\$300"],
     ["David Thompson", "W004", "Skilled", "+1 555-0126", "Plumbing", "\$275"],
     ["Sarah Williams", "W005", "Unskilled", "+1 555-0127", "Labor", "\$150"],
+    ["James Anderson", "W006", "Skilled", "+1 555-0128", "Woodwork", "\$260"],
+    ["Lisa Brown", "W007", "Skilled", "+1 555-0129", "Supervision", "\$350"],
+    ["Michael Davis", "W008", "Skilled", "+1 555-0130", "Welding", "\$290"],
   ];
 
   @override
@@ -53,7 +58,6 @@ class _WorkersScreenState extends State<WorkersScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            /// SELECT SITE
             Card(
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -86,7 +90,6 @@ class _WorkersScreenState extends State<WorkersScreen> {
 
             const SizedBox(height: 16),
 
-            /// STATS
             Row(
               children: [
                 Expanded(
@@ -95,7 +98,7 @@ class _WorkersScreenState extends State<WorkersScreen> {
                     subtitle: "Total Workers Assigned",
                     color: Colors.blue.shade100,
                     textColor: Colors.blue,
-                    onTap: () => debugPrint("Total Workers"),
+                    onTap: () {},
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -105,7 +108,7 @@ class _WorkersScreenState extends State<WorkersScreen> {
                     subtitle: "Workers Present Today",
                     color: Colors.orange.shade100,
                     textColor: Colors.orange,
-                    onTap: () => debugPrint("Present Workers"),
+                    onTap: () {},
                   ),
                 ),
               ],
@@ -113,7 +116,6 @@ class _WorkersScreenState extends State<WorkersScreen> {
 
             const SizedBox(height: 16),
 
-            /// ADD WORKER (DISABLED) + SEARCH
             Row(
               children: [
                 ElevatedButton(
@@ -126,19 +128,42 @@ class _WorkersScreenState extends State<WorkersScreen> {
                   child: const Text("Add Worker"),
                 ),
                 const Spacer(),
-                TextButton.icon(
-                  onPressed: () {
-                    debugPrint("Search clicked");
-                  },
-                  icon: const Icon(Icons.search),
-                  label: const Text("Search"),
+                SizedBox(
+                  width: 240,
+                  child: TextField(
+                    controller: searchController,
+                    decoration: InputDecoration(
+                      isDense: true,
+                      filled: true,
+                      fillColor: Colors.white,
+                      prefixIcon: const Icon(Icons.search),
+                      hintText: "Search",
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: Colors.grey.shade400),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: const BorderSide(color: Colors.blue),
+                      ),
+                    ),
+                  ),
                 ),
               ],
             ),
 
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
 
-            /// WORKER TABLE
+            const Text(
+              "Worker List",
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+            ),
+
+            const SizedBox(height: 10),
+
             Card(
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -148,7 +173,7 @@ class _WorkersScreenState extends State<WorkersScreen> {
                 child: SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: DataTable(
-                    showCheckboxColumn: false, // ✅ removes checkbox icons
+                    showCheckboxColumn: false,
                     headingRowColor: MaterialStateProperty.all(
                       Colors.grey.shade200,
                     ),
@@ -165,24 +190,20 @@ class _WorkersScreenState extends State<WorkersScreen> {
     );
   }
 
-  /// CLICKABLE HEADER COLUMNS
   List<DataColumn> _buildHeaderColumns() {
     final headers = ["NAME", "ID", "TYPE", "PHONE NO", "TASK", "AMOUNT"];
-
-    return headers.map((title) {
-      return DataColumn(
-        label: GestureDetector(
-          onTap: () => debugPrint("Header clicked: $title"),
-          child: Text(
-            title,
-            style: const TextStyle(fontWeight: FontWeight.bold),
+    return headers
+        .map(
+          (title) => DataColumn(
+            label: Text(
+              title,
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
           ),
-        ),
-      );
-    }).toList();
+        )
+        .toList();
   }
 
-  /// CLICKABLE DATA CELLS (NO ROW CLICK)
   List<DataRow> _buildWorkerRows() {
     return workers.map((worker) {
       return DataRow(
@@ -190,7 +211,7 @@ class _WorkersScreenState extends State<WorkersScreen> {
           return DataCell(
             Text(cell),
             onTap: () {
-              debugPrint("Cell clicked: $cell");
+              // Cell-level action (safe placeholder)
             },
           );
         }).toList(),
@@ -198,7 +219,6 @@ class _WorkersScreenState extends State<WorkersScreen> {
     }).toList();
   }
 
-  /// STAT CARD
   Widget _statCard({
     required String title,
     required String subtitle,
