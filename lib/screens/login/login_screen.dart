@@ -6,7 +6,6 @@ import 'package:graville_operations/screens/commons/widgets/custom_button.dart';
 import 'package:graville_operations/screens/commons/widgets/custom_text_input.dart';
 import 'package:graville_operations/screens/forgot_password/forgot_password.dart';
 import 'package:graville_operations/screens/signup/signup_screen.dart';
-import 'package:graville_operations/screens/commons/widgets/custom_button.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -35,6 +34,7 @@ class _LoginScreenState extends State<LoginScreen> {
         color: color,
         size: 20,
       ),
+
 
     ),
   );
@@ -174,13 +174,13 @@ class _LoginScreenState extends State<LoginScreen> {
                  ),
                 const SizedBox(height: 8),
 
-
                     CustomButton(
                       label: "Login",
                       backgroundColor: Colors.grey,
                       textColor: Colors.black,
                       onPressed: signUpUser,
                     ),
+
 
                 const SizedBox(height: 20),
                 Row(
