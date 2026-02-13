@@ -18,7 +18,8 @@ class SectionCard extends StatelessWidget {
             offset: Offset(0, 5),
           ),
         ],
-        borderRadius: BorderRadius.circular(15),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: Colors.grey.shade300),
       ),
       child: child,
     );
