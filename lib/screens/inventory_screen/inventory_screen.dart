@@ -15,7 +15,6 @@ class InventoryScreen extends StatefulWidget {
 class InventoryScreenState extends State<InventoryScreen> {
   String selectedSite = 'Plaza 2000 - Nairobi';
 
-  // Combined Data Map with ALL sites
   final Map<String, Map<String, String>> siteInventory = {
     'Plaza 2000 - Nairobi': {
       'cement': '450 bags', 'steel': '2,340 units', 'sand': '85 tons', 'bricks': '12,500 units',
@@ -95,7 +94,6 @@ class InventoryScreenState extends State<InventoryScreen> {
             const Text("Construction Site", style: TextStyle(color: Colors.grey, fontSize: 12)),
             const SizedBox(height: 6),
 
-            // Dropdown with Grey Background
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12),
               decoration: BoxDecoration(
@@ -155,7 +153,6 @@ class InventoryScreenState extends State<InventoryScreen> {
   }
 }
 
-// --- PUBLIC COMPONENTS ---
 
 class InventoryCard extends StatelessWidget {
   final List<Widget> children;
