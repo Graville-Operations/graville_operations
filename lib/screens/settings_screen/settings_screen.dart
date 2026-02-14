@@ -3,12 +3,6 @@ import 'package:flutter/material.dart';
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 
-  void _onItemTap(BuildContext context, String title) {
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text('$title clicked')));
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -99,30 +93,43 @@ class SettingsScreen extends StatelessWidget {
     BuildContext context, {
     required List<_SettingsItem> items,
   }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-      ),
+    return Material(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(16),
+
       child: Column(
         children: items.map((item) {
-          return ListTile(
-            leading: Icon(item.icon, color: Colors.black54),
-            title: Text(
-              item.title,
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+          return InkWell(
+            borderRadius: BorderRadius.circular(16),
+            onTap: () {},
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              child: Row(
+                children: [
+                  Icon(item.icon, color: Colors.black54),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Text(
+                      item.title,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                  const Icon(Icons.chevron_right),
+                ],
+              ),
             ),
-            trailing: const Icon(Icons.chevron_right),
-            onTap: () => _onItemTap(context, item.title),
           );
         }).toList(),
       ),
     );
   }
+}
 
-  _SettingsItem _item(IconData icon, String title) {
-    return _SettingsItem(icon: icon, title: title);
-  }
+_SettingsItem _item(IconData icon, String title) {
+  return _SettingsItem(icon: icon, title: title);
 }
 
 class _SettingsItem {
