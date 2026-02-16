@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:graville_operations/screens/support/support_screen.dart';
-import 'package:graville_operations/settings_screen/settings_screen.dart';
+import 'package:graville_operations/screens/settings_screen/settings_screen.dart';
 
 class AccountScreen extends StatelessWidget {
   const AccountScreen({super.key});
