@@ -1,4 +1,5 @@
 import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:graville_operations/navigation/navigation.dart';
@@ -147,22 +148,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   },
                 ),
     
-                    //const SizedBox(height: 10)
-              // Align(
-              //   alignment: Alignment.centerRight,
-              //   child: SizedBox(
-              //     width: 150,
-              //  child:CustomButton(
-              //  label: "forgot password", 
-              //  backgroundColor: Colors.black,
-              //         textColor: Colors.blue,
-              //       onPressed: () => Navigator.push(
-              //         context,
-              //         MaterialPageRoute(builder: (context)=>ForgotPasswordScreen()),
-              //       ),
-              //   ),
-              // ),
-              // ),
                 Align(
                   alignment: Alignment.centerRight,
                   child: TextButton(
@@ -246,16 +231,6 @@ class _LoginScreenState extends State<LoginScreen> {
                          ],
                        ),
                      ),
-                // Row(
-                //   mainAxisAlignment: MainAxisAlignment.center,
-                //   children: [
-                //     _socialIcon(FontAwesomeIcons.google, Colors.red),
-                //     _socialIcon(FontAwesomeIcons.linkedinIn, Colors.blueAccent),
-                //     _socialIcon(FontAwesomeIcons.facebookF, Colors.blue),
-                //     _socialIcon(FontAwesomeIcons.instagram, Colors.purple),
-                //     _socialIcon(FontAwesomeIcons.xTwitter, Colors.black),
-                //   ],
-                // ),
               ],
             ),
           ),

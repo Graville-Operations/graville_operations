@@ -65,7 +65,7 @@ class _WorkersScreenState extends State<WorkersScreen> {
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: DropdownButtonFormField<String>(
-                  value: selectedSite,
+                  initialValue: selectedSite,
                   hint: const Text("Select Site"),
                   items: sites
                       .map(
@@ -174,7 +174,7 @@ class _WorkersScreenState extends State<WorkersScreen> {
                   scrollDirection: Axis.horizontal,
                   child: DataTable(
                     showCheckboxColumn: false,
-                    headingRowColor: MaterialStateProperty.all(
+                    headingRowColor: WidgetStateProperty.all(
                       Colors.grey.shade200,
                     ),
                     columnSpacing: 30,
