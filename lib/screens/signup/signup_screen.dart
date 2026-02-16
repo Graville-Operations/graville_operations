@@ -4,7 +4,6 @@ import 'package:graville_operations/screens/commons/assets/images.dart';
 import 'package:graville_operations/screens/commons/widgets/custom_button.dart';
 import 'package:graville_operations/screens/commons/widgets/custom_text_input.dart';
 import 'package:graville_operations/screens/login/login_screen.dart';
-import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class Signup extends StatefulWidget {
@@ -77,7 +76,7 @@ class _SignupState extends State<Signup> {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      backgroundColor: Colors.grey[500],
+      backgroundColor: const Color.fromRGBO(158, 158, 158, 1),
       body: Stack(
         children: [
           SizedBox.expand(
@@ -156,7 +155,7 @@ class _SignupState extends State<Signup> {
                       controller: passwordController,
                       isPassword: _isPasswordVisible,
                       isObscure: !_isPasswordVisible,
-                      onVisibilityPressed: () {
+                      onSuffixIconPressed: () {
                         setState(() {
                           _isPasswordVisible = !_isPasswordVisible;
                         });
@@ -166,7 +165,7 @@ class _SignupState extends State<Signup> {
                       prefixIcon: Icons.lock,
                       suffixIcon: _isPasswordVisible
                           ? Icons.visibility
-                          : Icons.visibility_off, onSuffixIconPressed: () {  },
+                          : Icons.visibility_off,
                     ),
 
                     SizedBox(height: 20),
@@ -174,7 +173,7 @@ class _SignupState extends State<Signup> {
                       controller: confirmpasswordController,
                       isPassword: _isConfirmpasswordVisible,
                       isObscure: !_isConfirmpasswordVisible,
-                      onVisibilityPressed: () {
+                      onSuffixIconPressed: () {
                         setState(() {
                           _isConfirmpasswordVisible =
                               !_isConfirmpasswordVisible;
@@ -185,7 +184,7 @@ class _SignupState extends State<Signup> {
                       prefixIcon: Icons.lock,
                       suffixIcon: _isConfirmpasswordVisible
                           ? Icons.visibility
-                          : Icons.visibility_off, onSuffixIconPressed: () {  },
+                          : Icons.visibility_off,
                     ),
 
                     //signup button
