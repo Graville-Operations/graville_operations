@@ -14,7 +14,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'graville operations',
-      themeMode: ThemeMode.light,
+
+      themeMode: ThemeMode.dark,
       theme: ThemeData(useMaterial3: true),
       home: const LoginScreen(),
     );
