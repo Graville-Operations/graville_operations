@@ -1,5 +1,23 @@
 import 'package:flutter/material.dart';
 
+class Worker {
+  final String name;
+  final String id;
+  final String skillLevel;
+  final String phone;
+  final String specialty;
+  final String rate;
+
+  Worker({
+    required this.name,
+    required this.id,
+    required this.skillLevel,
+    required this.phone,
+    required this.specialty,
+    required this.rate,
+  });
+}
+
 class WorkersScreen extends StatefulWidget {
   const WorkersScreen({super.key});
 
@@ -21,15 +39,71 @@ class _WorkersScreenState extends State<WorkersScreen> {
     'Iremele',
   ];
 
-  final List<List<String>> workers = [
-    ["John Mitchell", "W001", "Skilled", "+1 555-0123", "Brickwork", "\$250"],
-    ["Robert Chen", "W002", "Skilled", "+1 555-0124", "Carpentry", "\$280"],
-    ["Maria Garcia", "W003", "Skilled", "+1 555-0125", "Electrical", "\$300"],
-    ["David Thompson", "W004", "Skilled", "+1 555-0126", "Plumbing", "\$275"],
-    ["Sarah Williams", "W005", "Unskilled", "+1 555-0127", "Labor", "\$150"],
-    ["James Anderson", "W006", "Skilled", "+1 555-0128", "Woodwork", "\$260"],
-    ["Lisa Brown", "W007", "Skilled", "+1 555-0129", "Supervision", "\$350"],
-    ["Michael Davis", "W008", "Skilled", "+1 555-0130", "Welding", "\$290"],
+  final List<Worker> workers = [
+    Worker(
+      name: "John Mitchell",
+      id: "W001",
+      skillLevel: "Skilled",
+      phone: "+1 555-0123",
+      specialty: "Brickwork",
+      rate: "\$250",
+    ),
+    Worker(
+      name: "Robert Chen",
+      id: "W002",
+      skillLevel: "Skilled",
+      phone: "+1 555-0124",
+      specialty: "Carpentry",
+      rate: "\$280",
+    ),
+    Worker(
+      name: "Maria Garcia",
+      id: "W003",
+      skillLevel: "Skilled",
+      phone: "+1 555-0125",
+      specialty: "Electrical",
+      rate: "\$300",
+    ),
+    Worker(
+      name: "David Thompson",
+      id: "W004",
+      skillLevel: "Skilled",
+      phone: "+1 555-0126",
+      specialty: "Plumbing",
+      rate: "\$275",
+    ),
+    Worker(
+      name: "Sarah Williams",
+      id: "W005",
+      skillLevel: "Unskilled",
+      phone: "+1 555-0127",
+      specialty: "Labor",
+      rate: "\$150",
+    ),
+    Worker(
+      name: "James Anderson",
+      id: "W006",
+      skillLevel: "Skilled",
+      phone: "+1 555-0128",
+      specialty: "Woodwork",
+      rate: "\$260",
+    ),
+    Worker(
+      name: "Lisa Brown",
+      id: "W007",
+      skillLevel: "Skilled",
+      phone: "+1 555-0129",
+      specialty: "Supervision",
+      rate: "\$350",
+    ),
+    Worker(
+      name: "Michael Davis",
+      id: "W008",
+      skillLevel: "Skilled",
+      phone: "+1 555-0130",
+      specialty: "Welding",
+      rate: "\$290",
+    ),
   ];
 
   @override
@@ -58,15 +132,31 @@ class _WorkersScreenState extends State<WorkersScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // LABEL OUTSIDE CARD
+            const Text(
+              "Construction Site",
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: Colors.black87,
+              ),
+            ),
+            const SizedBox(height: 6),
+
+            // REDUCED SIZE CARD
             Card(
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Padding(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
                 child: DropdownButtonFormField<String>(
                   initialValue: selectedSite,
                   hint: const Text("Select Site"),
+                  isDense: true,
                   items: sites
                       .map(
                         (site) =>
@@ -77,8 +167,13 @@ class _WorkersScreenState extends State<WorkersScreen> {
                     setState(() => selectedSite = value);
                   },
                   decoration: InputDecoration(
+                    isDense: true,
                     filled: true,
                     fillColor: Colors.grey.shade100,
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
                       borderSide: BorderSide.none,
@@ -119,13 +214,27 @@ class _WorkersScreenState extends State<WorkersScreen> {
             Row(
               children: [
                 ElevatedButton(
-                  onPressed: null,
+                  onPressed: () {},
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    disabledBackgroundColor: Colors.blue,
-                    foregroundColor: Colors.white,
+                    backgroundColor: const Color(
+                      0xFF3366FF,
+                    ), // new button color
+                    foregroundColor: Colors.white, // text color
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 12,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                   ),
-                  child: const Text("Add Worker"),
+                  child: const Text(
+                    "Add Worker",
+                    style: TextStyle(
+                      fontWeight: FontWeight.normal,
+                      fontSize: 10,
+                    ),
+                  ),
                 ),
                 const Spacer(),
                 SizedBox(
@@ -207,53 +316,74 @@ class _WorkersScreenState extends State<WorkersScreen> {
   List<DataRow> _buildWorkerRows() {
     return workers.map((worker) {
       return DataRow(
-        cells: worker.map((cell) {
-          return DataCell(
-            Text(cell),
-            onTap: () {
-              // Cell-level action (safe placeholder)
-            },
-          );
-        }).toList(),
+        onSelectChanged: (selected) {},
+        cells: [
+          DataCell(Text(worker.name)),
+          DataCell(Text(worker.id)),
+          DataCell(
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: worker.skillLevel.toLowerCase() == 'skilled'
+                    ? Colors.blue.shade100
+                    : Colors.grey.shade300,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                worker.skillLevel,
+                style: TextStyle(
+                  color: worker.skillLevel.toLowerCase() == 'skilled'
+                      ? Colors.blue.shade800
+                      : Colors.grey.shade800,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 12,
+                ),
+              ),
+            ),
+          ),
+          DataCell(Text(worker.phone)),
+          DataCell(Text(worker.specialty)),
+          DataCell(Text(worker.rate)),
+        ],
       );
     }).toList();
   }
+}
 
-  Widget _statCard({
-    required String title,
-    required String subtitle,
-    required Color color,
-    required Color textColor,
-    required VoidCallback onTap,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: color,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Column(
-          children: [
-            Text(
-              title,
-              style: TextStyle(
-                fontSize: 26,
-                fontWeight: FontWeight.bold,
-                color: textColor,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              subtitle,
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 13),
-            ),
-          ],
-        ),
+Widget _statCard({
+  required String title,
+  required String subtitle,
+  required Color color,
+  required Color textColor,
+  required VoidCallback onTap,
+}) {
+  return InkWell(
+    onTap: onTap,
+    borderRadius: BorderRadius.circular(12),
+    child: Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(12),
       ),
-    );
-  }
+      child: Column(
+        children: [
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 26,
+              fontWeight: FontWeight.bold,
+              color: textColor,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            subtitle,
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 13),
+          ),
+        ],
+      ),
+    ),
+  );
 }
