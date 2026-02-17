@@ -1,42 +1,101 @@
 import 'package:flutter/material.dart';
-import 'package:graville_operations/screens/inventory_screen/site_data.dart';
+import 'package:graville_operations/models/inventory/Inventory.dart';
+import 'package:graville_operations/models/inventory/material_data.dart';
+import 'package:graville_operations/screens/commons/widgets/custom_dropdown.dart';
 
 
-void main() => runApp(const MaterialApp(
-  debugShowCheckedModeBanner: false, 
-  home: InventoryScreen()
-));
+void main() => runApp(
+  const MaterialApp(
+    debugShowCheckedModeBanner: false,
+    home: InventoryScreen(),
+  ),
+);
 
 class InventoryScreen extends StatefulWidget {
   const InventoryScreen({super.key});
 
   @override
-  InventoryScreenState createState() => InventoryScreenState();
+  State<InventoryScreen> createState() => _InventoryScreenState();
 }
 
-class InventoryScreenState extends State<InventoryScreen> {
-  String selectedSite = 'Plaza 2000 - Nairobi';
+class _InventoryScreenState extends State<InventoryScreen> {
+  Inventory? selectedInventory;
 
+  final List<Inventory> inventoryData = [
+    Inventory(
+      site: "Plaza 2000 - Nairobi",
+      materials: [
+        MaterialData(name: "Cement", quantity: "450", unit: "bags"),
+        MaterialData(name: "Steel Rods", quantity: "2,340", unit: "units"),
+        MaterialData(name: "Sand", quantity: "85", unit: "tons"),
+        MaterialData(name: "Bricks", quantity: "12,500", unit: "units"),
+      ],
+      hiredTools: [
+        MaterialData(name: "Concrete Mixer", quantity: "3", unit: "units"),
+        MaterialData(name: "Electric Drill", quantity: "8", unit: "units"),
+        MaterialData(name: "Scaffolding", quantity: "12", unit: "units"),
+        MaterialData(name: "Generator", quantity: "2", unit: "units"),
+      ],
+      createdAt: DateTime.now(),
+    ),
+    Inventory(
+      site: "Huruma",
+      materials: [
+        MaterialData(name: "Cement", quantity: "300", unit: "bags"),
+        MaterialData(name: "Steel Rods", quantity: "1,500", unit: "units"),
+        MaterialData(name: "Sand", quantity: "50", unit: "tons"),
+        MaterialData(name: "Bricks", quantity: "8,000", unit: "units"),
+      ],
+      hiredTools: [
+        MaterialData(name: "Concrete Mixer", quantity: "2", unit: "units"),
+        MaterialData(name: "Electric Drill", quantity: "5", unit: "units"),
+        MaterialData(name: "Scaffolding", quantity: "10", unit: "units"),
+        MaterialData(name: "Generator", quantity: "1", unit: "unit"),
+      ],
+      createdAt: DateTime.now(),
+    ),
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    // Optional: start with first site selected
+    if (inventoryData.isNotEmpty) {
+      selectedInventory = inventoryData.first;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    final data = SiteData.inventory[selectedSite]!;
+    final materials = selectedInventory?.materials ?? [];
+    final tools = selectedInventory?.hiredTools ?? [];
 
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.white,
-        title: const Text('Inventory', 
-          style: TextStyle(color: Colors.black, fontSize: 26, fontWeight: FontWeight.bold)),
+        title: const Text(
+          'Inventory',
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 26,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text("Construction Site", style: TextStyle(color: Colors.grey, fontSize: 12)),
+            const Text(
+              "Construction Site",
+              style: TextStyle(color: Colors.grey, fontSize: 12),
+            ),
             const SizedBox(height: 6),
+
+            // ── Replaced old Dropdown with CustomDropdown ──
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12),
               decoration: BoxDecoration(
@@ -44,57 +103,104 @@ class InventoryScreenState extends State<InventoryScreen> {
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(color: Colors.grey.shade200),
               ),
-              child: DropdownButtonHideUnderline(
-                child: DropdownButton<String>(
-                  value: selectedSite,
-                  isExpanded: true,
-                  menuMaxHeight: 400, // Important for long lists
-                  dropdownColor: const Color(0xFFF5F7F9),
-                  icon: const Icon(Icons.keyboard_arrow_down, color: Colors.black54),
-                  items: SiteData.inventory.keys.map((String site) {
-                    return DropdownMenuItem(value: site, child: Text(site));
-                  }).toList(),
-                  onChanged: (val) => setState(() => selectedSite = val!),
-                ),
+              child: CustomDropdown<Inventory>(
+                value: selectedInventory,
+                items: inventoryData,
+                displayMapper: (inv) => inv.site,
+                onChanged: (Inventory? newValue) {
+                  setState(() => selectedInventory = newValue);
+                },
+                hint: "Select site",
+                isExpanded: true,
+                isDense: true,
+                border: InputBorder.none, // hide default border (we use container)
+                fillColor: Colors.transparent,
+                borderRadius: BorderRadius.circular(10),
               ),
             ),
 
             const SizedBox(height: 20),
-            const Text("Materials", style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF34495E))),
+            const Text(
+              "Materials",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF34495E),
+              ),
+            ),
             const SizedBox(height: 10),
 
-            InventoryCard(children: [
-              InventoryTile(icon: Icons.view_in_ar, color: Colors.blue, title: "Cement", value: data['cement']!),
-              const Divider(height: 1),
-              InventoryTile(icon: Icons.adjust, color: Colors.blue, title: "Steel Rods", value: data['steel']!),
-              const Divider(height: 1),
-              InventoryTile(icon: Icons.grid_on, color: Colors.blue, title: "Sand", value: data['sand']!),
-              const Divider(height: 1),
-              InventoryTile(icon: Icons.layers, color: Colors.blue, title: "Bricks", value: data['bricks']!),
-              AddButton(label: "Add Material", onTap: () {}),
-            ]),
+            InventoryCard(
+              children: [
+                ...materials.map((m) => Column(
+                  children: [
+                    InventoryTile(
+                      icon: _getMaterialIcon(m.name),
+                      color: Colors.blue,
+                      title: m.name,
+                      value: "${m.quantity} ${m.unit}",
+                    ),
+                    const Divider(height: 1),
+                  ],
+                )),
+                AddButton(label: "Add Material", onTap: () {}),
+              ],
+            ),
 
             const SizedBox(height: 25),
-            const Text("Hired Tools", style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF34495E))),
+            const Text(
+              "Hired Tools",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF34495E),
+              ),
+            ),
             const SizedBox(height: 10),
 
-            InventoryCard(children: [
-              InventoryTile(icon: Icons.build_circle_outlined, color: Colors.orange, title: "Concrete Mixer", value: data['mixer']!),
-              const Divider(height: 1),
-              InventoryTile(icon: Icons.electric_bolt_outlined, color: Colors.orange, title: "Electric Drill", value: data['drill']!),
-              const Divider(height: 1),
-              InventoryTile(icon: Icons.architecture, color: Colors.orange, title: "Scaffolding", value: data['scaffold']!),
-              const Divider(height: 1),
-              InventoryTile(icon: Icons.bolt, color: Colors.orange, title: "Generator", value: data['gen']!),
-              AddButton(label: "Add Hired Tool", onTap: () {}),
-            ]),
+            InventoryCard(
+              children: [
+                ...tools.map((t) => Column(
+                  children: [
+                    InventoryTile(
+                      icon: _getToolIcon(t.name),
+                      color: Colors.orange,
+                      title: t.name,
+                      value: "${t.quantity} ${t.unit}",
+                    ),
+                    const Divider(height: 1),
+                  ],
+                )),
+                AddButton(label: "Add Hired Tool", onTap: () {}),
+              ],
+            ),
+
             const SizedBox(height: 30),
           ],
         ),
       ),
     );
   }
+
+  // Optional: better icon matching
+  IconData _getMaterialIcon(String name) {
+    final lower = name.toLowerCase();
+    if (lower.contains('cement')) return Icons.view_in_ar;
+    if (lower.contains('steel') || lower.contains('rod')) return Icons.adjust;
+    if (lower.contains('sand')) return Icons.grid_on;
+    if (lower.contains('brick')) return Icons.layers;
+    return Icons.inventory_2_outlined;
+  }
+
+  IconData _getToolIcon(String name) {
+    final lower = name.toLowerCase();
+    if (lower.contains('mixer')) return Icons.build_circle_outlined;
+    if (lower.contains('drill')) return Icons.electric_bolt_outlined;
+    if (lower.contains('scaffold')) return Icons.architecture;
+    if (lower.contains('generator') || lower.contains('gen')) return Icons.bolt;
+    return Icons.construction;
+  }
 }
+
+// ── Keep your existing supporting widgets unchanged ──
 class InventoryCard extends StatelessWidget {
   final List<Widget> children;
   const InventoryCard({super.key, required this.children});
@@ -106,8 +212,13 @@ class InventoryCard extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: Colors.grey.shade100),
-        // ignore: deprecated_member_use
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10, offset: const Offset(0, 4))],
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.03),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(children: children),
     );
@@ -120,19 +231,37 @@ class InventoryTile extends StatelessWidget {
   final String title;
   final String value;
 
-  const InventoryTile({super.key, required this.icon, required this.color, required this.title, required this.value});
+  const InventoryTile({
+    super.key,
+    required this.icon,
+    required this.color,
+    required this.title,
+    required this.value,
+  });
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
       leading: Container(
         padding: const EdgeInsets.all(6),
-        // ignore: deprecated_member_use
-        decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(8),
+        ),
         child: Icon(icon, color: color, size: 20),
       ),
-      title: Text(title, style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 14)),
-      trailing: Text(value, style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF2C3E50), fontSize: 14)),
+      title: Text(
+        title,
+        style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 14),
+      ),
+      trailing: Text(
+        value,
+        style: const TextStyle(
+          fontWeight: FontWeight.bold,
+          color: Color(0xFF2C3E50),
+          fontSize: 14,
+        ),
+      ),
     );
   }
 }
@@ -140,6 +269,7 @@ class InventoryTile extends StatelessWidget {
 class AddButton extends StatelessWidget {
   final String label;
   final VoidCallback onTap;
+
   const AddButton({super.key, required this.label, required this.onTap});
 
   @override

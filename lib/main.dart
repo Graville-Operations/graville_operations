@@ -12,7 +12,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'graville_operations',
+      title: 'graville operations',
       themeMode: ThemeMode.light,
       theme: ThemeData(
         useMaterial3: true,
