@@ -13,7 +13,6 @@ class LoginScreen extends StatefulWidget {
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }
-
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
@@ -37,23 +36,6 @@ class _LoginScreenState extends State<LoginScreen> {
     ),
   );
 }
-
-
-  // Widget _socialIcon(IconData icon, Color color) {
-  //   return Padding(
-  //     padding: const EdgeInsets.symmetric(horizontal: 10),
-  //     child: InkWell(
-  //       borderRadius: BorderRadius.circular(30),
-  //       onTap: () {},
-  //       child: CircleAvatar(
-  //         radius: 22,
-  //         backgroundColor: Colors.grey[200],
-  //         child: FaIcon(icon, color: color, size: 20),
-  //       ),
-  //     ),
-  //   );
-  // }
-
   String? passwordErrorMessage;
   String? emailErrorMessage;
   
@@ -146,23 +128,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     });
                   },
                 ),
-    
-                    //const SizedBox(height: 10)
-              // Align(
-              //   alignment: Alignment.centerRight,
-              //   child: SizedBox(
-              //     width: 150,
-              //  child:CustomButton(
-              //  label: "forgot password", 
-              //  backgroundColor: Colors.black,
-              //         textColor: Colors.blue,
-              //       onPressed: () => Navigator.push(
-              //         context,
-              //         MaterialPageRoute(builder: (context)=>ForgotPasswordScreen()),
-              //       ),
-              //   ),
-              // ),
-              // ),
                 Align(
                   alignment: Alignment.centerRight,
                   child: TextButton(
@@ -228,7 +193,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                ),
                             ),
                          ),
-
                   ],
                 ),
                 
@@ -246,16 +210,6 @@ class _LoginScreenState extends State<LoginScreen> {
                          ],
                        ),
                      ),
-                // Row(
-                //   mainAxisAlignment: MainAxisAlignment.center,
-                //   children: [
-                //     _socialIcon(FontAwesomeIcons.google, Colors.red),
-                //     _socialIcon(FontAwesomeIcons.linkedinIn, Colors.blueAccent),
-                //     _socialIcon(FontAwesomeIcons.facebookF, Colors.blue),
-                //     _socialIcon(FontAwesomeIcons.instagram, Colors.purple),
-                //     _socialIcon(FontAwesomeIcons.xTwitter, Colors.black),
-                //   ],
-                // ),
               ],
             ),
           ),

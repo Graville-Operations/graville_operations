@@ -15,12 +15,18 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   bool _isFabOpen = false;
-  Widget _buildFab({required IconData icon, required VoidCallback onPressed}) {
-    return FloatingActionButton(
-      heroTag: icon.toString(),
-      backgroundColor: Colors.black,
-      onPressed: onPressed,
-      child: Icon(icon),
+  Widget miniFab(IconData icon, VoidCallback onPressed) {
+    return SizedBox(
+      width: 44,
+      height: 44,
+      child: FloatingActionButton(
+        heroTag: icon.toString(),
+        mini: true,
+        onPressed: onPressed,
+        shape: const CircleBorder(),
+        backgroundColor: Colors.black,
+        child: Icon(icon, color: Colors.white, size: 20),
+      ),
     );
   }
 
@@ -31,43 +37,37 @@ class _HomeScreenState extends State<HomeScreen> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              AnimatedSwitcher(
-                duration: const Duration(milliseconds: 100),
-                child: _isFabOpen
-                    ? Column(
-                        key: const ValueKey("expanded"),
-                        children: [
-                          _buildFab(icon: Icons.person_add, onPressed: () {}),
-                          const SizedBox(height: 12),
-
-                          _buildFab(icon: Icons.inventory_2, onPressed: () {}),
-                          const SizedBox(height: 12),
-
-                          _buildFab(icon: Icons.rate_review, onPressed: () {}),
-                          const SizedBox(height: 12),
-                        ],
-                      )
-                    : const SizedBox.shrink(),
-              ),
-
-              FloatingActionButton(
-                backgroundColor: Colors.black,
-                onPressed: () {
-                  setState(() {
-                    _isFabOpen = !_isFabOpen;
-                  });
-                },
-                child: AnimatedRotation(
-                  turns: _isFabOpen ? 0.125 : 0,
-                  duration: const Duration(milliseconds: 200),
-                  child: Icon(_isFabOpen ? Icons.close : Icons.add),
-                ),
-              ),
-            ],
+          if (_isFabOpen) ...[
+            Tooltip(
+              message: "Add worker",
+              child: miniFab(Icons.person_add, () {}),
+            ),
+            const SizedBox(height: 12),
+            Tooltip(
+              message: "Hired equipment",
+              child: miniFab(Icons.build, () {}),
+            ),
+            const SizedBox(height: 12),
+            Tooltip(
+              message: "Receive material",
+              child: miniFab(Icons.download, () {}),
+            ),
+            const SizedBox(height: 12),
+            Tooltip(
+              message: "Transfer material",
+              child: miniFab(Icons.local_shipping, () {}),
+            ),
+            const SizedBox(height: 12),
+          ],
+          FloatingActionButton(
+            backgroundColor: Colors.black,
+            shape: const CircleBorder(),
+            onPressed: () => setState(() => _isFabOpen = !_isFabOpen),
+            child: AnimatedRotation(
+              turns: _isFabOpen ? 0.125 : 0,
+              duration: const Duration(milliseconds: 200),
+              child: const Icon(Icons.add, color: Colors.white),
+            ),
           ),
         ],
       ),
@@ -79,31 +79,28 @@ class _HomeScreenState extends State<HomeScreen> {
             elevation: 0,
             floating: true,
             snap: true,
-            pinned: false,
             automaticallyImplyLeading: false,
-            title: Center(
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Image.asset(CommonImages.logo, height: 28),
-                  const SizedBox(width: 10),
-                  const Text(
-                    "  Graville Operations",
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                ],
-              ),
+            title: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Image.asset(CommonImages.logo, height: 28),
+                const SizedBox(width: 10),
+                const Text(
+                  "Graville Operations",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ],
             ),
           ),
+
           SliverPadding(
             padding: const EdgeInsets.all(15),
             sliver: SliverList(
               delegate: SliverChildListDelegate([
-                //Project card
-                const SectionCard(
+                SectionCard(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
+                    children: const [
                       Text(
                         "Current Project",
                         style: TextStyle(color: Colors.grey),
@@ -125,7 +122,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     ],
                   ),
                 ),
-                //Workers row card
+
+                //Workers
                 const SizedBox(height: 15),
                 const Row(
                   children: [
@@ -146,21 +144,21 @@ class _HomeScreenState extends State<HomeScreen> {
                         value: "87",
                         subtitle: "Active on Site",
                         color: Color(0xff1db954),
-                        //color: Colors.green,
                       ),
                     ),
                   ],
                 ),
-                //Material and completion cards
+
+                //Material stock and project completionconst SizedBox(height: 15),
                 const SizedBox(height: 15),
                 IntrinsicHeight(
                   child: Row(
                     children: [
-                      const Expanded(
+                      Expanded(
                         child: SectionCard(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
+                            children: const [
                               Row(
                                 children: [
                                   Icon(Icons.inventory, size: 18),
@@ -168,8 +166,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                   Text(
                                     "Material Stock",
                                     style: TextStyle(
-                                      fontSize: 13,
-                                      color: Colors.black,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
@@ -180,14 +176,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text(
-                                    "Cement",
-                                    style: TextStyle(fontSize: 14),
-                                  ),
+                                  Text("Cement"),
                                   Text(
                                     "250 bags",
                                     style: TextStyle(
-                                      fontSize: 14,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
@@ -198,11 +190,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text("Steel", style: TextStyle(fontSize: 14)),
+                                  Text("Steel"),
                                   Text(
                                     "1.5 tons",
                                     style: TextStyle(
-                                      fontSize: 14,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
@@ -212,21 +203,17 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ),
                       ),
-
                       const SizedBox(width: 12),
                       Expanded(
                         child: SectionCard(
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Text(
+                              const Text(
                                 "Project Completion",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14,
-                                ),
+                                style: TextStyle(fontWeight: FontWeight.bold),
                               ),
-                              //const SizedBox(height: 16),
+                              const SizedBox(height: 10),
                               SizedBox(
                                 height: 90,
                                 width: 90,
@@ -239,10 +226,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                       color: Colors.orange,
                                       backgroundColor: Colors.grey.shade300,
                                     ),
-                                    Text(
+                                    const Text(
                                       "68%",
                                       style: TextStyle(
-                                        fontSize: 14,
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
@@ -256,61 +242,25 @@ class _HomeScreenState extends State<HomeScreen> {
                     ],
                   ),
                 ),
-                //Task progress card
-                const SizedBox(height: 15),
-                const SectionCard(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Icon(Icons.task, size: 18),
-                          SizedBox(width: 8),
-                          Text(
-                            "Task Progress",
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 15),
-                      TaskProgress(
-                        title: "Foundation",
-                        percent: 1.0,
-                        color: Colors.green,
-                      ),
-                      TaskProgress(
-                        title: "Framing",
-                        percent: 0.75,
-                        color: Colors.orange,
-                      ),
-                      TaskProgress(
-                        title: "Electrical",
-                        percent: 0.45,
-                        color: Colors.blue,
-                      ),
-                    ],
-                  ),
-                ),
+
                 //Reviews
-                SizedBox(height: 15),
-                SectionCard(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Reviews",
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
+                const SizedBox(height: 20),
+                const Text(
+                  "Reviews",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 12),
+
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    final isWide = constraints.maxWidth > 700;
+
+                    return SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          minWidth: isWide ? constraints.maxWidth : 700,
                         ),
-                      ),
-                      SizedBox(height: 15),
-                      SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
                         child: DataTable(
                           columnSpacing: 40,
                           headingRowColor: MaterialStatePropertyAll(
@@ -321,55 +271,37 @@ class _HomeScreenState extends State<HomeScreen> {
                             DataColumn(label: Text("REVIEWER")),
                             DataColumn(label: Text("DATE")),
                           ],
-                          rows: [
+                          rows: const [
                             DataRow(
                               cells: [
                                 DataCell(
-                                  SizedBox(
-                                    width: 300,
-                                    child: Text(
-                                      "Great job on the installation at the new site. All safety protocols followed.",
-                                    ),
+                                  Text(
+                                    "Great job on the installation at the new site.",
                                   ),
                                 ),
-                                const DataCell(
-                                  SizedBox(
-                                    width: 200,
-                                    child: Text(
-                                      "James Paterson\nOperations Manager",
-                                    ),
-                                  ),
-                                ),
-                                const DataCell(Text("Feb 10")),
+                                DataCell(Text("James Paterson")),
+                                DataCell(Text("Feb 10")),
                               ],
                             ),
                             DataRow(
                               cells: [
                                 DataCell(
-                                  SizedBox(
-                                    width: 300,
-                                    child: Text(
-                                      "Work completed efficiently, but remember to update job status in real-time next time.",
-                                    ),
+                                  Text(
+                                    "Work completed efficiently, update status next time.",
                                   ),
                                 ),
-                                const DataCell(
-                                  SizedBox(
-                                    width: 200,
-                                    child: Text(
-                                      "Angela Martinez\nField Supervisor",
-                                    ),
-                                  ),
-                                ),
-                                const DataCell(Text("Feb 8")),
+                                DataCell(Text("Angela Martinez")),
+                                DataCell(Text("Feb 8")),
                               ],
                             ),
                           ],
                         ),
                       ),
-                    ],
-                  ),
+                    );
+                  },
                 ),
+
+                const SizedBox(height: 60),
               ]),
             ),
           ),

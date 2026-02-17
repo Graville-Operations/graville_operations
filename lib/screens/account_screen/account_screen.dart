@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:graville_operations/screens/settings_screen/settings_screen.dart';
 import 'package:graville_operations/screens/support/support_screen.dart';
+<<<<<<< HEAD
+=======
+import 'package:graville_operations/screens/settings_screen/settings_screen.dart';
+>>>>>>> main
 
 class AccountScreen extends StatelessWidget {
   const AccountScreen({super.key});
@@ -80,7 +84,7 @@ class _ProfileCard extends StatelessWidget {
             children: [
               CircleAvatar(
                 radius: 32,
-                backgroundColor: theme.colorScheme.surfaceVariant,
+                backgroundColor: theme.colorScheme.surfaceContainerHighest,
                 child: Icon(
                   Icons.person,
                   size: 32,
