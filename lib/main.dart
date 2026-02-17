@@ -15,8 +15,6 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-
-
       title: 'graville_operations',
       themeMode: ThemeMode.light,
       theme: ThemeData(
