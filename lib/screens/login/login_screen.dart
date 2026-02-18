@@ -1,5 +1,4 @@
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:graville_operations/navigation/navigation.dart';
@@ -14,7 +13,6 @@ class LoginScreen extends StatefulWidget {
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }
-
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
@@ -38,23 +36,6 @@ class _LoginScreenState extends State<LoginScreen> {
     ),
   );
 }
-
-
-  // Widget _socialIcon(IconData icon, Color color) {
-  //   return Padding(
-  //     padding: const EdgeInsets.symmetric(horizontal: 10),
-  //     child: InkWell(
-  //       borderRadius: BorderRadius.circular(30),
-  //       onTap: () {},
-  //       child: CircleAvatar(
-  //         radius: 22,
-  //         backgroundColor: Colors.grey[200],
-  //         child: FaIcon(icon, color: color, size: 20),
-  //       ),
-  //     ),
-  //   );
-  // }
-
   String? passwordErrorMessage;
   String? emailErrorMessage;
   
@@ -147,7 +128,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     });
                   },
                 ),
-    
                 Align(
                   alignment: Alignment.centerRight,
                   child: TextButton(
@@ -213,7 +193,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                ),
                             ),
                          ),
-
                   ],
                 ),
                 
