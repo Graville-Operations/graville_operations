@@ -7,8 +7,10 @@ class CustomButton extends StatelessWidget {
   final Color? backgroundColor;
   final Color? textColor;
   final double? height;
+  final double? width;
   final double? borderRadius;
   final Widget? icon;
+  final ButtonStyle? buttonStyle;
 
   const CustomButton({
     super.key,
@@ -20,16 +22,17 @@ class CustomButton extends StatelessWidget {
     this.height,
     this.borderRadius,
     this.icon,
+    this.width, this.buttonStyle,
   });
 
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
       onPressed: isLoading ? null : onPressed,
-      style: ElevatedButton.styleFrom(
+      style: buttonStyle ?? ElevatedButton.styleFrom(
         backgroundColor: backgroundColor ?? Colors.green,
         foregroundColor: textColor ?? Colors.white,
-        minimumSize: Size(double.infinity, height ?? 50),
+        minimumSize: Size(width??50, height ?? 50),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(borderRadius ?? 20),
         ),
@@ -45,6 +48,7 @@ class CustomButton extends StatelessWidget {
             )
           : Row(
               mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
               children: [
                 if (icon != null) ...[icon!, const SizedBox(width: 8)],
                 Text(

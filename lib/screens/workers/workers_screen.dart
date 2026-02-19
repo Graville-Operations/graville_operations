@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:graville_operations/screens/commons/widgets/custom_button.dart';
+import 'package:graville_operations/screens/commons/widgets/custom_text_input.dart';
 
 class Worker {
   final String name;
@@ -213,34 +215,17 @@ class _WorkersScreenState extends State<WorkersScreen> {
 
             Row(
               children: [
-                ElevatedButton(
-                  onPressed: () {},
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(
-                      0xFF3366FF,
-                    ), // new button color
-                    foregroundColor: Colors.white, // text color
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 24,
-                      vertical: 12,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  child: const Text(
-                    "Add Worker",
-                    style: TextStyle(
-                      fontWeight: FontWeight.normal,
-                      fontSize: 10,
-                    ),
-                  ),
+                CustomButton(
+                  label: "Add Worker",
+                  onPressed: (){},
+                  backgroundColor: const Color(0xFF3366FF),
                 ),
-                const Spacer(),
+                const SizedBox(width: 12),
                 SizedBox(
-                  width: 240,
-                  child: TextField(
+                  width: 220,
+                  child: CustomTextInput(
                     controller: searchController,
+                    hintText: "Search worker .....",
                     decoration: InputDecoration(
                       isDense: true,
                       filled: true,

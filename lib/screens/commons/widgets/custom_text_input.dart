@@ -5,10 +5,12 @@ class CustomTextInput extends StatelessWidget {
   final bool isPassword;
   final bool isObscure;
   final VoidCallback? onSuffixIconPressed;
-  final String labelText;
+  final String? labelText;
   final IconData? prefixIcon;
   final IconData? suffixIcon;
   final String hintText;
+  final TextInputType? keyboardType;
+  final InputDecoration? decoration;
 
   final String? Function(String?)? validator;
 
@@ -18,11 +20,14 @@ class CustomTextInput extends StatelessWidget {
     this.isPassword = false,
     this.isObscure = false,
     this.onSuffixIconPressed,
-    required this.labelText,
+    this.labelText,
     required this.hintText,
     this.prefixIcon,
     this.suffixIcon,
+
+
     this.validator,
+    this.keyboardType=TextInputType.text, this.decoration,
   });
 
   @override
@@ -36,7 +41,9 @@ class CustomTextInput extends StatelessWidget {
         style: TextStyle(
           color: Colors.black54
         ),
-        decoration: InputDecoration(
+
+        keyboardType: keyboardType,
+        decoration: decoration??InputDecoration(
           filled: true,
           fillColor: Colors.grey[100],
           prefixIcon: Icon(prefixIcon, color: Colors.grey),

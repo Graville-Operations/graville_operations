@@ -2,14 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:graville_operations/models/inventory/Inventory.dart';
 import 'package:graville_operations/models/inventory/material_data.dart';
 import 'package:graville_operations/screens/commons/widgets/custom_dropdown.dart';
-
-
-void main() => runApp(
-  const MaterialApp(
-    debugShowCheckedModeBanner: false,
-    home: InventoryScreen(),
-  ),
-);
+import 'package:graville_operations/models/material/inventory_material.dart';
 
 class InventoryScreen extends StatefulWidget {
   const InventoryScreen({super.key});
@@ -45,12 +38,15 @@ class _InventoryScreenState extends State<InventoryScreen> {
         MaterialData(name: "Steel Rods", quantity: "1,500", unit: "units"),
         MaterialData(name: "Sand", quantity: "50", unit: "tons"),
         MaterialData(name: "Bricks", quantity: "8,000", unit: "units"),
+        MaterialData(name: "Bricks", quantity: "8,000", unit: "units"),
+        MaterialData(name: "Bricks", quantity: "8,000", unit: "units"),
+        MaterialData(name: "Bricks", quantity: "8,000", unit: "units"),
+        MaterialData(name: "Bricks", quantity: "8,000", unit: "units"),
+        MaterialData(name: "Bricks", quantity: "8,000", unit: "units"),
+        MaterialData(name: "Bricks", quantity: "8,000", unit: "units"),
       ],
       hiredTools: [
         MaterialData(name: "Concrete Mixer", quantity: "2", unit: "units"),
-        MaterialData(name: "Electric Drill", quantity: "5", unit: "units"),
-        MaterialData(name: "Scaffolding", quantity: "10", unit: "units"),
-        MaterialData(name: "Generator", quantity: "1", unit: "unit"),
       ],
       createdAt: DateTime.now(),
     ),
@@ -94,8 +90,6 @@ class _InventoryScreenState extends State<InventoryScreen> {
               style: TextStyle(color: Colors.grey, fontSize: 12),
             ),
             const SizedBox(height: 6),
-
-            // ── Replaced old Dropdown with CustomDropdown ──
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12),
               decoration: BoxDecoration(
@@ -113,7 +107,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
                 hint: "Select site",
                 isExpanded: true,
                 isDense: true,
-                border: InputBorder.none, // hide default border (we use container)
+                border: InputBorder.none,
                 fillColor: Colors.transparent,
                 borderRadius: BorderRadius.circular(10),
               ),
@@ -179,8 +173,6 @@ class _InventoryScreenState extends State<InventoryScreen> {
       ),
     );
   }
-
-  // Optional: better icon matching
   IconData _getMaterialIcon(String name) {
     final lower = name.toLowerCase();
     if (lower.contains('cement')) return Icons.view_in_ar;

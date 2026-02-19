@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:graville_operations/screens/Inventory_Screen/inventory_screen.dart';
 import 'package:graville_operations/screens/account_screen/account_screen.dart';
 import 'package:graville_operations/screens/home/home_screen.dart';
-import 'package:graville_operations/screens/workers_screen/workers_screen.dart';
+import 'package:graville_operations/screens/inventory_screen/inventory_screen.dart';
+import 'package:graville_operations/screens/workers/workers_screen.dart';
 
 class MainNavigationScreen extends StatefulWidget {
   const MainNavigationScreen({super.key});
