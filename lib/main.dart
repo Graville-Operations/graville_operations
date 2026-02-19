@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:graville_operations/screens/Inventory_Screen/add_material.dart';
-import 'package:graville_operations/screens/Inventory_Screen/inventory_screen.dart';
+//import 'package:graville_operations/screens/Inventory_Screen/add_material.dart';
+
+//import 'package:graville_operations/screens/Inventory_Screen/inventory_screen.dart';
 
 import 'package:graville_operations/screens/login/login_screen.dart';
 //import 'package:graville_operations/screens/settings_screen/settings_screen.dart';
@@ -18,7 +19,9 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         useMaterial3: true,
       ),
-      home: const AddMaterialScreen(),
+
+      home: const LoginScreen(),
+
     );
   }
 }
