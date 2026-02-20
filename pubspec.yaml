@@ -10,7 +10,10 @@ dependencies:
   font_awesome_flutter: ^10.7.0
   flutter:
     sdk: flutter
+    
+  image_picker: ^1.0.7
   cupertino_icons: ^1.0.8
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -20,7 +23,8 @@ flutter:
   uses-material-design: true
   assets:
     - assets/images/
- 
+
+  
   # fonts:
   #   - family: Schyler
   #     fonts:
