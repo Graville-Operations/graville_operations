@@ -3,14 +3,6 @@ import 'package:graville_operations/models/inventory/Inventory.dart';
 import 'package:graville_operations/models/inventory/material_data.dart';
 import 'package:graville_operations/screens/commons/widgets/custom_dropdown.dart';
 
-
-void main() => runApp(
-  const MaterialApp(
-    debugShowCheckedModeBanner: false,
-    home: InventoryScreen(),
-  ),
-);
-
 class InventoryScreen extends StatefulWidget {
   const InventoryScreen({super.key});
 
@@ -113,7 +105,8 @@ class _InventoryScreenState extends State<InventoryScreen> {
                 hint: "Select site",
                 isExpanded: true,
                 isDense: true,
-                border: InputBorder.none, // hide default border (we use container)
+                border:
+                    InputBorder.none, // hide default border (we use container)
                 fillColor: Colors.transparent,
                 borderRadius: BorderRadius.circular(10),
               ),
@@ -131,17 +124,19 @@ class _InventoryScreenState extends State<InventoryScreen> {
 
             InventoryCard(
               children: [
-                ...materials.map((m) => Column(
-                  children: [
-                    InventoryTile(
-                      icon: _getMaterialIcon(m.name),
-                      color: Colors.blue,
-                      title: m.name,
-                      value: "${m.quantity} ${m.unit}",
-                    ),
-                    const Divider(height: 1),
-                  ],
-                )),
+                ...materials.map(
+                  (m) => Column(
+                    children: [
+                      InventoryTile(
+                        icon: _getMaterialIcon(m.name),
+                        color: Colors.blue,
+                        title: m.name,
+                        value: "${m.quantity} ${m.unit}",
+                      ),
+                      const Divider(height: 1),
+                    ],
+                  ),
+                ),
                 AddButton(label: "Add Material", onTap: () {}),
               ],
             ),
@@ -158,17 +153,19 @@ class _InventoryScreenState extends State<InventoryScreen> {
 
             InventoryCard(
               children: [
-                ...tools.map((t) => Column(
-                  children: [
-                    InventoryTile(
-                      icon: _getToolIcon(t.name),
-                      color: Colors.orange,
-                      title: t.name,
-                      value: "${t.quantity} ${t.unit}",
-                    ),
-                    const Divider(height: 1),
-                  ],
-                )),
+                ...tools.map(
+                  (t) => Column(
+                    children: [
+                      InventoryTile(
+                        icon: _getToolIcon(t.name),
+                        color: Colors.orange,
+                        title: t.name,
+                        value: "${t.quantity} ${t.unit}",
+                      ),
+                      const Divider(height: 1),
+                    ],
+                  ),
+                ),
                 AddButton(label: "Add Hired Tool", onTap: () {}),
               ],
             ),
@@ -284,7 +281,9 @@ class AddButton extends StatelessWidget {
           label: Text(label, style: const TextStyle(color: Colors.blue)),
           style: OutlinedButton.styleFrom(
             side: BorderSide(color: Colors.grey.shade300),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
             padding: const EdgeInsets.symmetric(vertical: 12),
           ),
         ),
