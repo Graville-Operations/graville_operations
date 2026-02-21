@@ -19,7 +19,7 @@ class WorkerProfileScreen extends StatelessWidget {
               ClipRRect(
                 borderRadius: BorderRadius.circular(24),
                 child: Image.asset(
-                  CommonImages.Worker,
+                  CommonImages.worker,
                   height: 220,
                   width: double.infinity,
                   fit: BoxFit.cover,
