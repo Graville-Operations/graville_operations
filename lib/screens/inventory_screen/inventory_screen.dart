@@ -3,6 +3,8 @@ import 'package:graville_operations/models/inventory/Inventory.dart';
 import 'package:graville_operations/models/inventory/material_data.dart';
 import 'package:graville_operations/screens/Inventory_Screen/inventory_screen.dart';
 import 'package:graville_operations/screens/commons/widgets/custom_dropdown.dart';
+import 'package:graville_operations/screens/inventory_screen/widgets/inventory_card.dart';
+import 'package:graville_operations/screens/inventory_screen/widgets/inventory_tile.dart';
 
 class InventoryScreen extends StatefulWidget {
   const InventoryScreen({super.key});
