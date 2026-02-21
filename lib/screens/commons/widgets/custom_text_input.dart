@@ -9,6 +9,8 @@ class CustomTextInput extends StatelessWidget {
   final IconData? prefixIcon;
   final IconData? suffixIcon;
   final String hintText;
+  final TextInputType? keyboardType;
+  final int? maxLines;
 
   final String? Function(String?)? validator;
   final TextInputType? keyboardType;
