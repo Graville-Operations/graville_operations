@@ -18,7 +18,7 @@ class MyApp extends StatelessWidget {
       title: 'graville operations',
       themeMode: ThemeMode.light,
       theme: ThemeData(useMaterial3: true),
-      home: const AddWorkerScreen(),
+      home: const LoginScreen(),
     );
   }
 }
