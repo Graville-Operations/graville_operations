@@ -15,7 +15,7 @@ class WorkerProfileScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
 
-              // ================= HEADER IMAGE =================
+              
               ClipRRect(
                 borderRadius: BorderRadius.circular(24),
                 child: Image.asset(
@@ -28,7 +28,7 @@ class WorkerProfileScreen extends StatelessWidget {
 
               const SizedBox(height: 20),
 
-              // ================= CONTACT INFORMATION =================
+              
               _buildSectionCard(
                 title: "CONTACT INFORMATION",
                 child: Column(
@@ -64,7 +64,7 @@ class WorkerProfileScreen extends StatelessWidget {
 
               const SizedBox(height: 20),
 
-              // ================= PROFESSIONAL DETAILS =================
+              
               _buildSectionCard(
                 title: "PROFESSIONAL DETAILS",
                 child: Column(
@@ -132,7 +132,7 @@ class WorkerProfileScreen extends StatelessWidget {
 
               const SizedBox(height: 20),
 
-              // ================= CURRENT ASSIGNMENT =================
+             
               _buildSectionCard(
                 title: "CURRENT ASSIGNMENT",
                 child: _buildInfoRow(
@@ -149,7 +149,7 @@ class WorkerProfileScreen extends StatelessWidget {
     );
   }
 
-  // ================= SECTION CARD =================
+  
   Widget _buildSectionCard({
     required String title,
     required Widget child,
@@ -189,7 +189,7 @@ class WorkerProfileScreen extends StatelessWidget {
     );
   }
 
-  // ================= INFO ROW =================
+  
   Widget _buildInfoRow({
     required IconData icon,
     required String label,
