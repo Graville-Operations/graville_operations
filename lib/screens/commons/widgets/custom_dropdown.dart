@@ -88,19 +88,32 @@ class CustomDropdown<T> extends StatelessWidget {
             style: const TextStyle(fontSize: 15),
             overflow: TextOverflow.ellipsis,
           ),
-        );
-      }).toList(),
-      onChanged: onChanged,
-      selectedItemBuilder: (context) {
-        return items.map((T item) {
+        ),
+        items: items.map((T item) {
           final displayText = displayMapper(item);
-          return Text(
-            displayText,
-            style: const TextStyle(fontWeight: FontWeight.w500),
-            overflow: TextOverflow.ellipsis,
+          final itemValue = valueMapper != null ? valueMapper!(item) : item;
+
+          return DropdownMenuItem<T>(
+            value: item,
+            child: Text(
+              displayText,
+              style: const TextStyle(fontSize: 15),
+              overflow: TextOverflow.ellipsis,
+            ),
           );
-        }).toList();
-      },
+        }).toList(),
+        onChanged: onChanged,
+        selectedItemBuilder: (context) {
+          return items.map((T item) {
+            final displayText = displayMapper(item);
+            return Text(
+              displayText,
+              style: const TextStyle(fontWeight: FontWeight.w500),
+              overflow: TextOverflow.ellipsis,
+            );
+          }).toList();
+        },
+      ),
     );
   }
 }
