@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:graville_operations/screens/Inventory_Screen/inventory_screen.dart';
 import 'package:graville_operations/screens/commons/widgets/custom_button.dart';
+import 'package:graville_operations/screens/inventory/inventory_screen.dart';
 
 class UpdateInventoryScreen extends StatefulWidget {
   const UpdateInventoryScreen({super.key});

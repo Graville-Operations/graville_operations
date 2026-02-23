@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
-void main() => runApp(const MaterialApp(home: AddWorkerScreen()));
 
 class AddWorkerScreen extends StatefulWidget {
   const AddWorkerScreen({super.key});
