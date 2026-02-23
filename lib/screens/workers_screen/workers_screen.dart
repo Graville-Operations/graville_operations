@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:graville_operations/screens/add_worker_screen/add_worker_screen.dart';
 
 class Worker {
   final String name;
@@ -143,7 +144,6 @@ class _WorkersScreenState extends State<WorkersScreen> {
             ),
             const SizedBox(height: 6),
 
-            // REDUCED SIZE CARD
             Card(
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -214,12 +214,23 @@ class _WorkersScreenState extends State<WorkersScreen> {
             Row(
               children: [
                 ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () async {
+                    final newWorker = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const AddWorkerScreen(),
+                      ),
+                    );
+
+                    if (newWorker != null && newWorker is Worker) {
+                      setState(() {
+                        workers.add(newWorker);
+                      });
+                    }
+                  },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(
-                      0xFF3366FF,
-                    ), // new button color
-                    foregroundColor: Colors.white, // text color
+                    backgroundColor: const Color(0xFF3366FF),
+                    foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(
                       horizontal: 24,
                       vertical: 12,
