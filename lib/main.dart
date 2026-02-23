@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:graville_operations/screens/Inventory_Screen/inventory_screen.dart';
-import 'package:graville_operations/screens/add_worker_screen/add_worker_screen.dart';
+//import 'package:graville_operations/screens/Inventory_Screen/inventory_screen.dart';
 
 import 'package:graville_operations/screens/login/login_screen.dart';
 
@@ -18,7 +17,7 @@ class MyApp extends StatelessWidget {
       title: 'graville operations',
       themeMode: ThemeMode.light,
       theme: ThemeData(useMaterial3: true),
-      home: const AddWorkerScreen(),
+      home: const LoginScreen(),
     );
   }
 }
