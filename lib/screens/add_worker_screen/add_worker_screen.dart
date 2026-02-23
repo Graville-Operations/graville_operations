@@ -4,7 +4,6 @@ import 'package:image_picker/image_picker.dart';
 
 void main() => runApp(const MaterialApp(home: AddWorkerScreen()));
 
-/// ✅ Worker model (required for returning data safely)
 class Worker {
   final String name;
   final String id;
@@ -100,35 +99,42 @@ class _AddWorkerScreenState extends State<AddWorkerScreen> {
   Widget _photoCard() {
     return GestureDetector(
       onTap: _openCamera,
-      child: Container(
-        height: 120,
-        width: double.infinity,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.grey.shade300),
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(12),
-          child: _photo == null
-              ? Container(
-                  color: const Color(0xFFF8F9FA),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
-                      CircleAvatar(
-                        radius: 26,
-                        backgroundColor: Color(0xFFE6F0FF),
-                        child: Icon(Icons.camera_alt, color: Colors.blue),
-                      ),
-                      SizedBox(height: 8),
-                      Text(
-                        "Tap to capture photo",
-                        style: TextStyle(color: Colors.grey),
-                      ),
-                    ],
-                  ),
-                )
-              : Image.file(_photo!, fit: BoxFit.cover),
+      child: Center(
+        child: SizedBox(
+          width: 140,
+          height: 140,
+          child: Container(
+            decoration: BoxDecoration(
+              color: const Color(0xFFF8F9FA),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.grey.shade400, width: 1.2),
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: _photo == null
+                  ? Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: const [
+                        CircleAvatar(
+                          radius: 20,
+                          backgroundColor: Color(0xFFE6F0FF),
+                          child: Icon(
+                            Icons.camera_alt,
+                            color: Colors.blue,
+                            size: 20,
+                          ),
+                        ),
+                        SizedBox(height: 6),
+                        Text(
+                          "Tap to capture photo",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 12, color: Colors.grey),
+                        ),
+                      ],
+                    )
+                  : Image.file(_photo!, fit: BoxFit.cover),
+            ),
+          ),
         ),
       ),
     );
@@ -181,14 +187,14 @@ class _AddWorkerScreenState extends State<AddWorkerScreen> {
 
             FormLabel(label: "Worker ID *"),
             CustomTextField(
-              hint: "e.g. 40635223",
+              hint: "e.g. 11111111",
               controller: idController,
               onChanged: (_) => setState(() {}),
             ),
 
             FormLabel(label: "Phone Number *"),
             CustomTextField(
-              hint: "e.g. +254 769902927",
+              hint: "e.g. +254 712345678",
               controller: phoneController,
               onChanged: (_) => setState(() {}),
             ),
@@ -275,7 +281,6 @@ class _AddWorkerScreenState extends State<AddWorkerScreen> {
   }
 }
 
-/// ✅ Red asterisk implementation (clean & reusable)
 class FormLabel extends StatelessWidget {
   final String label;
   const FormLabel({super.key, required this.label});
