@@ -5,12 +5,16 @@ class CustomTextInput extends StatelessWidget {
   final bool isPassword;
   final bool isObscure;
   final VoidCallback? onSuffixIconPressed;
-  final String labelText;
+  final String? labelText;
   final IconData? prefixIcon;
   final IconData? suffixIcon;
   final String hintText;
+  // final TextInputType? keyboardType;
+  // final int? maxLines;
 
   final String? Function(String?)? validator;
+  final TextInputType? keyboardType;
+  final int? maxLines;
 
   const CustomTextInput({
     super.key,
@@ -18,11 +22,13 @@ class CustomTextInput extends StatelessWidget {
     this.isPassword = false,
     this.isObscure = false,
     this.onSuffixIconPressed,
-    required this.labelText,
+    this.labelText,
     required this.hintText,
     this.prefixIcon,
     this.suffixIcon,
     this.validator,
+    this.keyboardType,
+    this.maxLines,
   });
 
   @override
@@ -33,9 +39,7 @@ class CustomTextInput extends StatelessWidget {
         controller: controller,
         obscureText: isPassword,
         validator: validator,
-        style: TextStyle(
-          color: Colors.black54
-        ),
+        style: TextStyle(color: Colors.black54),
         decoration: InputDecoration(
           filled: true,
           fillColor: Colors.grey[100],
@@ -46,9 +50,7 @@ class CustomTextInput extends StatelessWidget {
             fontWeight: FontWeight.bold,
           ),
           hintText: hintText,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
           errorBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide(color: Colors.red),
@@ -58,11 +60,8 @@ class CustomTextInput extends StatelessWidget {
             borderSide: BorderSide(color: Colors.black),
           ),
           suffixIcon: IconButton(
-            icon: Icon(
-              suffixIcon,
-              color: Colors.grey,
-            ),
-            onPressed:onSuffixIconPressed,
+            icon: Icon(suffixIcon, color: Colors.grey),
+            onPressed: onSuffixIconPressed,
           ),
         ),
       ),
