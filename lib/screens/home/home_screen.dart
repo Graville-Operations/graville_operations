@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:graville_operations/models/project_status.dart';
-import 'package:graville_operations/screens/Inventory_Screen/add_material.dart';
-import 'package:graville_operations/screens/Inventory_Screen/update_inventory.dart';
+import 'package:graville_operations/navigation/custom_navigator.dart';
+import 'package:graville_operations/screens/add_transport_screen/add_transport_screen.dart';
+import 'package:graville_operations/screens/inventory/add_material.dart';
+import 'package:graville_operations/screens/inventory/update_inventory.dart';
+import 'package:graville_operations/screens/workers/add_worker_screen.dart';
 import 'package:graville_operations/screens/commons/assets/images.dart';
 import 'package:graville_operations/screens/commons/widgets/section_card.dart';
 import 'package:graville_operations/screens/commons/widgets/status_chip.dart';
@@ -42,28 +45,29 @@ class _HomeScreenState extends State<HomeScreen> {
           if (_isFabOpen) ...[
             Tooltip(
               message: "Add worker",
-              child: miniFab(Icons.person_add, () {}),
+              child: miniFab(Icons.person_add, () =>context.push(const AddWorkerScreen())),
             ),
             const SizedBox(height: 12),
             Tooltip(
               message: "Hired equipment",
-              child: miniFab(Icons.build, () {}),
+              child: miniFab(Icons.build, () => context.push(const AddMaterialScreen())),
             ),
             const SizedBox(height: 12),
             Tooltip(
               message: "Receive material",
               child: miniFab(Icons.download, () {}),
             ),
+            const SizedBox(height: 12),
             Tooltip(
               message: "update inventory",
-              child: miniFab(Icons.store, () =>Navigator.push(context, MaterialPageRoute(builder: (context)=>UpdateInventoryScreen()))
+              child: miniFab(Icons.store, () =>context.push(const UpdateInventoryScreen())
                 
               ),
             ),
             const SizedBox(height: 12),
             Tooltip(
               message: "Transfer material",
-              child: miniFab(Icons.local_shipping, ()=>Navigator.push(context, MaterialPageRoute(builder: (context)=>AddMaterialScreen()))),
+              child: miniFab(Icons.local_shipping, ()=>context.push(const AddTransportScreen())),
             ),
             const SizedBox(height: 12),
           ],
