@@ -61,11 +61,13 @@ class _AddWorkerScreenState extends State<AddWorkerScreen> {
   void _updateAmount() {
     setState(() {
       if (workerType == "Skilled") {
-        amount = task == "Roadworks"
-            ? 1500
-            : task != null
-            ? 1200
-            : 0;
+        if (task == "Roadworks") {
+          amount = 1500;
+        } else if (task != null) {
+          amount = 1200;
+        } else {
+          amount = 0;
+        }
       } else if (workerType == "Unskilled") {
         amount = 600;
       } else {
@@ -74,14 +76,15 @@ class _AddWorkerScreenState extends State<AddWorkerScreen> {
     });
   }
 
-  bool get isFormValid =>
-      selectedSite != null &&
-      nameController.text.isNotEmpty &&
-      idController.text.isNotEmpty &&
-      phoneController.text.isNotEmpty &&
-      workerType != null &&
-      task != null &&
-      amount > 0;
+  bool get isFormValid {
+    return selectedSite != null &&
+        nameController.text.isNotEmpty &&
+        idController.text.isNotEmpty &&
+        phoneController.text.isNotEmpty &&
+        workerType != null &&
+        task != null &&
+        amount > 0;
+  }
 
   void _clearForm() {
     setState(() {
@@ -101,13 +104,16 @@ class _AddWorkerScreenState extends State<AddWorkerScreen> {
       onTap: _openCamera,
       child: Center(
         child: SizedBox(
-          width: 140,
-          height: 140,
+          width: 120, // 👈 controls size
+          height: 120, // 👈 controls size
           child: Container(
             decoration: BoxDecoration(
               color: const Color(0xFFF8F9FA),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.grey.shade400, width: 1.2),
+              border: Border.all(
+                color: Colors.grey.shade400, // 👈 clearly visible border
+                width: 1.2,
+              ),
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(12),
@@ -187,14 +193,14 @@ class _AddWorkerScreenState extends State<AddWorkerScreen> {
 
             FormLabel(label: "Worker ID *"),
             CustomTextField(
-              hint: "e.g. 11111111",
+              hint: "e.g. 40635223",
               controller: idController,
               onChanged: (_) => setState(() {}),
             ),
 
             FormLabel(label: "Phone Number *"),
             CustomTextField(
-              hint: "e.g. +254 712345678",
+              hint: "e.g. +254 769902927",
               controller: phoneController,
               onChanged: (_) => setState(() {}),
             ),
@@ -372,7 +378,9 @@ class CustomDropdownField extends StatelessWidget {
       items: options
           .map((e) => DropdownMenuItem(value: e, child: Text(e)))
           .toList(),
-      onChanged: (v) => v != null ? onSelected(v) : null,
+      onChanged: (v) {
+        if (v != null) onSelected(v);
+      },
       decoration: InputDecoration(
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
       ),

@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 
+<<<<<<< HEAD
 void main() => runApp(const MaterialApp(
   debugShowCheckedModeBanner: false, 
   home: InventoryScreen()
 ));
 
+=======
+>>>>>>> main
 class InventoryScreen extends StatefulWidget {
   const InventoryScreen({super.key});
 
@@ -103,6 +106,7 @@ class InventoryScreenState extends State<InventoryScreen> {
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(color: Colors.grey.shade200),
               ),
+<<<<<<< HEAD
               child: DropdownButtonHideUnderline(
                 child: DropdownButton<String>(
                   value: selectedSite,
@@ -115,6 +119,22 @@ class InventoryScreenState extends State<InventoryScreen> {
                   }).toList(),
                   onChanged: (val) => setState(() => selectedSite = val!),
                 ),
+=======
+              child: CustomDropdown<Inventory>(
+                value: selectedInventory,
+                items: inventoryData,
+                displayMapper: (inv) => inv.site,
+                onChanged: (Inventory? newValue) {
+                  setState(() => selectedInventory = newValue);
+                },
+                hint: "Select site",
+                isExpanded: true,
+                isDense: true,
+                border:
+                    InputBorder.none, // hide default border (we use container)
+                fillColor: Colors.transparent,
+                borderRadius: BorderRadius.circular(10),
+>>>>>>> main
               ),
             ),
 
@@ -122,6 +142,7 @@ class InventoryScreenState extends State<InventoryScreen> {
             const Text("Materials", style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF34495E))),
             const SizedBox(height: 10),
 
+<<<<<<< HEAD
             InventoryCard(children: [
               InventoryTile(icon: Icons.view_in_ar, color: Colors.blue, title: "Cement", value: data['cement']!),
               const Divider(height: 1),
@@ -132,11 +153,32 @@ class InventoryScreenState extends State<InventoryScreen> {
               InventoryTile(icon: Icons.layers, color: Colors.blue, title: "Bricks", value: data['bricks']!),
               AddButton(label: "Add Material", onTap: () {}),
             ]),
+=======
+            InventoryCard(
+              children: [
+                ...materials.map(
+                  (m) => Column(
+                    children: [
+                      InventoryTile(
+                        icon: _getMaterialIcon(m.name),
+                        color: Colors.blue,
+                        title: m.name,
+                        value: "${m.quantity} ${m.unit}",
+                      ),
+                      const Divider(height: 1),
+                    ],
+                  ),
+                ),
+                AddButton(label: "Add Material", onTap: () {}),
+              ],
+            ),
+>>>>>>> main
 
             const SizedBox(height: 25),
             const Text("Hired Tools", style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF34495E))),
             const SizedBox(height: 10),
 
+<<<<<<< HEAD
             InventoryCard(children: [
               InventoryTile(icon: Icons.build_circle_outlined, color: Colors.orange, title: "Concrete Mixer", value: data['mixer']!),
               const Divider(height: 1),
@@ -147,6 +189,27 @@ class InventoryScreenState extends State<InventoryScreen> {
               InventoryTile(icon: Icons.bolt, color: Colors.orange, title: "Generator", value: data['gen']!),
               AddButton(label: "Add Hired Tool", onTap: () {}),
             ]),
+=======
+            InventoryCard(
+              children: [
+                ...tools.map(
+                  (t) => Column(
+                    children: [
+                      InventoryTile(
+                        icon: _getToolIcon(t.name),
+                        color: Colors.orange,
+                        title: t.name,
+                        value: "${t.quantity} ${t.unit}",
+                      ),
+                      const Divider(height: 1),
+                    ],
+                  ),
+                ),
+                AddButton(label: "Add Hired Tool", onTap: () {}),
+              ],
+            ),
+
+>>>>>>> main
             const SizedBox(height: 30),
           ],
         ),
@@ -215,7 +278,9 @@ class AddButton extends StatelessWidget {
           label: Text(label, style: const TextStyle(color: Colors.blue)),
           style: OutlinedButton.styleFrom(
             side: BorderSide(color: Colors.grey.shade300),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
             padding: const EdgeInsets.symmetric(vertical: 12),
           ),
         ),
