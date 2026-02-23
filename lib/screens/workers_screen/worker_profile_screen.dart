@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:graville_operations/screens/commons/assets/images.dart';
+import 'package:graville_operations/screens/workers_screen/workers_screen.dart';
 
 class WorkerProfileScreen extends StatelessWidget {
-  const WorkerProfileScreen({super.key});
+  final Worker worker;
+
+  const WorkerProfileScreen({
+    super.key,
+    required this.worker,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -35,8 +41,8 @@ class WorkerProfileScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
 
-                    const Text(
-                      "Marcus Johnson",
+                   Text(
+                       worker.name,
                       style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
@@ -48,7 +54,7 @@ class WorkerProfileScreen extends StatelessWidget {
                     _buildInfoRow(
                       icon: Icons.phone,
                       label: "Phone Number",
-                      value: "+254 755 234 567",
+                      value: worker.phone,
                     ),
 
                     const SizedBox(height: 16),
@@ -56,7 +62,7 @@ class WorkerProfileScreen extends StatelessWidget {
                     _buildInfoRow(
                       icon: Icons.badge,
                       label: "National ID",
-                      value: "402456",
+                     value: worker.id,
                     ),
                   ],
                 ),
@@ -74,7 +80,7 @@ class WorkerProfileScreen extends StatelessWidget {
                     _buildInfoRow(
                       icon: Icons.apartment,
                       label: "Department",
-                      value: "Electrical",
+                      value: worker.specialty,
                     ),
 
                     const SizedBox(height: 20),
@@ -89,7 +95,7 @@ class WorkerProfileScreen extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
 
-                            const Text(
+                             Text(
                               "Skill Level",
                               style: TextStyle(
                                 fontSize: 13,

@@ -1,17 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:graville_operations/screens/Inventory_Screen/inventory_screen.dart';
-<<<<<<< HEAD
-import 'package:graville_operations/screens/login/login_screen.dart';
-import 'package:graville_operations/screens/settings_screen/settings_screen.dart';
-//import 'package:graville_operations/screens/worker_profile_screen.dart';
-import 'package:graville_operations/screens/workers_screen/worker_profile_screen.dart';
-=======
-import 'package:graville_operations/screens/add_worker_screen/add_worker_screen.dart';
 
 import 'package:graville_operations/screens/login/login_screen.dart';
+
 
 //import 'package:graville_operations/screens/settings_screen/settings_screen.dart';
->>>>>>> main
 void main() {
   runApp(const MyApp());
 }
@@ -24,15 +16,12 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'graville operations',
       themeMode: ThemeMode.light,
-<<<<<<< HEAD
+
       theme: ThemeData(
         useMaterial3: true,
       ),
-     home: const WorkerProfileScreen(),
-=======
-      theme: ThemeData(useMaterial3: true),
-      home: const AddWorkerScreen(),
->>>>>>> main
+      home: const LoginScreen(),
+
     );
   }
 }

@@ -4,7 +4,6 @@ import 'package:graville_operations/screens/commons/assets/images.dart';
 import 'package:graville_operations/screens/commons/widgets/section_card.dart';
 import 'package:graville_operations/screens/commons/widgets/status_chip.dart';
 import 'package:graville_operations/screens/commons/widgets/stat_card.dart';
-import 'package:graville_operations/screens/commons/widgets/progress_bar.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});

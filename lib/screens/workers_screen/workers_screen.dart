@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'worker_profile_screen.dart';
 
 class Worker {
   final String name;
@@ -314,40 +315,48 @@ class _WorkersScreenState extends State<WorkersScreen> {
   }
 
   List<DataRow> _buildWorkerRows() {
-    return workers.map((worker) {
-      return DataRow(
-        onSelectChanged: (selected) {},
-        cells: [
-          DataCell(Text(worker.name)),
-          DataCell(Text(worker.id)),
-          DataCell(
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(
+  return workers.map((worker) {
+    return DataRow(
+      onSelectChanged: (selected) {
+        if (selected == true) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => WorkerProfileScreen(worker: worker),
+            ),
+          );
+        }
+      },
+      cells: [
+        DataCell(Text(worker.name)),
+        DataCell(Text(worker.id)),
+        DataCell(
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: worker.skillLevel.toLowerCase() == 'skilled'
+                  ? Colors.blue.shade100
+                  : Colors.grey.shade300,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Text(
+              worker.skillLevel,
+              style: TextStyle(
                 color: worker.skillLevel.toLowerCase() == 'skilled'
-                    ? Colors.blue.shade100
-                    : Colors.grey.shade300,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(
-                worker.skillLevel,
-                style: TextStyle(
-                  color: worker.skillLevel.toLowerCase() == 'skilled'
-                      ? Colors.blue.shade800
-                      : Colors.grey.shade800,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 12,
-                ),
+                    ? Colors.blue.shade800
+                    : Colors.grey.shade800,
+                fontWeight: FontWeight.bold,
+                fontSize: 12,
               ),
             ),
           ),
-          DataCell(Text(worker.phone)),
-          DataCell(Text(worker.specialty)),
-          DataCell(Text(worker.rate)),
-        ],
-      );
-    }).toList();
-  }
+        ),
+        DataCell(Text(worker.phone)),
+        DataCell(Text(worker.specialty)),
+        DataCell(Text(worker.rate)),
+      ],
+    );
+  }).toList();
 }
 
 Widget _statCard({
@@ -386,4 +395,5 @@ Widget _statCard({
       ),
     ),
   );
+}
 }
