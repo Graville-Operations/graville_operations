@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:graville_operations/models/inventory/Inventory.dart';
 import 'package:graville_operations/models/inventory/material_data.dart';
+import 'package:graville_operations/screens/Inventory_Screen/inventory_screen.dart';
 import 'package:graville_operations/screens/commons/widgets/custom_dropdown.dart';
+//import 'package:graville_operations/screens/inventory_screen/widgets/inventory_card.dart';
+//import 'package:graville_operations/screens/inventory_screen/widgets/inventory_tile.dart';
 
 class InventoryScreen extends StatefulWidget {
   const InventoryScreen({super.key});
@@ -177,7 +180,6 @@ class _InventoryScreenState extends State<InventoryScreen> {
     );
   }
 
-  // Optional: better icon matching
   IconData _getMaterialIcon(String name) {
     final lower = name.toLowerCase();
     if (lower.contains('cement')) return Icons.view_in_ar;
@@ -197,71 +199,6 @@ class _InventoryScreenState extends State<InventoryScreen> {
   }
 }
 
-// ── Keep your existing supporting widgets unchanged ──
-class InventoryCard extends StatelessWidget {
-  final List<Widget> children;
-  const InventoryCard({super.key, required this.children});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade100),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.03),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(children: children),
-    );
-  }
-}
-
-class InventoryTile extends StatelessWidget {
-  final IconData icon;
-  final Color color;
-  final String title;
-  final String value;
-
-  const InventoryTile({
-    super.key,
-    required this.icon,
-    required this.color,
-    required this.title,
-    required this.value,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      leading: Container(
-        padding: const EdgeInsets.all(6),
-        decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Icon(icon, color: color, size: 20),
-      ),
-      title: Text(
-        title,
-        style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 14),
-      ),
-      trailing: Text(
-        value,
-        style: const TextStyle(
-          fontWeight: FontWeight.bold,
-          color: Color(0xFF2C3E50),
-          fontSize: 14,
-        ),
-      ),
-    );
-  }
-}
 
 class AddButton extends StatelessWidget {
   final String label;
