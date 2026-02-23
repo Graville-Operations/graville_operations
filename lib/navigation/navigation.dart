@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:graville_operations/screens/account_screen/account_screen.dart';
 import 'package:graville_operations/screens/home/home_screen.dart';
-import 'package:graville_operations/screens/inventory_screen/inventory_screen.dart';
 import 'package:graville_operations/screens/workers/workers_screen.dart';
 
 class MainNavigationScreen extends StatefulWidget {
@@ -16,7 +15,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   final List<Widget> _screens = [
     const HomeScreen(),
     const WorkersScreen(),
-    const InventoryScreen(),
+    //const InventoryScreen(),
     const AccountScreen(),
   ];
   @override

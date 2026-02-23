@@ -11,9 +11,9 @@ class CustomTextInput extends StatelessWidget {
   final String hintText;
   final TextInputType? keyboardType;
   final InputDecoration? decoration;
+  final int? maxLines;
 
   final String? Function(String?)? validator;
-
   const CustomTextInput({
     super.key,
     required this.controller,
@@ -24,10 +24,9 @@ class CustomTextInput extends StatelessWidget {
     required this.hintText,
     this.prefixIcon,
     this.suffixIcon,
-
-
     this.validator,
     this.keyboardType=TextInputType.text, this.decoration,
+    this.maxLines,
   });
 
   @override
@@ -53,9 +52,7 @@ class CustomTextInput extends StatelessWidget {
             fontWeight: FontWeight.bold,
           ),
           hintText: hintText,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
           errorBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide(color: Colors.red),
@@ -65,11 +62,8 @@ class CustomTextInput extends StatelessWidget {
             borderSide: BorderSide(color: Colors.black),
           ),
           suffixIcon: IconButton(
-            icon: Icon(
-              suffixIcon,
-              color: Colors.grey,
-            ),
-            onPressed:onSuffixIconPressed,
+            icon: Icon(suffixIcon, color: Colors.grey),
+            onPressed: onSuffixIconPressed,
           ),
         ),
       ),
