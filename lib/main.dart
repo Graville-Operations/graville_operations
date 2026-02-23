@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:graville_operations/screens/add_worker_screen/add_worker_screen.dart';
 import 'package:graville_operations/screens/login/login_screen.dart';
 import 'package:graville_operations/screens/material/receive_material.dart';
 
@@ -17,7 +16,6 @@ class MyApp extends StatelessWidget {
       themeMode: ThemeMode.light,
       theme: ThemeData(useMaterial3: true),
       home: const LoginScreen(),
-      home: LoginScreen()
     );
   }
 }
