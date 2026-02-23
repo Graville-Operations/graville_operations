@@ -67,6 +67,10 @@ class _InventoryScreenState extends State<InventoryScreen> {
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.white,
+          leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
+          onPressed: () {},
+        ),
         title: const Text(
           'Inventory',
           style: TextStyle(
