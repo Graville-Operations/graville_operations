@@ -154,6 +154,9 @@ class InventoryScreenState extends State<InventoryScreen> {
     );
   }
 }
+
+// --- PUBLIC COMPONENTS ---
+
 class InventoryCard extends StatelessWidget {
   final List<Widget> children;
   const InventoryCard({super.key, required this.children});
