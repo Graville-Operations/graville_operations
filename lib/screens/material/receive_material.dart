@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:graville_operations/screens/material/sections/material_info_section.dart';
-import 'package:graville_operations/screens/material/sections/material_photo_section.dart';
+import 'package:graville_operations/screens/commons/widgets/sections/material_info_section.dart';
+import 'package:graville_operations/screens/commons/widgets/sections/material_photo_section.dart';
+import 'package:graville_operations/screens/commons/widgets/sections/material_quantity_section.dart';
+import 'package:graville_operations/screens/commons/widgets/sections/material_payment_section.dart';
+import 'package:graville_operations/screens/commons/widgets/custom_button.dart';
 
 class ReceiveMaterialScreen extends StatelessWidget {
   const ReceiveMaterialScreen({super.key});
@@ -35,9 +38,25 @@ class ReceiveMaterialScreen extends StatelessWidget {
           SliverPadding(
             padding: EdgeInsets.all(16),
             sliver: SliverList(
-              delegate: SliverChildListDelegate(const [
+              delegate: SliverChildListDelegate([
                 MaterialPhotoSection(),
                 MaterialInfoSection(),
+                MaterialQuantitySection(),
+                MaterialPaymentSection(),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 0),
+                  child: CustomButton(
+                    label: "Confirm Receipt",
+                    icon: const Icon(Icons.check_circle_outline),
+                    backgroundColor: Colors.grey.shade400,
+                    textColor: Colors.white,
+                    borderRadius: 16,
+                    height: 55,
+                    onPressed: () {
+                      print("Receipt Confirmed");
+                    },
+                  ),
+                ),
               ]),
             ),
           ),
