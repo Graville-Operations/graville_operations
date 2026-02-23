@@ -5,12 +5,12 @@ class CustomTextInput extends StatelessWidget {
   final bool isPassword;
   final bool isObscure;
   final VoidCallback? onSuffixIconPressed;
-  final String labelText;
+  final String? labelText;
   final IconData? prefixIcon;
   final IconData? suffixIcon;
   final String hintText;
-  final TextInputType? keyboardType;
-  final int? maxLines;
+  // final TextInputType? keyboardType;
+  // final int? maxLines;
 
   final String? Function(String?)? validator;
   final TextInputType? keyboardType;
@@ -22,7 +22,7 @@ class CustomTextInput extends StatelessWidget {
     this.isPassword = false,
     this.isObscure = false,
     this.onSuffixIconPressed,
-    required this.labelText,
+    this.labelText,
     required this.hintText,
     this.prefixIcon,
     this.suffixIcon,
