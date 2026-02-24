@@ -242,6 +242,44 @@ class _HomeScreenState extends State<HomeScreen> {
                     ],
                   ),
                 ),
+                //Task progress card
+                const SizedBox(height: 15),
+                const SectionCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(Icons.task, size: 18),
+                          SizedBox(width: 8),
+                          Text(
+                            "Task Progress",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 15),
+                      TaskProgress(
+                        title: "Foundation",
+                        percent: 1.0,
+                        color: Colors.green,
+                      ),
+                      TaskProgress(
+                        title: "Framing",
+                        percent: 0.75,
+                        color: Colors.orange,
+                      ),
+                      TaskProgress(
+                        title: "Electrical",
+                        percent: 0.45,
+                        color: Colors.blue,
+                      ),
+                    ],
+                  ),
+                ),
 
                 //Reviews
                 const SizedBox(height: 20),
