@@ -1,4 +1,4 @@
-import 'package:graville_operations/screens/inventory/material_data.dart';
+import 'package:graville_operations/models/material/material_data.dart';
 
 class Inventory {
   final String site;
