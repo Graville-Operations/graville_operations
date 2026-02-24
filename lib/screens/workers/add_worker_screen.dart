@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
-void main() => runApp(const MaterialApp(home: AddWorkerScreen()));
 
 /// ✅ Worker model (needed for Navigator.pop)
 class Worker {
