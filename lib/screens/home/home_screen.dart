@@ -69,7 +69,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             const SizedBox(height: 12),
             Tooltip(
-              message: "update inventory",
+              message: "Update inventory",
               child: miniFab(
                 Icons.store,
                 () => context.push(const UpdateInventoryScreen()),
@@ -268,9 +268,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     ],
                   ),
                 ),
-                //Task progress card
+                //Task progress section
                 const SizedBox(height: 15),
-                const SectionCard(
+                SectionCard(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -280,10 +280,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           SizedBox(width: 8),
                           Text(
                             "Task Progress",
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
+                            style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ],
                       ),
