@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:graville_operations/models/inventory/Inventory.dart';
-import 'package:graville_operations/models/inventory/material_data.dart';
+import 'package:graville_operations/models/Inventory.dart';
+import 'package:graville_operations/models/material/material_data.dart';
 import 'package:graville_operations/screens/commons/widgets/custom_dropdown.dart';
 import 'package:graville_operations/screens/inventory/widgets/inventory_card.dart';
 import 'package:graville_operations/screens/inventory/widgets/inventory_tile.dart';
@@ -177,6 +177,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
       ),
     );
   }
+
   IconData _getMaterialIcon(String name) {
     final lower = name.toLowerCase();
     if (lower.contains('cement')) return Icons.view_in_ar;
@@ -195,7 +196,6 @@ class _InventoryScreenState extends State<InventoryScreen> {
     return Icons.construction;
   }
 }
-
 
 class AddButton extends StatelessWidget {
   final String label;

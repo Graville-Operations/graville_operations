@@ -1,4 +1,4 @@
-import 'package:graville_operations/models/inventory/material_data.dart';
+import 'package:graville_operations/models/material/material_data.dart';
 
 class Inventory {
   final String site;
@@ -17,13 +17,12 @@ class Inventory {
     String? site,
     List<MaterialData>? materials,
     List<MaterialData>? hiredTools,
-
   }) {
     return Inventory(
       site: site ?? this.site,
       materials: materials ?? this.materials,
       hiredTools: hiredTools ?? this.hiredTools,
-      createdAt: createdAt
+      createdAt: createdAt,
     );
   }
 }
