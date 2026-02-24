@@ -9,13 +9,11 @@ class CustomTextInput extends StatelessWidget {
   final IconData? prefixIcon;
   final IconData? suffixIcon;
   final String hintText;
-  // final TextInputType? keyboardType;
-  // final int? maxLines;
-
-  final String? Function(String?)? validator;
   final TextInputType? keyboardType;
+  final InputDecoration? decoration;
   final int? maxLines;
 
+  final String? Function(String?)? validator;
   const CustomTextInput({
     super.key,
     required this.controller,
@@ -27,7 +25,7 @@ class CustomTextInput extends StatelessWidget {
     this.prefixIcon,
     this.suffixIcon,
     this.validator,
-    this.keyboardType,
+    this.keyboardType=TextInputType.text, this.decoration,
     this.maxLines,
   });
 
@@ -39,8 +37,12 @@ class CustomTextInput extends StatelessWidget {
         controller: controller,
         obscureText: isPassword,
         validator: validator,
-        style: TextStyle(color: Colors.black54),
-        decoration: InputDecoration(
+        style: TextStyle(
+          color: Colors.black54
+        ),
+
+        keyboardType: keyboardType,
+        decoration: decoration??InputDecoration(
           filled: true,
           fillColor: Colors.grey[100],
           prefixIcon: Icon(prefixIcon, color: Colors.grey),
