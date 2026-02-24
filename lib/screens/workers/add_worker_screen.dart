@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
-void main() => runApp(const MaterialApp(home: AddWorkerScreen()));
 
 class AddWorkerScreen extends StatefulWidget {
   const AddWorkerScreen({super.key});
@@ -86,7 +85,7 @@ class _AddWorkerScreenState extends State<AddWorkerScreen> {
     return GestureDetector(
       onTap: _openCamera,
       child: Container(
-        height: 130,
+        height: 120,
         width: double.infinity,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
