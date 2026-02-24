@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:graville_operations/models/inventory/Inventory.dart';
-import 'package:graville_operations/models/inventory/material_data.dart';
+import 'package:graville_operations/models/Inventory.dart';
+import 'package:graville_operations/models/material/material_data.dart';
+import 'package:graville_operations/navigation/custom_navigator.dart';
 import 'package:graville_operations/screens/commons/widgets/custom_dropdown.dart';
 import 'package:graville_operations/screens/inventory/widgets/inventory_card.dart';
 import 'package:graville_operations/screens/inventory/widgets/inventory_tile.dart';
+import 'package:graville_operations/screens/material/hired_materials.dart';
 
 class InventoryScreen extends StatefulWidget {
   const InventoryScreen({super.key});
@@ -173,7 +175,10 @@ class _InventoryScreenState extends State<InventoryScreen> {
                     ],
                   ),
                 ),
-                AddButton(label: "Add Hired Tool", onTap: () {}),
+                AddButton(
+                  label: "Add Hired Tool",
+                  onTap: () => context.push(HiredMaterialScreen()),
+                ),
               ],
             ),
 
@@ -183,6 +188,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
       ),
     );
   }
+
   IconData _getMaterialIcon(String name) {
     final lower = name.toLowerCase();
     if (lower.contains('cement')) return Icons.view_in_ar;
@@ -201,8 +207,6 @@ class _InventoryScreenState extends State<InventoryScreen> {
     return Icons.construction;
   }
 }
-
-
 
 class InventoryCard extends StatelessWidget {
   final List<Widget> children;
@@ -268,6 +272,7 @@ class InventoryTile extends StatelessWidget {
     );
   }
 }
+
 
 
 class AddButton extends StatelessWidget {
