@@ -7,9 +7,12 @@ environment:
   sdk: ^3.8.1
 dependencies:
   pinput: ^5.0.0 
+
   font_awesome_flutter: ^10.7.0
+  image_picker: ^1.2.1
   flutter:
     sdk: flutter
+    
   cupertino_icons: ^1.0.8
 dev_dependencies:
   flutter_test:
@@ -20,7 +23,8 @@ flutter:
   uses-material-design: true
   assets:
     - assets/images/
- 
+
+  
   # fonts:
   #   - family: Schyler
   #     fonts:
