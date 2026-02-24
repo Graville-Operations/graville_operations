@@ -22,7 +22,7 @@ class ReceiveMaterialScreen extends StatelessWidget {
             automaticallyImplyLeading: true,
             title: Row(
               children: [
-                Icon(Icons.inventory, size: 22),
+                Icon(Icons.inventory, color: Colors.blue, size: 22),
                 SizedBox(width: 8),
                 Text(
                   "Receive Material",
@@ -43,12 +43,13 @@ class ReceiveMaterialScreen extends StatelessWidget {
                 MaterialInfoSection(),
                 MaterialQuantitySection(),
                 MaterialPaymentSection(),
+                SizedBox(height: 15),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 0),
                   child: CustomButton(
                     label: "Confirm Receipt",
                     icon: const Icon(Icons.check_circle_outline),
-                    backgroundColor: Colors.grey.shade400,
+                    backgroundColor: Colors.blue,
                     textColor: Colors.white,
                     borderRadius: 16,
                     height: 55,

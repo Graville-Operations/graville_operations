@@ -25,48 +25,49 @@ class CustomTextInput extends StatelessWidget {
     this.prefixIcon,
     this.suffixIcon,
     this.validator,
-    this.keyboardType=TextInputType.text, this.decoration,
-    this.maxLines,
+    this.keyboardType = TextInputType.text,
+    this.decoration,
+    this.maxLines = 1,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: TextFormField(
-        controller: controller,
-        obscureText: isPassword,
-        validator: validator,
-        style: TextStyle(
-          color: Colors.black54
-        ),
+    final bool isMultiline = maxLines != null && maxLines! > 1;
+    return TextFormField(
+      controller: controller,
+      obscureText: isPassword,
+      validator: validator,
+      style: TextStyle(color: Colors.black54),
 
-        keyboardType: keyboardType,
-        decoration: decoration??InputDecoration(
-          filled: true,
-          fillColor: Colors.grey[100],
-          prefixIcon: Icon(prefixIcon, color: Colors.grey),
-          labelText: labelText,
-          floatingLabelStyle: TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.bold,
+      keyboardType: isMultiline ? TextInputType.multiline : keyboardType,
+      minLines: isMultiline ? 4 : 1,
+      maxLines: isMultiline ? null : 1,
+      decoration:
+          decoration ??
+          InputDecoration(
+            filled: true,
+            fillColor: Colors.grey[100],
+            prefixIcon: Icon(prefixIcon, color: Colors.grey),
+            labelText: labelText,
+            floatingLabelStyle: TextStyle(
+              color: Colors.black,
+              fontWeight: FontWeight.bold,
+            ),
+            hintText: hintText,
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+            errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: Colors.red),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: Colors.black),
+            ),
+            suffixIcon: IconButton(
+              icon: Icon(suffixIcon, color: Colors.grey),
+              onPressed: onSuffixIconPressed,
+            ),
           ),
-          hintText: hintText,
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-          errorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(color: Colors.red),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(color: Colors.black),
-          ),
-          suffixIcon: IconButton(
-            icon: Icon(suffixIcon, color: Colors.grey),
-            onPressed: onSuffixIconPressed,
-          ),
-        ),
-      ),
     );
   }
 }
