@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:graville_operations/screens/commons/widgets/custom_button.dart';
+import 'package:graville_operations/screens/commons/widgets/custom_text_input.dart';
 
 class Worker {
   final String name;
@@ -42,67 +44,67 @@ class _WorkersScreenState extends State<WorkersScreen> {
   final List<Worker> workers = [
     Worker(
       name: "John Mitchell",
-      id: "W001",
-      skillLevel: "Skilled",
-      phone: "+1 555-0123",
+      id: "98765432",
+      skillLevel: "Unskilled",
+      phone: "+254712345678",
       specialty: "Brickwork",
-      rate: "\$250",
+      rate: "KSH 600",
     ),
     Worker(
       name: "Robert Chen",
-      id: "W002",
+      id: "98765432",
       skillLevel: "Skilled",
-      phone: "+1 555-0124",
+      phone: "+254712345678",
       specialty: "Carpentry",
-      rate: "\$280",
+      rate: "KSH 1000",
     ),
     Worker(
       name: "Maria Garcia",
-      id: "W003",
-      skillLevel: "Skilled",
-      phone: "+1 555-0125",
+      id: "98765432",
+      skillLevel: "Unskilled",
+      phone: "+254712345678",
       specialty: "Electrical",
-      rate: "\$300",
+      rate: "KSH 600",
     ),
     Worker(
       name: "David Thompson",
-      id: "W004",
+      id: "98765432",
       skillLevel: "Skilled",
-      phone: "+1 555-0126",
+      phone: "+254712345678",
       specialty: "Plumbing",
-      rate: "\$275",
+      rate: "KSH 1000",
     ),
     Worker(
       name: "Sarah Williams",
-      id: "W005",
+      id: "98765432",
       skillLevel: "Unskilled",
-      phone: "+1 555-0127",
+      phone: "+254712345678",
       specialty: "Labor",
-      rate: "\$150",
+      rate: "KSH 600",
     ),
     Worker(
       name: "James Anderson",
-      id: "W006",
+      id: "98765432",
       skillLevel: "Skilled",
-      phone: "+1 555-0128",
+      phone: "+254712345678",
       specialty: "Woodwork",
-      rate: "\$260",
+      rate: "KSH 1000",
     ),
     Worker(
       name: "Lisa Brown",
-      id: "W007",
+      id: "98765432",
       skillLevel: "Skilled",
-      phone: "+1 555-0129",
+      phone: "+254712345678",
       specialty: "Supervision",
-      rate: "\$350",
+      rate: "KSH 1000",
     ),
     Worker(
       name: "Michael Davis",
-      id: "W008",
+      id: "98765432",
       skillLevel: "Skilled",
-      phone: "+1 555-0130",
+      phone: "+254712345678",
       specialty: "Welding",
-      rate: "\$290",
+      rate: "KSH 1000",
     ),
   ];
 
@@ -213,34 +215,17 @@ class _WorkersScreenState extends State<WorkersScreen> {
 
             Row(
               children: [
-                ElevatedButton(
-                  onPressed: () {},
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(
-                      0xFF3366FF,
-                    ), // new button color
-                    foregroundColor: Colors.white, // text color
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 24,
-                      vertical: 12,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  child: const Text(
-                    "Add Worker",
-                    style: TextStyle(
-                      fontWeight: FontWeight.normal,
-                      fontSize: 10,
-                    ),
-                  ),
+                CustomButton(
+                  label: "Add Worker",
+                  onPressed: (){},
+                  backgroundColor: const Color(0xFF3366FF),
                 ),
-                const Spacer(),
+                const SizedBox(width: 12),
                 SizedBox(
-                  width: 240,
-                  child: TextField(
+                  width: 220,
+                  child: CustomTextInput(
                     controller: searchController,
+                    hintText: "Search worker .....",
                     decoration: InputDecoration(
                       isDense: true,
                       filled: true,
