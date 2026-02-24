@@ -32,6 +32,10 @@ class _WorkersScreenState extends State<WorkersScreen> {
 
   final TextEditingController searchController = TextEditingController();
 
+  // Overlay variables
+  final LayerLink _layerLink = LayerLink();
+  OverlayEntry? _overlayEntry;
+
   final List<String> sites = [
     'Mabatini',
     'Mishi Mboko',
@@ -108,6 +112,83 @@ class _WorkersScreenState extends State<WorkersScreen> {
     ),
   ];
 
+  // Show overlay
+  void _showOverlay() {
+    _removeOverlay();
+
+    _overlayEntry = OverlayEntry(
+      builder: (context) {
+        final query = searchController.text.toLowerCase();
+
+        final results = workers.where((worker) {
+          return worker.name.toLowerCase().contains(query);
+        }).toList();
+
+        return Positioned(
+          width: 240,
+          child: CompositedTransformFollower(
+            link: _layerLink,
+            offset: const Offset(0, 50),
+            showWhenUnlinked: false,
+            child: Material(
+              elevation: 4,
+              borderRadius: BorderRadius.circular(8),
+              child: Container(
+                constraints: const BoxConstraints(maxHeight: 200),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: results.isEmpty
+                    ? const Padding(
+                        padding: EdgeInsets.all(12),
+                        child: Text("No result"),
+                      )
+                    : ListView.builder(
+                        padding: EdgeInsets.zero,
+                        shrinkWrap: true,
+                        itemCount: results.length,
+                        itemBuilder: (context, index) {
+                          final worker = results[index];
+                          return ListTile(
+                            title: Text(worker.name),
+                            onTap: () {
+                              _removeOverlay();
+                              searchController.clear();
+
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      WorkerProfileScreen(worker: worker),
+                                ),
+                              );
+                            },
+                          );
+                        },
+                      ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+
+    Overlay.of(context).insert(_overlayEntry!);
+  }
+
+  void _removeOverlay() {
+    _overlayEntry?.remove();
+    _overlayEntry = null;
+  }
+
+  @override
+  void dispose() {
+    _removeOverlay();
+    searchController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -134,7 +215,6 @@ class _WorkersScreenState extends State<WorkersScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // LABEL OUTSIDE CARD
             const Text(
               "Construction Site",
               style: TextStyle(
@@ -251,24 +331,36 @@ class _WorkersScreenState extends State<WorkersScreen> {
                 const Spacer(),
                 SizedBox(
                   width: 240,
-                  child: TextField(
-                    controller: searchController,
-                    decoration: InputDecoration(
-                      isDense: true,
-                      filled: true,
-                      fillColor: Colors.white,
-                      prefixIcon: const Icon(Icons.search),
-                      hintText: "Search",
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(color: Colors.grey.shade400),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: const BorderSide(color: Colors.blue),
+                  child: CompositedTransformTarget(
+                    link: _layerLink,
+                    child: TextField(
+                      controller: searchController,
+                      onChanged: (value) {
+                        if (value.isEmpty) {
+                          _removeOverlay();
+                        } else {
+                          _showOverlay();
+                        }
+                      },
+                      decoration: InputDecoration(
+                        isDense: true,
+                        filled: true,
+                        fillColor: Colors.white,
+                        prefixIcon: const Icon(Icons.search),
+                        hintText: "Search",
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide:
+                              BorderSide(color: Colors.grey.shade400),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide:
+                              const BorderSide(color: Colors.blue),
+                        ),
                       ),
                     ),
                   ),
@@ -295,7 +387,7 @@ class _WorkersScreenState extends State<WorkersScreen> {
                   scrollDirection: Axis.horizontal,
                   child: DataTable(
                     showCheckboxColumn: false,
-                    headingRowColor: WidgetStateProperty.all(
+                    headingRowColor: MaterialStateProperty.all(
                       Colors.grey.shade200,
                     ),
                     columnSpacing: 30,
@@ -326,85 +418,85 @@ class _WorkersScreenState extends State<WorkersScreen> {
   }
 
   List<DataRow> _buildWorkerRows() {
-  return workers.map((worker) {
-    return DataRow(
-      onSelectChanged: (selected) {
-        if (selected == true) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => WorkerProfileScreen(worker: worker),
-            ),
-          );
-        }
-      },
-      cells: [
-        DataCell(Text(worker.name)),
-        DataCell(Text(worker.id)),
-        DataCell(
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(
-              color: worker.skillLevel.toLowerCase() == 'skilled'
-                  ? Colors.blue.shade100
-                  : Colors.grey.shade300,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Text(
-              worker.skillLevel,
-              style: TextStyle(
+    return workers.map((worker) {
+      return DataRow(
+        onSelectChanged: (selected) {
+          if (selected == true) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => WorkerProfileScreen(worker: worker),
+              ),
+            );
+          }
+        },
+        cells: [
+          DataCell(Text(worker.name)),
+          DataCell(Text(worker.id)),
+          DataCell(
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
                 color: worker.skillLevel.toLowerCase() == 'skilled'
-                    ? Colors.blue.shade800
-                    : Colors.grey.shade800,
-                fontWeight: FontWeight.bold,
-                fontSize: 12,
+                    ? Colors.blue.shade100
+                    : Colors.grey.shade300,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                worker.skillLevel,
+                style: TextStyle(
+                  color: worker.skillLevel.toLowerCase() == 'skilled'
+                      ? Colors.blue.shade800
+                      : Colors.grey.shade800,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 12,
+                ),
               ),
             ),
           ),
-        ),
-        DataCell(Text(worker.phone)),
-        DataCell(Text(worker.specialty)),
-        DataCell(Text(worker.rate)),
-      ],
-    );
-  }).toList();
-}
-
-Widget _statCard({
-  required String title,
-  required String subtitle,
-  required Color color,
-  required Color textColor,
-  required VoidCallback onTap,
-}) {
-  return InkWell(
-    onTap: onTap,
-    borderRadius: BorderRadius.circular(12),
-    child: Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        children: [
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: 26,
-              fontWeight: FontWeight.bold,
-              color: textColor,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            subtitle,
-            textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 13),
-          ),
+          DataCell(Text(worker.phone)),
+          DataCell(Text(worker.specialty)),
+          DataCell(Text(worker.rate)),
         ],
+      );
+    }).toList();
+  }
+
+  Widget _statCard({
+    required String title,
+    required String subtitle,
+    required Color color,
+    required Color textColor,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(
+          children: [
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 26,
+                fontWeight: FontWeight.bold,
+                color: textColor,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              subtitle,
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 13),
+            ),
+          ],
+        ),
       ),
-    ),
-  );
-}
+    );
+  }
 }
