@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:graville_operations/screens/commons/assets/images.dart';
-import 'package:graville_operations/screens/workers_screen/workers_screen.dart';
+import 'package:graville_operations/models/worker.dart';
 
 class WorkerProfileScreen extends StatelessWidget {
   final Worker worker;

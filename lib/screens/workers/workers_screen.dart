@@ -1,24 +1,8 @@
 import 'package:flutter/material.dart';
 import 'worker_profile_screen.dart';
+import 'package:graville_operations/models/worker.dart';
 import 'package:graville_operations/screens/add_worker_screen/add_worker_screen.dart';
 
-class Worker {
-  final String name;
-  final String id;
-  final String skillLevel;
-  final String phone;
-  final String specialty;
-  final String rate;
-
-  Worker({
-    required this.name,
-    required this.id,
-    required this.skillLevel,
-    required this.phone,
-    required this.specialty,
-    required this.rate,
-  });
-}
 
 class WorkersScreen extends StatefulWidget {
   const WorkersScreen({super.key});
@@ -235,7 +219,7 @@ class _WorkersScreenState extends State<WorkersScreen> {
                   vertical: 8,
                 ),
                 child: DropdownButtonFormField<String>(
-                  initialValue: selectedSite,
+                  value: selectedSite,
                   hint: const Text("Select Site"),
                   isDense: true,
                   items: sites
@@ -387,7 +371,7 @@ class _WorkersScreenState extends State<WorkersScreen> {
                   scrollDirection: Axis.horizontal,
                   child: DataTable(
                     showCheckboxColumn: false,
-                    headingRowColor: WidgetStateProperty.all(
+                    headingRowColor: MaterialStateProperty.all(
                       Colors.grey.shade200,
                     ),
                     columnSpacing: 30,

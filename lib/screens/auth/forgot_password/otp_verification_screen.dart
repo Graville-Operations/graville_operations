@@ -1,9 +1,10 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:graville_operations/screens/auth/forgot_password/reset_password_screen.dart';
 import 'package:graville_operations/screens/commons/assets/images.dart';
-import 'package:pinput/pinput.dart';
 import 'package:graville_operations/screens/commons/widgets/custom_button.dart';
-import 'package:graville_operations/screens/forgot_password/reset_password_screen.dart';
+import 'package:pinput/pinput.dart';
 
 class OtpVerificationScreen extends StatefulWidget {
   final String generatedOtp;

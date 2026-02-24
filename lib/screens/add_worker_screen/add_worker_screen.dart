@@ -1,26 +1,9 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:graville_operations/models/worker.dart';
 
-void main() => runApp(const MaterialApp(home: AddWorkerScreen()));
 
-class Worker {
-  final String name;
-  final String id;
-  final String skillLevel;
-  final String phone;
-  final String specialty;
-  final String rate;
-
-  Worker({
-    required this.name,
-    required this.id,
-    required this.skillLevel,
-    required this.phone,
-    required this.specialty,
-    required this.rate,
-  });
-}
 
 class AddWorkerScreen extends StatefulWidget {
   const AddWorkerScreen({super.key});

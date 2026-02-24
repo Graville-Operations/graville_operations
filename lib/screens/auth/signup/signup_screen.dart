@@ -1,9 +1,9 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:graville_operations/screens/auth/login/login_screen.dart';
 import 'package:graville_operations/screens/commons/assets/images.dart';
 import 'package:graville_operations/screens/commons/widgets/custom_button.dart';
 import 'package:graville_operations/screens/commons/widgets/custom_text_input.dart';
-import 'package:graville_operations/screens/login/login_screen.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class Signup extends StatefulWidget {
@@ -191,8 +191,7 @@ class _SignupState extends State<Signup> {
                     SizedBox(height: 20),
                     CustomButton(
                       label: "Sign up",
-                      backgroundColor: Colors.green,
-                      textColor: Colors.black,
+                      width: double.infinity,
                       onPressed: signUpUser,
                     ),
                     SizedBox(height: 20),
