@@ -74,7 +74,9 @@ class _InventoryScreenState extends State<InventoryScreen> {
         backgroundColor: Colors.white,
           leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
-          onPressed: () {},
+          onPressed: () {
+             Navigator.pop(context);
+          },
         ),
         title: const Text(
           'Inventory',

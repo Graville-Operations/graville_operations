@@ -143,21 +143,9 @@ class UpdateInventoryScreenState
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 6),
-            DropdownButtonFormField<String>(
-              value: selectedUnit,
-              items: units
-                  .map((e) => DropdownMenuItem(
-                        value: e,
-                        child: Text(e),
-                      ))
-                  .toList(),
-              onChanged: (val) {
-                setState(() {
-                  selectedUnit = val;
-                });
-              },
-              decoration: inputDecoration(),
-            ),
+             TextField(
+                decoration: inputDecoration(),
+               ),
 
             const SizedBox(height: 20),
 
