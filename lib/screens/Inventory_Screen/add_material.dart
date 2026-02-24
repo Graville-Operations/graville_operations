@@ -51,7 +51,6 @@ class AddMaterialScreenState extends State<AddMaterialScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
 
-            /// Material Name
             const Text(
               "Material Name",
               style: TextStyle(fontSize: 14,fontWeight: FontWeight.bold),
@@ -69,7 +68,6 @@ class AddMaterialScreenState extends State<AddMaterialScreen> {
 
             const SizedBox(height: 20),
 
-            /// Category
             const Text(
               "Category",
               style: TextStyle(fontSize: 14,fontWeight: FontWeight.bold),
@@ -87,7 +85,6 @@ class AddMaterialScreenState extends State<AddMaterialScreen> {
 
             const SizedBox(height: 20),
 
-            /// Unit
             const Text(
               "Unit",
               style: TextStyle(fontSize: 14,fontWeight: FontWeight.bold),
