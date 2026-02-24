@@ -14,6 +14,7 @@ class AddMaterialScreen extends StatefulWidget {
   const AddMaterialScreen({super.key});
 
   @override
+
   State<AddMaterialScreen> createState() => AddMaterialScreenState();
 }
 
@@ -25,6 +26,7 @@ class AddMaterialScreenState extends State<AddMaterialScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+
       backgroundColor: Colors.grey[200],
       appBar: AppBar(
         backgroundColor: Colors.grey[200],
@@ -161,3 +163,4 @@ class AddMaterialScreenState extends State<AddMaterialScreen> {
     );
   }
 }
+

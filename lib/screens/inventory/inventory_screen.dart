@@ -200,8 +200,8 @@ class _InventoryScreenState extends State<InventoryScreen> {
   }
 }
 
-<<<<<<< HEAD:lib/screens/inventory_screen/inventory_screen.dart
-// ── Keep your existing supporting widgets unchanged ──
+
+
 class InventoryCard extends StatelessWidget {
   final List<Widget> children;
   const InventoryCard({super.key, required this.children});
@@ -266,8 +266,7 @@ class InventoryTile extends StatelessWidget {
     );
   }
 }
-=======
->>>>>>> main:lib/screens/inventory/inventory_screen.dart
+
 
 class AddButton extends StatelessWidget {
   final String label;
