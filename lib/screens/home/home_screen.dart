@@ -262,7 +262,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         child: DataTable(
                           columnSpacing: 40,
-                          headingRowColor: MaterialStatePropertyAll(
+                          headingRowColor: WidgetStatePropertyAll(
                             Colors.grey.shade200,
                           ),
                           columns: const [
