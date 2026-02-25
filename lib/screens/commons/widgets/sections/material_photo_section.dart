@@ -1,61 +1,82 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:graville_operations/screens/commons/widgets/sections/form_section.dart';
 
-class MaterialPhotoSection extends StatelessWidget {
+class MaterialPhotoSection extends StatefulWidget {
   const MaterialPhotoSection({super.key});
 
   @override
+  State<MaterialPhotoSection> createState() => _MaterialPhotoSectionState();
+}
+
+class _MaterialPhotoSectionState extends State<MaterialPhotoSection> {
+  File? _imageFile;
+  final ImagePicker _picker = ImagePicker();
+
+  Future<void> _pickImage() async {
+    final XFile? pickedFile = await _picker.pickImage(
+      source: ImageSource.camera,
+    );
+
+    if (pickedFile != null) {
+      setState(() {
+        _imageFile = File(pickedFile.path);
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
     return FormSection(
       title: "Material Photo",
       icon: Icons.image_outlined,
-      child: InkWell(
-        onTap: () {},
-        borderRadius: BorderRadius.circular(16),
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            const maxHeight = 260.0;
-
-            final calculatedHeight = constraints.maxWidth / (6 / 2);
-
-            final height = calculatedHeight > maxHeight
-                ? maxHeight
-                : calculatedHeight;
-
-            return SizedBox(
-              width: double.infinity,
-              height: height,
+      child: Align(
+        alignment: AlignmentGeometry.topCenter,
+        child: InkWell(
+          onTap: _pickImage,
+          borderRadius: BorderRadius.circular(16),
+          child: SizedBox(
+            height: screenHeight * 0.5,
+            child: AspectRatio(
+              aspectRatio: 1,
               child: Container(
                 decoration: BoxDecoration(
                   color: Colors.grey.shade100,
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(color: Colors.grey.shade300),
                 ),
-                child: Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      CircleAvatar(
-                        radius: 28,
-                        backgroundColor: Colors.blue.shade100,
-                        child: const Icon(Icons.camera_alt_outlined),
+                child: _imageFile == null
+                    ? Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            CircleAvatar(
+                              radius: 28,
+                              backgroundColor: Colors.blue.shade100,
+                              child: const Icon(Icons.camera_alt_outlined),
+                            ),
+                            const SizedBox(height: 10),
+                            const Text(
+                              "Tap to capture photo",
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
+                      )
+                    : ClipRRect(
+                        borderRadius: BorderRadius.circular(16),
+                        child: Image.file(
+                          _imageFile!,
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                          height: double.infinity,
+                        ),
                       ),
-                      const SizedBox(height: 10),
-                      const Text(
-                        "Tap to capture photo",
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 6),
-                      const Text(
-                        "or select from gallery",
-                        style: TextStyle(fontSize: 12, color: Colors.grey),
-                      ),
-                    ],
-                  ),
-                ),
               ),
-            );
-          },
+            ),
+          ),
         ),
       ),
     );
