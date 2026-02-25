@@ -5,6 +5,7 @@ class Worker {
   final String phone;
   final String specialty;
   final String rate;
+  final DateTime joinDate;
 
   Worker({
     required this.name,
@@ -13,5 +14,6 @@ class Worker {
     required this.phone,
     required this.specialty,
     required this.rate,
+    required this.joinDate,
   });
 }

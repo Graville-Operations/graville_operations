@@ -258,6 +258,7 @@ class _AddWorkerScreenState extends State<AddWorkerScreen> {
                   phone: phoneController.text.trim(),
                   specialty: task!,
                   rate: "KES $amount",
+                  joinDate: DateTime.now(),
                 );
                 Navigator.pop(context, worker);
               },

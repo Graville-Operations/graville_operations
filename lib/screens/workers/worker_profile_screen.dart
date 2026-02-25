@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:graville_operations/screens/commons/assets/images.dart';
 import 'package:graville_operations/models/worker.dart';
+ 
 
 class WorkerProfileScreen extends StatelessWidget {
   final Worker worker;
@@ -126,12 +127,12 @@ class WorkerProfileScreen extends StatelessWidget {
                     ),
 
                     const SizedBox(height: 20),
-
-                    _buildInfoRow(
-                      icon: Icons.calendar_month,
-                      label: "Join Date",
-                      value: "March 2014",
-                    ),
+_buildInfoRow(
+  icon: Icons.calendar_month,
+  label: "Join Date",
+  value:
+      "${worker.joinDate.day}/${worker.joinDate.month}/${worker.joinDate.year}",
+),
                   ],
                 ),
               ),

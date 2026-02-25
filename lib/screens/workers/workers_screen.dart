@@ -37,6 +37,8 @@ class _WorkersScreenState extends State<WorkersScreen> {
       phone: "+1 555-0123",
       specialty: "Brickwork",
       rate: "\$250",
+      joinDate: DateTime(2023, 1, 15),
+
     ),
     Worker(
       name: "Robert Chen",
@@ -45,6 +47,7 @@ class _WorkersScreenState extends State<WorkersScreen> {
       phone: "+1 555-0124",
       specialty: "Carpentry",
       rate: "\$280",
+      joinDate: DateTime(2023, 2, 20),
     ),
     Worker(
       name: "Maria Garcia",
@@ -53,6 +56,7 @@ class _WorkersScreenState extends State<WorkersScreen> {
       phone: "+1 555-0125",
       specialty: "Electrical",
       rate: "\$300",
+      joinDate: DateTime(2023, 3, 10),
     ),
     Worker(
       name: "David Thompson",
@@ -61,6 +65,7 @@ class _WorkersScreenState extends State<WorkersScreen> {
       phone: "+1 555-0126",
       specialty: "Plumbing",
       rate: "\$275",
+      joinDate: DateTime(2023, 4, 5),
     ),
     Worker(
       name: "Sarah Williams",
@@ -69,6 +74,7 @@ class _WorkersScreenState extends State<WorkersScreen> {
       phone: "+1 555-0127",
       specialty: "Labor",
       rate: "\$150",
+      joinDate: DateTime(2023, 5, 12),
     ),
     Worker(
       name: "James Anderson",
@@ -77,6 +83,7 @@ class _WorkersScreenState extends State<WorkersScreen> {
       phone: "+1 555-0128",
       specialty: "Woodwork",
       rate: "\$260",
+      joinDate: DateTime(2023, 6, 18),
     ),
     Worker(
       name: "Lisa Brown",
@@ -85,6 +92,7 @@ class _WorkersScreenState extends State<WorkersScreen> {
       phone: "+1 555-0129",
       specialty: "Supervision",
       rate: "\$350",
+      joinDate: DateTime(2023, 7, 1),
     ),
     Worker(
       name: "Michael Davis",
@@ -93,6 +101,7 @@ class _WorkersScreenState extends State<WorkersScreen> {
       phone: "+1 555-0130",
       specialty: "Welding",
       rate: "\$290",
+      joinDate: DateTime(2023, 8, 15),
     ),
   ];
 
