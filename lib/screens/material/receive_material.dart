@@ -1,13 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:graville_operations/models/material/app_material.dart';
 import 'package:graville_operations/screens/commons/widgets/sections/material_info_section.dart';
 import 'package:graville_operations/screens/commons/widgets/sections/material_photo_section.dart';
 import 'package:graville_operations/screens/commons/widgets/sections/material_quantity_section.dart';
 import 'package:graville_operations/screens/commons/widgets/sections/material_payment_section.dart';
 import 'package:graville_operations/screens/commons/widgets/custom_button.dart';
 
-class ReceiveMaterialScreen extends StatelessWidget {
+class ReceiveMaterialScreen extends StatefulWidget {
   const ReceiveMaterialScreen({super.key});
 
+  @override
+  State<ReceiveMaterialScreen> createState() => _ReceiveMaterialScreenState();
+}
+
+class _ReceiveMaterialScreenState extends State<ReceiveMaterialScreen> {
+  AppMaterial? selectedMaterial;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -40,8 +47,15 @@ class ReceiveMaterialScreen extends StatelessWidget {
             sliver: SliverList(
               delegate: SliverChildListDelegate([
                 MaterialPhotoSection(),
-                MaterialInfoSection(),
-                MaterialQuantitySection(),
+                MaterialInfoSection(
+                  selectedMaterial: selectedMaterial,
+                  onChanged: (material) {
+                    setState(() {
+                      selectedMaterial = material;
+                    });
+                  },
+                ),
+                MaterialQuantitySection(selectedMaterial: selectedMaterial),
                 MaterialPaymentSection(),
                 SizedBox(height: 15),
                 Padding(

@@ -12,6 +12,7 @@ class CustomTextInput extends StatelessWidget {
   final TextInputType? keyboardType;
   final InputDecoration? decoration;
   final int? maxLines;
+  final bool readOnly;
 
   final String? Function(String?)? validator;
   const CustomTextInput({
@@ -28,6 +29,7 @@ class CustomTextInput extends StatelessWidget {
     this.keyboardType = TextInputType.text,
     this.decoration,
     this.maxLines = 1,
+    this.readOnly = false,
   });
 
   @override
@@ -37,6 +39,7 @@ class CustomTextInput extends StatelessWidget {
       controller: controller,
       obscureText: isPassword,
       validator: validator,
+      readOnly: readOnly,
       style: TextStyle(color: Colors.black54),
 
       keyboardType: isMultiline ? TextInputType.multiline : keyboardType,
