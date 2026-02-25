@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:graville_operations/models/material/material_data.dart';
 //import 'package:graville_operations/screens/Inventory_Screen/inventory_screen.dart';
 import 'package:graville_operations/screens/commons/widgets/custom_button.dart';
-
+import 'package:graville_operations/models/material/inventory_material.dart';
 import 'package:graville_operations/screens/commons/widgets/custom_button.dart';
+import 'package:graville_operations/screens/commons/widgets/custom_dropdown.dart';
 import 'package:graville_operations/screens/inventory/inventory_screen.dart';
-
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
 
 class UpdateInventoryScreen extends StatefulWidget {
   const UpdateInventoryScreen({super.key});
 
   @override
-
   UpdateInventoryScreenState createState() =>UpdateInventoryScreenState();
 
 }
@@ -18,23 +20,55 @@ class UpdateInventoryScreen extends StatefulWidget {
 class UpdateInventoryScreenState
     extends State<UpdateInventoryScreen> {
 
-  String? selectedMaterial = "Cement";
-  String? selectedUnit = "Bags";
-  int quantity = 0;
+InventoryMaterial? selectedMaterial;
+final TextEditingController unitController = TextEditingController();
+final TextEditingController categoryController = TextEditingController();
+final TextEditingController quantityController = TextEditingController();
 
-  final List<String> materials = [
-    "Bricks",
-    "Cement",
-    "Sand",
-    "Steel"
-  ];
-
-  final List<String> units = [
-    "Bags",
-    "Liters",
-    "Kg",
-    "Meters"
-  ];
+ File? selectedImage;
+  ImagePicker imagePicker = ImagePicker();
+  Future<void> pickImage(BuildContext context) async {
+  showModalBottomSheet(
+    context: context,
+    builder: (_) {
+      return SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.photo_camera),
+              title: const Text('Take a Photo'),
+              onTap: () async {
+                Navigator.pop(context);
+                final XFile? image =
+                    await imagePicker.pickImage(source: ImageSource.camera);
+                if (image != null) {
+                  setState(() {
+                    selectedImage = File(image.path);
+                  });
+                }
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_library),
+              title: const Text('Choose from Gallery'),
+              onTap: () async {
+                Navigator.pop(context);
+                final XFile? image =
+                    await imagePicker.pickImage(source: ImageSource.gallery);
+                if (image != null) {
+                  setState(() {
+                    selectedImage = File(image.path);
+                  });
+                }
+              },
+            ),
+          ],
+        ),
+      );
+    },
+  );
+}
 
   @override
   Widget build(BuildContext context) {
@@ -62,57 +96,53 @@ class UpdateInventoryScreenState
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             GestureDetector(
-              onTap: () {},
-              child: Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(
-                    vertical: 30),
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade100,
-                  borderRadius:
-                      BorderRadius.circular(16),
-                  border: Border.all(
-                    color: Colors.grey.shade300,
+onTap: () => pickImage(context), // Open gallery
+  child: Container(
+    width: double.infinity,
+    padding: const EdgeInsets.symmetric(vertical: 30),
+    decoration: BoxDecoration(
+      color: Colors.grey.shade100,
+      borderRadius: BorderRadius.circular(16),
+      border: Border.all(color: Colors.grey.shade300),
+    ),
+    child: Column(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(18),
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: Colors.blue.shade100,
+          ),
+          child: selectedImage == null
+              ? const Icon(
+                  Icons.camera_alt,
+                  color: Colors.blue,
+                  size: 28,
+                )
+              : ClipRRect(
+                  borderRadius: BorderRadius.circular(50),
+                  child: Image.file(
+                    selectedImage!,
+                    width: 60,
+                    height: 60,
+                    fit: BoxFit.cover,
                   ),
                 ),
-                child: Column(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(18),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.blue.shade100,
-                      ),
-                      child: const Icon(
-                        Icons.camera_alt,
-                        color: Colors.blue,
-                        size: 28,
-                      ),
-                    ),
-
-                    const SizedBox(height: 15),
-
-                    const Text(
-                      "Tap to capture photo",
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-
-                    const SizedBox(height: 6),
-
-                    Text(
-                      "Select from gallery",
-                      style: TextStyle(
-                        color: Colors.grey.shade600,
-                        fontSize: 13,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-
+        ),
+        const SizedBox(height: 15),
+        Text(
+          selectedImage == null ? "Tap to capture photo" : "Photo selected",
+          style: const TextStyle(fontWeight: FontWeight.w600),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          selectedImage == null ? "Select from gallery" : "Change photo",
+          style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
+        ),
+      ],
+    ),
+  ),
+),
             const SizedBox(height: 30),
 
             const Text(
@@ -120,32 +150,49 @@ class UpdateInventoryScreenState
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 6),
-            DropdownButtonFormField<String>(
-              value: selectedMaterial,
-              items: materials
-                  .map((e) => DropdownMenuItem(
-                        value: e,
-                        child: Text(e),
-                      ))
-                  .toList(),
-              onChanged: (val) {
-                setState(() {
-                  selectedMaterial = val;
-                });
-              },
-              decoration: inputDecoration(),
+           CustomDropdown<InventoryMaterial>(
+            value: selectedMaterial,
+              items: allMaterials,
+              displayMapper: (material) => material.name,
+              onChanged: (InventoryMaterial? material) {
+              setState(() {
+              selectedMaterial = material;
+              unitController.text = material?.unit ?? "";
+               categoryController.text = material?.category ?? ""; 
+              });
+            },
+         hint: "Select Material",
+          isExpanded: true,
+          isDense: true,
+          border: InputBorder.none,
+          fillColor: Colors.white,
+          borderRadius: BorderRadius.circular(14),
             ),
 
             const SizedBox(height: 20),
-
             const Text(
-              "Unit Type",
+              "Unit ",
               style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+              TextField(
+                controller: unitController,
+                readOnly: true,
+                decoration: inputDecoration(),
+                  ),
+
+             const SizedBox(height: 20),
+
+           
+            const Text(
+              "Category",
+              style: TextStyle(fontSize: 14,fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 6),
              TextField(
+                controller: categoryController,
+                readOnly: true,
                 decoration: inputDecoration(),
-               ),
+                  ),
 
             const SizedBox(height: 20),
 
@@ -155,11 +202,12 @@ class UpdateInventoryScreenState
             ),
             const SizedBox(height: 6),
                TextField(
-                keyboardType: TextInputType.number,
-                decoration: inputDecoration(
-                  hintText: "Enter quantity",
-                ),
-               ),
+                     controller: quantityController,
+                      keyboardType: TextInputType.number,
+                      decoration: inputDecoration(
+                             hintText: "Enter quantity",
+                     ),
+                    ),
 
             const SizedBox(height: 20),
 
@@ -206,16 +254,28 @@ class UpdateInventoryScreenState
             child:CustomButton(label: "Save Material",
               backgroundColor: Colors.blue,
               onPressed: () {
-                debugPrint("saved");
+        if (selectedMaterial == null ||
+           quantityController.text.isEmpty) {
+             return;
+              }
+
+             final newMaterial = MaterialData(
+             name: selectedMaterial!.name,
+             quantity: quantityController.text,
+             unit: selectedMaterial!.unit,
+             );
+
+            debugPrint("Saved: ${newMaterial.name} - ${newMaterial.quantity} ${newMaterial.unit}",
+               );
               },
             ),
           ),
-             ],
-            ),
-          ],
+         ],
         ),
-      ),
-    );
+        ],          
+        ),
+       ),
+      );
   }
 
   InputDecoration inputDecoration({
