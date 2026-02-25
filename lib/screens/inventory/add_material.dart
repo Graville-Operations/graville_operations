@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:graville_operations/models/material/inventory_material.dart';
 import 'package:graville_operations/screens/commons/widgets/custom_button.dart';
+import 'package:graville_operations/screens/commons/widgets/custom_dropdown.dart';
 //import 'package:graville_operations/screens/inventory_screen/inventory_screen.dart';
 //import 'package:graville_operations/widgets/custom_button.dart';
 
@@ -19,9 +21,11 @@ class AddMaterialScreen extends StatefulWidget {
 }
 
 class AddMaterialScreenState extends State<AddMaterialScreen> {
-  String? selectedMaterial = "Bricks";
-  String? selectedCategory = "Structural";
-  String? selectedUnit = "Bags";
+  
+ InventoryMaterial? selectedMaterial;
+final TextEditingController unitController = TextEditingController();
+final TextEditingController categoryController = TextEditingController();
+final TextEditingController quantityController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -58,15 +62,25 @@ class AddMaterialScreenState extends State<AddMaterialScreen> {
               style: TextStyle(fontSize: 14,fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
-            buildDropdown(
-              value: selectedMaterial,
-              items: const ["Bricks", "Cement", "Sand"],
-              onChanged: (value) {
-                setState(() {
-                  selectedMaterial = value;
-                });
-              },
+            CustomDropdown<InventoryMaterial>(
+            value: selectedMaterial,
+              items: allMaterials,
+              displayMapper: (material) => material.name,
+              onChanged: (InventoryMaterial? material) {
+              setState(() {
+              selectedMaterial = material;
+              unitController.text = material?.unit ?? "";
+               categoryController.text = material?.category ?? ""; 
+              });
+            },
+         hint: "Select Material",
+          isExpanded: true,
+          isDense: true,
+          border: InputBorder.none,
+          fillColor: Colors.white,
+          borderRadius: BorderRadius.circular(14),
             ),
+
 
             const SizedBox(height: 20),
 
@@ -75,16 +89,11 @@ class AddMaterialScreenState extends State<AddMaterialScreen> {
               style: TextStyle(fontSize: 14,fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
-            buildDropdown(
-              value: selectedCategory,
-              items: const ["Structural", "Finishing", "Electrical"],
-              onChanged: (value) {
-                setState(() {
-                  selectedCategory = value;
-                });
-              },
-            ),
-
+           TextField(
+                controller: categoryController,
+                readOnly: true,
+                decoration: inputDecoration(),
+                  ),
             const SizedBox(height: 20),
 
             const Text(
@@ -92,16 +101,12 @@ class AddMaterialScreenState extends State<AddMaterialScreen> {
               style: TextStyle(fontSize: 14,fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
-            buildDropdown(
-              value: selectedUnit,
-              items: const ["Bags", "Pieces", "Tonnes"],
-              onChanged: (value) {
-                setState(() {
-                  selectedUnit = value;
-                });
-              },
-            ),
-
+                          TextField(
+                controller: unitController,
+                readOnly: true,
+                decoration: inputDecoration(),
+                  ),
+                  
           const SizedBox(height: 40,),
 
          Row(
@@ -131,36 +136,22 @@ class AddMaterialScreenState extends State<AddMaterialScreen> {
       ),
     );
   }
-
-  Widget buildDropdown({
-    required String? value,
-    required List<String> items,
-    required ValueChanged<String?> onChanged,
+  InputDecoration inputDecoration({
+    String? hintText,
+    String? prefixText,
   }) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade400),
-      ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<String>(
-          value: value,
-          isExpanded: true,
-          icon: const Icon(Icons.keyboard_arrow_down),
-          items: items
-              .map(
-                (item) => DropdownMenuItem<String>(
-                  value: item,
-                  child: Text(item),
-                ),
-              )
-              .toList(),
-          onChanged: onChanged,
-        ),
+    return InputDecoration(
+      hintText: hintText,
+      prefixText: prefixText,
+      filled: true,
+      fillColor: Colors.white,
+      contentPadding:
+          const EdgeInsets.symmetric(
+              horizontal: 14, vertical: 14),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14),
+        borderSide: BorderSide.none,
       ),
     );
   }
 }
-
