@@ -51,7 +51,7 @@ class _MaterialPaymentSectionState extends State<MaterialPaymentSection> {
           child: CustomTextInput(
             controller: notesController,
             hintText: "Add any additional notes or remarks...",
-            prefixIcon: Icons.notes_outlined,
+            //prefixIcon: Icons.notes_outlined,
             maxLines: 5,
           ),
         ),
