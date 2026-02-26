@@ -28,7 +28,7 @@ class FormSection extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               if (icon != null) ...[
-                Icon(icon, size: 18, color: Colors.blueGrey),
+                Icon(icon, size: 18, color: Colors.blue),
                 SizedBox(width: 8),
               ],
               Text(title, style: labelStyle),
