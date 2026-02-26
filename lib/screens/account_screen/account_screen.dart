@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:graville_operations/screens/settings/settings_screen.dart';
 import 'package:graville_operations/screens/support/support_screen.dart';
-import 'package:graville_operations/settings_screen/settings_screen.dart';
 
 class AccountScreen extends StatelessWidget {
   const AccountScreen({super.key});
@@ -50,7 +50,7 @@ final List<_AccountItem> _accountItems = [
   _AccountItem(
     icon: Icons.settings,
     title: 'Settings',
-    destination: SettingsScreen(),
+    destination:  SettingsScreen(),
   ),
   _AccountItem(
     icon: Icons.support_agent,

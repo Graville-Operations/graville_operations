@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-//import 'package:graville_operations/screens/Inventory_Screen/inventory_screen.dart';
-
-import 'package:graville_operations/screens/login/login_screen.dart';
-//import 'package:graville_operations/screens/settings_screen/settings_screen.dart';
+import 'package:graville_operations/screens/auth/login/login_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -10,21 +7,14 @@ void main() {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-
-
-      title: 'graville_operations',
+      title: 'graville operations',
       themeMode: ThemeMode.light,
-      theme: ThemeData(
-        useMaterial3: true,
-      ),
+      theme: ThemeData(useMaterial3: true),
       home: const LoginScreen(),
-
-
     );
   }
 }

@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:graville_operations/models/project_status.dart';
+import 'package:graville_operations/navigation/custom_navigator.dart';
+import 'package:graville_operations/screens/add_transport_screen/add_transport_screen.dart';
+import 'package:graville_operations/screens/inventory/add_material.dart';
+import 'package:graville_operations/screens/inventory/update_inventory.dart';
+import 'package:graville_operations/screens/material/receive_material.dart';
+import 'package:graville_operations/screens/workers/add_worker_screen.dart';
 import 'package:graville_operations/screens/commons/assets/images.dart';
 import 'package:graville_operations/screens/commons/widgets/section_card.dart';
 import 'package:graville_operations/screens/commons/widgets/status_chip.dart';
@@ -40,22 +46,42 @@ class _HomeScreenState extends State<HomeScreen> {
           if (_isFabOpen) ...[
             Tooltip(
               message: "Add worker",
-              child: miniFab(Icons.person_add, () {}),
+              child: miniFab(
+                Icons.person_add,
+                () => context.push(const AddWorkerScreen()),
+              ),
             ),
             const SizedBox(height: 12),
             Tooltip(
               message: "Hired equipment",
-              child: miniFab(Icons.build, () {}),
+              child: miniFab(
+                Icons.build,
+                () => context.push(const AddMaterialScreen()),
+              ),
             ),
             const SizedBox(height: 12),
             Tooltip(
               message: "Receive material",
-              child: miniFab(Icons.download, () {}),
+              child: miniFab(
+                Icons.download,
+                () => context.push(const ReceiveMaterialScreen()),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Tooltip(
+              message: "Update inventory",
+              child: miniFab(
+                Icons.store,
+                () => context.push(const UpdateInventoryScreen()),
+              ),
             ),
             const SizedBox(height: 12),
             Tooltip(
               message: "Transfer material",
-              child: miniFab(Icons.local_shipping, () {}),
+              child: miniFab(
+                Icons.local_shipping,
+                () => context.push(const AddTransportScreen()),
+              ),
             ),
             const SizedBox(height: 12),
           ],
@@ -242,6 +268,41 @@ class _HomeScreenState extends State<HomeScreen> {
                     ],
                   ),
                 ),
+                //Task progress section
+                const SizedBox(height: 15),
+                SectionCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(Icons.task, size: 18),
+                          SizedBox(width: 8),
+                          Text(
+                            "Task Progress",
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 15),
+                      TaskProgress(
+                        title: "Foundation",
+                        percent: 1.0,
+                        color: Colors.green,
+                      ),
+                      TaskProgress(
+                        title: "Framing",
+                        percent: 0.75,
+                        color: Colors.orange,
+                      ),
+                      TaskProgress(
+                        title: "Electrical",
+                        percent: 0.45,
+                        color: Colors.blue,
+                      ),
+                    ],
+                  ),
+                ),
 
                 //Reviews
                 const SizedBox(height: 20),
@@ -263,7 +324,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         child: DataTable(
                           columnSpacing: 40,
-                          headingRowColor: MaterialStatePropertyAll(
+                          headingRowColor: WidgetStatePropertyAll(
                             Colors.grey.shade200,
                           ),
                           columns: const [
