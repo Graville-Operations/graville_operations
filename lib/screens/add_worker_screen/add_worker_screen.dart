@@ -1,7 +1,8 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:graville_operations/screens/commons/widgets/custom_image_picker.dart';
 import 'package:graville_operations/screens/workers/workers_screen.dart';
-import 'package:image_picker/image_picker.dart';
+//import 'package:image_picker/image_picker.dart';
 
 void main() => runApp(const MaterialApp(home: AddWorkerScreen()));
 
@@ -13,8 +14,8 @@ class AddWorkerScreen extends StatefulWidget {
 }
 
 class _AddWorkerScreenState extends State<AddWorkerScreen> {
-  File? _photo;
-  final ImagePicker _picker = ImagePicker();
+  //File? _photo;
+  //final ImagePicker _picker = ImagePicker();
 
   String? workerType;
   String? task;
@@ -34,12 +35,12 @@ class _AddWorkerScreenState extends State<AddWorkerScreen> {
     super.dispose();
   }
 
-  Future<void> _openCamera() async {
-    final XFile? image = await _picker.pickImage(source: ImageSource.camera);
-    if (image != null) {
-      setState(() => _photo = File(image.path));
-    }
-  }
+  // Future<void> _openCamera() async {
+  //  final XFile? image = await _picker.pickImage(source: ImageSource.camera);
+  //   if (image != null) {
+  //     setState(() => _photo = File(image.path));
+  //   }
+  // }
 
   void _updateAmount() {
     setState(() {
@@ -75,55 +76,11 @@ class _AddWorkerScreenState extends State<AddWorkerScreen> {
       workerType = null;
       task = null;
       amount = 0;
-      _photo = null;
+      //_photo = null;
       nameController.clear();
       idController.clear();
       phoneController.clear();
     });
-  }
-
-  Widget _photoCard() {
-    return GestureDetector(
-      onTap: _openCamera,
-      child: Center(
-        child: SizedBox(
-          width: 200,
-          height: 200,
-          child: Container(
-            decoration: BoxDecoration(
-              color: const Color(0xFFF8F9FA),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.grey.shade400, width: 1.2),
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: _photo == null
-                  ? Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [
-                        CircleAvatar(
-                          radius: 20,
-                          backgroundColor: Color(0xFFE6F0FF),
-                          child: Icon(
-                            Icons.camera_alt,
-                            color: Colors.blue,
-                            size: 20,
-                          ),
-                        ),
-                        SizedBox(height: 6),
-                        Text(
-                          "Tap to capture photo",
-                          textAlign: TextAlign.center,
-                          style: TextStyle(fontSize: 12, color: Colors.grey),
-                        ),
-                      ],
-                    )
-                  : Image.file(_photo!, fit: BoxFit.cover),
-            ),
-          ),
-        ),
-      ),
-    );
   }
 
   @override
@@ -143,7 +100,7 @@ class _AddWorkerScreenState extends State<AddWorkerScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _photoCard(),
+            MaterialPhotoSection(),
             const SizedBox(height: 20),
 
             FormLabel(label: "Select Site *"),
@@ -267,7 +224,6 @@ class _AddWorkerScreenState extends State<AddWorkerScreen> {
   }
 }
 
-/// ✅ Red asterisk implementation
 class FormLabel extends StatelessWidget {
   final String label;
   const FormLabel({super.key, required this.label});
