@@ -9,7 +9,6 @@ class AddMaterialScreen extends StatefulWidget {
 }
 
 class AddMaterialScreenState extends State<AddMaterialScreen> {
-
   String? selectedCategory;
   String? selectedUnit;
 
@@ -17,15 +16,10 @@ class AddMaterialScreenState extends State<AddMaterialScreen> {
     "Electrical",
     "Plumbing",
     "Hardware",
-    "Tools"
+    "Tools",
   ];
 
-  final List<String> units = [
-    "Pieces",
-    "Kg",
-    "Liters",
-    "Meters"
-  ];
+  final List<String> units = ["Pieces", "Kg", "Liters", "Meters"];
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +35,6 @@ class AddMaterialScreenState extends State<AddMaterialScreen> {
           padding: const EdgeInsets.all(16),
           child: Column(
             children: [
-
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
@@ -51,13 +44,12 @@ class AddMaterialScreenState extends State<AddMaterialScreen> {
                     BoxShadow(
                       color: Colors.black.withOpacity(0.05),
                       blurRadius: 10,
-                    )
+                    ),
                   ],
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-
                     const Text(
                       "Material Name",
                       style: TextStyle(fontWeight: FontWeight.bold),
@@ -75,12 +67,11 @@ class AddMaterialScreenState extends State<AddMaterialScreen> {
                     ),
                     const SizedBox(height: 6),
                     DropdownButtonFormField<String>(
-                      value: selectedCategory,
+                      initialValue: selectedCategory,
                       items: categories
-                          .map((e) => DropdownMenuItem(
-                                value: e,
-                                child: Text(e),
-                              ))
+                          .map(
+                            (e) => DropdownMenuItem(value: e, child: Text(e)),
+                          )
                           .toList(),
                       onChanged: (val) {
                         setState(() {
@@ -105,8 +96,7 @@ class AddMaterialScreenState extends State<AddMaterialScreen> {
                               const SizedBox(height: 6),
                               TextField(
                                 keyboardType: TextInputType.number,
-                                decoration:
-                                    inputDecoration("Enter quantity"),
+                                decoration: inputDecoration("Enter quantity"),
                               ),
                             ],
                           ),
@@ -122,20 +112,21 @@ class AddMaterialScreenState extends State<AddMaterialScreen> {
                               ),
                               const SizedBox(height: 6),
                               DropdownButtonFormField<String>(
-                                value: selectedUnit,
+                                initialValue: selectedUnit,
                                 items: units
-                                    .map((e) => DropdownMenuItem(
-                                          value: e,
-                                          child: Text(e),
-                                        ))
+                                    .map(
+                                      (e) => DropdownMenuItem(
+                                        value: e,
+                                        child: Text(e),
+                                      ),
+                                    )
                                     .toList(),
                                 onChanged: (val) {
                                   setState(() {
                                     selectedUnit = val;
                                   });
                                 },
-                                decoration:
-                                    inputDecoration("Select Unit"),
+                                decoration: inputDecoration("Select Unit"),
                               ),
                             ],
                           ),
@@ -205,7 +196,7 @@ class AddMaterialScreenState extends State<AddMaterialScreen> {
                     ),
                   ),
                 ],
-              )
+              ),
             ],
           ),
         ),
@@ -218,8 +209,7 @@ class AddMaterialScreenState extends State<AddMaterialScreen> {
       hintText: hint,
       filled: true,
       fillColor: Colors.grey.shade100,
-      contentPadding:
-          const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
         borderSide: BorderSide.none,

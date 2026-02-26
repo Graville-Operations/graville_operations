@@ -6,30 +6,17 @@ class UpdateInventoryScreen extends StatefulWidget {
   const UpdateInventoryScreen({super.key});
 
   @override
-  UpdateInventoryScreenState createState() =>
-      UpdateInventoryScreenState();
+  UpdateInventoryScreenState createState() => UpdateInventoryScreenState();
 }
 
-class UpdateInventoryScreenState
-    extends State<UpdateInventoryScreen> {
-
+class UpdateInventoryScreenState extends State<UpdateInventoryScreen> {
   String? selectedMaterial = "Cement";
   String? selectedUnit = "Bags";
   int quantity = 0;
 
-  final List<String> materials = [
-    "Bricks",
-    "Cement",
-    "Sand",
-    "Steel"
-  ];
+  final List<String> materials = ["Bricks", "Cement", "Sand", "Steel"];
 
-  final List<String> units = [
-    "Bags",
-    "Liters",
-    "Kg",
-    "Meters"
-  ];
+  final List<String> units = ["Bags", "Liters", "Kg", "Meters"];
 
   @override
   Widget build(BuildContext context) {
@@ -40,14 +27,14 @@ class UpdateInventoryScreenState
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
-          onPressed: () => Navigator.push(context,MaterialPageRoute(builder: (context)=>InventoryScreen())),
+          onPressed: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => InventoryScreen()),
+          ),
         ),
         title: const Text(
           "Update Inventory",
-          style: TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.bold,
-          ),
+          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
         ),
         iconTheme: const IconThemeData(color: Colors.black),
       ),
@@ -60,15 +47,11 @@ class UpdateInventoryScreenState
               onTap: () {},
               child: Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(
-                    vertical: 30),
+                padding: const EdgeInsets.symmetric(vertical: 30),
                 decoration: BoxDecoration(
                   color: Colors.grey.shade100,
-                  borderRadius:
-                      BorderRadius.circular(16),
-                  border: Border.all(
-                    color: Colors.grey.shade300,
-                  ),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: Colors.grey.shade300),
                 ),
                 child: Column(
                   children: [
@@ -89,9 +72,7 @@ class UpdateInventoryScreenState
 
                     const Text(
                       "Tap to capture photo",
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                      ),
+                      style: TextStyle(fontWeight: FontWeight.w600),
                     ),
 
                     const SizedBox(height: 6),
@@ -116,12 +97,9 @@ class UpdateInventoryScreenState
             ),
             const SizedBox(height: 6),
             DropdownButtonFormField<String>(
-              value: selectedMaterial,
+              initialValue: selectedMaterial,
               items: materials
-                  .map((e) => DropdownMenuItem(
-                        value: e,
-                        child: Text(e),
-                      ))
+                  .map((e) => DropdownMenuItem(value: e, child: Text(e)))
                   .toList(),
               onChanged: (val) {
                 setState(() {
@@ -139,12 +117,9 @@ class UpdateInventoryScreenState
             ),
             const SizedBox(height: 6),
             DropdownButtonFormField<String>(
-              value: selectedUnit,
+              initialValue: selectedUnit,
               items: units
-                  .map((e) => DropdownMenuItem(
-                        value: e,
-                        child: Text(e),
-                      ))
+                  .map((e) => DropdownMenuItem(value: e, child: Text(e)))
                   .toList(),
               onChanged: (val) {
                 setState(() {
@@ -161,12 +136,10 @@ class UpdateInventoryScreenState
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 6),
-               TextField(
-                keyboardType: TextInputType.number,
-                decoration: inputDecoration(
-                  hintText: "Enter quantity",
-                ),
-               ),
+            TextField(
+              keyboardType: TextInputType.number,
+              decoration: inputDecoration(hintText: "Enter quantity"),
+            ),
 
             const SizedBox(height: 20),
 
@@ -177,9 +150,7 @@ class UpdateInventoryScreenState
             const SizedBox(height: 6),
             TextField(
               keyboardType: TextInputType.number,
-              decoration:inputDecoration(
-                hintText: "Enter price",
-              ),
+              decoration: inputDecoration(hintText: "Enter price"),
             ),
 
             const SizedBox(height: 20),
@@ -192,32 +163,36 @@ class UpdateInventoryScreenState
             TextField(
               maxLines: 2,
               decoration: inputDecoration(
-                hintText:"e.g., Delivered by XYZ supplier",
+                hintText: "e.g., Delivered by XYZ supplier",
               ),
             ),
 
             const SizedBox(height: 30),
 
-         Row(
-          children: [
-            Expanded(
-            child:CustomButton(label: "cancel",
-            backgroundColor: Colors.white10,
-              textColor:  Colors.blue,
-              onPressed: () {Navigator.pop(context);},
-            ),
-          ),
-        
-            const SizedBox(width: 15),
-            Expanded(
-            child:CustomButton(label: "Save Material",
-              backgroundColor: Colors.blue,
-              onPressed: () {
-                debugPrint("saved");
-              },
-            ),
-          ),
-             ],
+            Row(
+              children: [
+                Expanded(
+                  child: CustomButton(
+                    label: "cancel",
+                    backgroundColor: Colors.white10,
+                    textColor: Colors.blue,
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                ),
+
+                const SizedBox(width: 15),
+                Expanded(
+                  child: CustomButton(
+                    label: "Save Material",
+                    backgroundColor: Colors.blue,
+                    onPressed: () {
+                      debugPrint("saved");
+                    },
+                  ),
+                ),
+              ],
             ),
           ],
         ),
@@ -225,18 +200,13 @@ class UpdateInventoryScreenState
     );
   }
 
-  InputDecoration inputDecoration({
-    String? hintText,
-    String? prefixText,
-  }) {
+  InputDecoration inputDecoration({String? hintText, String? prefixText}) {
     return InputDecoration(
       hintText: hintText,
       prefixText: prefixText,
       filled: true,
       fillColor: Colors.white,
-      contentPadding:
-          const EdgeInsets.symmetric(
-              horizontal: 14, vertical: 14),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
         borderSide: BorderSide.none,

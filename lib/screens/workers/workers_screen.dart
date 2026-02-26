@@ -156,7 +156,7 @@ class _WorkersScreenState extends State<WorkersScreen> {
                   vertical: 8,
                 ),
                 child: DropdownButtonFormField<String>(
-                  value: selectedSite,
+                  initialValue: selectedSite,
                   hint: const Text("Select Site"),
                   isDense: true,
                   items: sites
@@ -217,7 +217,7 @@ class _WorkersScreenState extends State<WorkersScreen> {
               children: [
                 CustomButton(
                   label: "Add Worker",
-                  onPressed: (){},
+                  onPressed: () {},
                   backgroundColor: const Color(0xFF3366FF),
                 ),
                 const SizedBox(width: 12),
