@@ -1,27 +1,9 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:graville_operations/screens/workers/workers_screen.dart';
 import 'package:image_picker/image_picker.dart';
 
 void main() => runApp(const MaterialApp(home: AddWorkerScreen()));
-
-/// ✅ Worker model (needed for Navigator.pop)
-class Worker {
-  final String name;
-  final String id;
-  final String skillLevel;
-  final String phone;
-  final String specialty;
-  final String rate;
-
-  Worker({
-    required this.name,
-    required this.id,
-    required this.skillLevel,
-    required this.phone,
-    required this.specialty,
-    required this.rate,
-  });
-}
 
 class AddWorkerScreen extends StatefulWidget {
   const AddWorkerScreen({super.key});
@@ -105,8 +87,8 @@ class _AddWorkerScreenState extends State<AddWorkerScreen> {
       onTap: _openCamera,
       child: Center(
         child: SizedBox(
-          width: 120,
-          height: 120,
+          width: 200,
+          height: 200,
           child: Container(
             decoration: BoxDecoration(
               color: const Color(0xFFF8F9FA),
@@ -191,14 +173,14 @@ class _AddWorkerScreenState extends State<AddWorkerScreen> {
 
             FormLabel(label: "Worker ID *"),
             CustomTextField(
-              hint: "e.g. 40635223",
+              hint: "e.g. 11111111",
               controller: idController,
               onChanged: (_) => setState(() {}),
             ),
 
             FormLabel(label: "Phone Number *"),
             CustomTextField(
-              hint: "e.g. +254 769902927",
+              hint: "e.g. +254 712345678",
               controller: phoneController,
               onChanged: (_) => setState(() {}),
             ),
