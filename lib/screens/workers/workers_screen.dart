@@ -81,7 +81,7 @@ class _WorkersScreenState extends State<WorkersScreen> {
       id: "W006",
       skillLevel: "Skilled",
       phone: "+1 555-0128",
-      specialty: "Woodwork",
+      specialty: "Woodwork", 
       rate: "\$260",
       joinDate: DateTime(2023, 6, 18),
     ),
