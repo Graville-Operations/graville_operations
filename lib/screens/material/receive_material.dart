@@ -15,6 +15,18 @@ class ReceiveMaterialScreen extends StatefulWidget {
 
 class _ReceiveMaterialScreenState extends State<ReceiveMaterialScreen> {
   AppMaterial? selectedMaterial;
+
+  bool hasPhoto = false;
+  bool hasQuantity = false;
+  bool hasPaymentInfo = false;
+
+  bool get isFormValid {
+    return selectedMaterial != null &&
+        hasPhoto &&
+        hasQuantity &&
+        hasPaymentInfo;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -46,7 +58,13 @@ class _ReceiveMaterialScreenState extends State<ReceiveMaterialScreen> {
             padding: EdgeInsets.all(16),
             sliver: SliverList(
               delegate: SliverChildListDelegate([
-                MaterialPhotoSection(),
+                MaterialPhotoSection(
+                  onPhotoChanged: (hasPhoto) {
+                    setState(() {
+                      this.hasPhoto = hasPhoto;
+                    });
+                  },
+                ),
                 MaterialInfoSection(
                   selectedMaterial: selectedMaterial,
                   onChanged: (material) {
@@ -55,21 +73,38 @@ class _ReceiveMaterialScreenState extends State<ReceiveMaterialScreen> {
                     });
                   },
                 ),
-                MaterialQuantitySection(selectedMaterial: selectedMaterial),
-                MaterialPaymentSection(),
+                MaterialQuantitySection(
+                  selectedMaterial: selectedMaterial,
+                  onQuantityChanged: (value) {
+                    setState(() {
+                      hasQuantity = value;
+                    });
+                  },
+                ),
+                MaterialPaymentSection(
+                  onPaymentChanged: (value) {
+                    setState(() {
+                      hasPaymentInfo = value;
+                    });
+                  },
+                ),
                 SizedBox(height: 15),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 0),
                   child: CustomButton(
                     label: "Confirm Receipt",
                     icon: const Icon(Icons.check_circle_outline),
-                    backgroundColor: Colors.blue,
+                    backgroundColor: isFormValid
+                        ? Colors.blue
+                        : Colors.grey.shade400,
                     textColor: Colors.white,
                     borderRadius: 16,
                     height: 55,
-                    onPressed: () {
-                      print("Receipt Confirmed");
-                    },
+                    onPressed: isFormValid
+                        ? () {
+                            print("Receipt Confirmed");
+                          }
+                        : null,
                   ),
                 ),
               ]),

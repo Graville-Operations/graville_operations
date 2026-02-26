@@ -5,8 +5,13 @@ import 'package:graville_operations/screens/commons/widgets/custom_dropdown.dart
 import 'package:graville_operations/screens/commons/widgets/sections/form_section.dart';
 
 class MaterialQuantitySection extends StatefulWidget {
+  final ValueChanged<bool>? onQuantityChanged;
   final AppMaterial? selectedMaterial;
-  const MaterialQuantitySection({super.key, required this.selectedMaterial});
+  const MaterialQuantitySection({
+    super.key,
+    required this.selectedMaterial,
+    this.onQuantityChanged,
+  });
 
   @override
   State<MaterialQuantitySection> createState() =>
@@ -52,6 +57,10 @@ class _MaterialQuantitySectionState extends State<MaterialQuantitySection> {
               controller: quantityController,
               hintText: "0",
               keyboardType: TextInputType.number,
+              onChanged: (value) {
+                final isValid = value.trim().isNotEmpty;
+                widget.onQuantityChanged?.call(isValid);
+              },
             ),
           ),
         ),
