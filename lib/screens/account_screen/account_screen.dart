@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:graville_operations/screens/support/support_screen.dart';
+import 'package:graville_operations/settings_screen/settings_screen.dart';
 
 class AccountScreen extends StatelessWidget {
   const AccountScreen({super.key});
@@ -46,8 +47,16 @@ class AccountScreen extends StatelessWidget {
 
 final List<_AccountItem> _accountItems = [
   _AccountItem(icon: Icons.person, title: 'Profile'),
-  _AccountItem(icon: Icons.settings, title: 'Settings'),
-  _AccountItem(icon: Icons.support_agent, title: 'Contact Support',destination: SupportScreen()),
+  _AccountItem(
+    icon: Icons.settings,
+    title: 'Settings',
+    destination: SettingsScreen(),
+  ),
+  _AccountItem(
+    icon: Icons.support_agent,
+    title: 'Contact Support',
+    destination: SupportScreen(),
+  ),
   _AccountItem(icon: Icons.description, title: 'Terms & Policies'),
   _AccountItem(icon: Icons.language, title: 'Visit Our Website'),
 ];
@@ -71,7 +80,7 @@ class _ProfileCard extends StatelessWidget {
             children: [
               CircleAvatar(
                 radius: 32,
-                backgroundColor: theme.colorScheme.surfaceVariant,
+                backgroundColor: theme.colorScheme.surfaceContainerHighest,
                 child: Icon(
                   Icons.person,
                   size: 32,
@@ -104,7 +113,11 @@ class _AccountItem {
   final IconData icon;
   final String title;
   final Widget? destination;
-  const _AccountItem({required this.icon, required this.title,this.destination});
+  const _AccountItem({
+    required this.icon,
+    required this.title,
+    this.destination,
+  });
 }
 
 class _AccountItemTile extends StatelessWidget {
@@ -121,8 +134,11 @@ class _AccountItemTile extends StatelessWidget {
       children: [
         InkWell(
           onTap: () {
-            if(item.destination!=null){
-              Navigator.push(context, MaterialPageRoute(builder: (context)=>item.destination!));
+            if (item.destination != null) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => item.destination!),
+              );
             }
           },
           child: Padding(

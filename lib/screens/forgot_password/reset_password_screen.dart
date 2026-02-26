@@ -51,7 +51,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Container(
+                SizedBox(
                   height: 80,
                   width: 80,
                   child: Image.asset(
