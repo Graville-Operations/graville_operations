@@ -58,7 +58,6 @@ class _InventoryScreenState extends State<InventoryScreen> {
   @override
   void initState() {
     super.initState();
-    // Optional: start with first site selected
     if (inventoryData.isNotEmpty) {
       selectedInventory = inventoryData.first;
     }

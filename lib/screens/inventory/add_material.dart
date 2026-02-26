@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:graville_operations/models/material/inventory_material.dart';
+import 'package:graville_operations/models/material/material_data.dart';
 import 'package:graville_operations/screens/commons/widgets/custom_button.dart';
 import 'package:graville_operations/screens/commons/widgets/custom_dropdown.dart';
 //import 'package:graville_operations/screens/inventory_screen/inventory_screen.dart';
@@ -30,7 +31,6 @@ final TextEditingController quantityController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
       backgroundColor: Colors.grey[200],
       appBar: AppBar(
         backgroundColor: Colors.grey[200],
@@ -41,7 +41,6 @@ final TextEditingController quantityController = TextEditingController();
             Navigator.pop(context);
           },
         ),
-
         title: const Text(
           "Add Material",
           style: TextStyle(
@@ -81,7 +80,6 @@ final TextEditingController quantityController = TextEditingController();
           borderRadius: BorderRadius.circular(14),
             ),
 
-
             const SizedBox(height: 20),
 
             const Text(
@@ -109,27 +107,55 @@ final TextEditingController quantityController = TextEditingController();
                   
           const SizedBox(height: 40,),
 
-         Row(
-          children: [
-            Expanded(
-            child:CustomButton(label: "cancel",
-            backgroundColor: Colors.white10,
-              textColor:  Colors.blue,
-              onPressed: () {Navigator.pop(context);},
-            ),
+   Column(
+    children: [
+    Row(
+      children: [
+        Expanded(
+          child: CustomButton(
+            label: "Save Material",
+            backgroundColor: Colors.orange,
+            textColor: Colors.white,
+            height: 55,
+            borderRadius: 14,
+            onPressed: () {
+              if (selectedMaterial == null ||
+                  quantityController.text.isEmpty) {
+                return;
+              }
+
+              final newMaterial = MaterialData(
+                name: selectedMaterial!.name,
+                quantity: quantityController.text,
+                unit: selectedMaterial!.unit,
+              );
+
+              debugPrint(
+                "Saved: ${newMaterial.name} - ${newMaterial.quantity} ${newMaterial.unit}",
+              );
+            },
           ),
-        
-            const SizedBox(width: 40),
-            Expanded(
-            child:CustomButton(label: "Save Material",
-              backgroundColor: Colors.blue,
-              onPressed: () {
-                debugPrint("saved");
-              },
-            ),
-          ),
-             ],
-            ),
+        ),
+      ],
+    ),
+
+    const SizedBox(height: 15),
+
+    GestureDetector(
+      onTap: () {
+        Navigator.pop(context);
+      },
+      child: const Text(
+        "Cancel",
+        style: TextStyle(
+          color: Colors.blue,
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+    ),
+  ],
+),
             const SizedBox(height: 20),
           ],
         ),
