@@ -1,6 +1,11 @@
 // This is a generated file; do not edit or check into version control.
+<<<<<<< HEAD
 FLUTTER_ROOT=C:\Android\flutter
 FLUTTER_APPLICATION_PATH=C:\Users\Admin\Desktop\GravilleOp\graville_operations
+=======
+FLUTTER_ROOT=F:\FLUTTER\flutter
+FLUTTER_APPLICATION_PATH=F:\GRAVILLEENT\graville_operations
+>>>>>>> a56475222d806959dadba87586e62684fd183fa8
 COCOAPODS_PARALLEL_CODE_SIGN=true
 FLUTTER_BUILD_DIR=build
 FLUTTER_BUILD_NAME=1.0.0

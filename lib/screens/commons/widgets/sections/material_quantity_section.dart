@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:graville_operations/models/material/app_material.dart';
 import 'package:graville_operations/screens/commons/widgets/custom_text_input.dart';
 import 'package:graville_operations/screens/commons/widgets/custom_dropdown.dart';
 import 'package:graville_operations/screens/commons/widgets/sections/form_section.dart';
 
 class MaterialQuantitySection extends StatefulWidget {
-  const MaterialQuantitySection({super.key});
+  final AppMaterial? selectedMaterial;
+  const MaterialQuantitySection({super.key, required this.selectedMaterial});
 
   @override
   State<MaterialQuantitySection> createState() =>
@@ -13,10 +15,29 @@ class MaterialQuantitySection extends StatefulWidget {
 
 class _MaterialQuantitySectionState extends State<MaterialQuantitySection> {
   final TextEditingController quantityController = TextEditingController();
+  final TextEditingController unitController = TextEditingController();
 
-  String? selectedUnit;
+  @override
+  void initState() {
+    super.initState();
+    unitController.text = widget.selectedMaterial?.unit ?? "";
+  }
 
-  final units = ["Bags", "Tonnes", "Pieces", "Litres", "Kg"];
+  @override
+  void didUpdateWidget(covariant MaterialQuantitySection oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.selectedMaterial != widget.selectedMaterial) {
+      unitController.text = widget.selectedMaterial?.unit ?? "";
+    }
+  }
+
+  @override
+  void dispose() {
+    quantityController.dispose();
+    unitController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -39,17 +60,11 @@ class _MaterialQuantitySectionState extends State<MaterialQuantitySection> {
           child: FormSection(
             title: "Unit",
             icon: Icons.balance,
-            required: true,
-            child: CustomDropdown<String>(
-              value: selectedUnit,
-              items: units,
-              displayMapper: (item) => item,
-              //hint: "Select unit",
-              onChanged: (value) {
-                setState(() {
-                  selectedUnit = value;
-                });
-              },
+            required: false,
+            child: CustomTextInput(
+              controller: unitController,
+              hintText: "",
+              readOnly: true,
             ),
           ),
         ),
