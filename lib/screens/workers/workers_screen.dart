@@ -134,7 +134,6 @@ class _WorkersScreenState extends State<WorkersScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // LABEL OUTSIDE CARD
             const Text(
               "Construction Site",
               style: TextStyle(
@@ -145,7 +144,6 @@ class _WorkersScreenState extends State<WorkersScreen> {
             ),
             const SizedBox(height: 6),
 
-            // REDUCED SIZE CARD
             Card(
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -217,7 +215,7 @@ class _WorkersScreenState extends State<WorkersScreen> {
               children: [
                 CustomButton(
                   label: "Add Worker",
-                  onPressed: (){},
+                  onPressed: () {},
                   backgroundColor: const Color(0xFF3366FF),
                 ),
                 const SizedBox(width: 12),
@@ -244,6 +242,7 @@ class _WorkersScreenState extends State<WorkersScreen> {
                         borderSide: const BorderSide(color: Colors.blue),
                       ),
                     ),
+                    onChanged: (String p1) {},
                   ),
                 ),
               ],
@@ -334,6 +333,8 @@ class _WorkersScreenState extends State<WorkersScreen> {
     }).toList();
   }
 }
+
+class InvalidType {}
 
 Widget _statCard({
   required String title,
