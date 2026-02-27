@@ -64,7 +64,7 @@ class MaterialInfoSection extends StatelessWidget {
           ),
         ),
 
-        const SizedBox(height: 16),
+        //const SizedBox(height: 16),
         FormSection(
           title: "Material Category",
           icon: Icons.category,
