@@ -22,11 +22,24 @@ class AddMaterialScreen extends StatefulWidget {
 }
 
 class AddMaterialScreenState extends State<AddMaterialScreen> {
+  List<String> allCategories = [
+  "Electrical",
+  "Plumbing",
+  "Masonry",
+  "Carpentry",
+];
+
+List<String> allUnits = [
+  "kg",
+  "pcs",
+  "liters",
+  "meters",
+];
+
+String? selectedCategory;
+String? selectedUnit;
   
  InventoryMaterial? selectedMaterial;
-final TextEditingController unitController = TextEditingController();
-final TextEditingController categoryController = TextEditingController();
-final TextEditingController quantityController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -65,13 +78,11 @@ final TextEditingController quantityController = TextEditingController();
             value: selectedMaterial,
               items: allMaterials,
               displayMapper: (material) => material.name,
-              onChanged: (InventoryMaterial? material) {
-              setState(() {
-              selectedMaterial = material;
-              unitController.text = material?.unit ?? "";
-               categoryController.text = material?.category ?? ""; 
-              });
-            },
+            onChanged: (InventoryMaterial? material) {
+  setState(() {
+    selectedMaterial = material;
+  });
+},
          hint: "Select Material",
           isExpanded: true,
           isDense: true,
@@ -83,27 +94,49 @@ final TextEditingController quantityController = TextEditingController();
             const SizedBox(height: 20),
 
             const Text(
-              "Category",
-              style: TextStyle(fontSize: 14,fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-           TextField(
-                controller: categoryController,
-                readOnly: true,
-                decoration: inputDecoration(),
-                  ),
+  "Category",
+  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+),
+const SizedBox(height: 8),
+
+CustomDropdown<String>(
+  value: selectedCategory,
+  items: allCategories,
+  displayMapper: (cat) => cat,
+  onChanged: (String? cat) {
+    setState(() {
+      selectedCategory = cat;
+    });
+  },
+  isExpanded: true,
+  isDense: true,
+  border: InputBorder.none,
+  fillColor: Colors.white,
+  borderRadius: BorderRadius.circular(14),
+),
             const SizedBox(height: 20),
 
-            const Text(
-              "Unit",
-              style: TextStyle(fontSize: 14,fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-                          TextField(
-                controller: unitController,
-                readOnly: true,
-                decoration: inputDecoration(),
-                  ),
+           const Text(
+  "Unit",
+  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+),
+const SizedBox(height: 8),
+
+CustomDropdown<String>(
+  value: selectedUnit,
+  items: allUnits,
+  displayMapper: (unit) => unit,
+  onChanged: (String? unit) {
+    setState(() {
+      selectedUnit = unit;
+    });
+  },
+  isExpanded: true,
+  isDense: true,
+  border: InputBorder.none,
+  fillColor: Colors.white,
+  borderRadius: BorderRadius.circular(14),
+),
                   
           const SizedBox(height: 40,),
 
@@ -120,18 +153,18 @@ final TextEditingController quantityController = TextEditingController();
             borderRadius: 14,
             onPressed: () {
               if (selectedMaterial == null ||
-                  quantityController.text.isEmpty) {
-                return;
-              }
+    selectedCategory == null ||
+    selectedUnit == null) {
+  return;
+}
 
               final newMaterial = MaterialData(
                 name: selectedMaterial!.name,
-                quantity: quantityController.text,
-                unit: selectedMaterial!.unit,
+                unit: selectedUnit!, quantity: '',
               );
 
               debugPrint(
-                "Saved: ${newMaterial.name} - ${newMaterial.quantity} ${newMaterial.unit}",
+                "Saved: ${newMaterial.name} -${newMaterial.unit}",
               );
             },
           ),
