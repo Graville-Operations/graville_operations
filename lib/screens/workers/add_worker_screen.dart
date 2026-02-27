@@ -167,25 +167,23 @@ class _AddWorkerScreenState extends State<AddWorkerScreen> {
             ),
 
             FormLabel(label: "Amount *"),
-            Card(
-              elevation: 0,
-              color: const Color(0xFFF5F6FA),
-              shape: RoundedRectangleBorder(
+            const SizedBox(height: 6),
+            Container(
+              width: double.infinity,
+              height: 50,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: const Color(0xFFF5F6FA),
                 borderRadius: BorderRadius.circular(8),
-                side: BorderSide(color: Colors.grey.shade300),
+                border: Border.all(color: Colors.grey.shade300),
               ),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 16,
-                ),
-                child: Text(
-                  amount > 0 ? "KES $amount" : "Amount will be calculated",
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: amount > 0 ? Colors.black : Colors.grey,
-                  ),
+              child: Text(
+                amount > 0 ? "KES $amount" : "Amount will be calculated",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: amount > 0 ? Colors.black : Colors.grey,
                 ),
               ),
             ),
