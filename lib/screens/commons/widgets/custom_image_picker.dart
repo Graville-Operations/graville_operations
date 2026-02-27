@@ -4,7 +4,9 @@ import 'package:image_picker/image_picker.dart';
 import 'package:graville_operations/screens/commons/widgets/sections/form_section.dart';
 
 class MaterialPhotoSection extends StatefulWidget {
-  const MaterialPhotoSection({super.key});
+  const MaterialPhotoSection({super.key, this.title});
+
+  final String? title;
 
   @override
   State<MaterialPhotoSection> createState() => _MaterialPhotoSectionState();
@@ -30,7 +32,7 @@ class _MaterialPhotoSectionState extends State<MaterialPhotoSection> {
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
     return FormSection(
-      title: "Material Photo",
+      title: widget.title ?? "Photo",
       icon: Icons.image_outlined,
       child: Align(
         alignment: AlignmentGeometry.topCenter,

@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 
 class FormSection extends StatelessWidget {
-  final String title;
+  final String? title;
   final Widget child;
   final IconData? icon;
   final bool required;
   const FormSection({
     super.key,
-    required this.title,
     required this.child,
     this.icon,
     this.required = false,
+    this.title,
   });
 
   @override
@@ -31,7 +31,7 @@ class FormSection extends StatelessWidget {
                 Icon(icon, size: 18, color: Colors.blue),
                 SizedBox(width: 8),
               ],
-              Text(title, style: labelStyle),
+              if (title != null) Text(title!, style: labelStyle),
               if (required)
                 Text(
                   " *",

@@ -65,7 +65,6 @@ class _AddWorkerScreenState extends State<AddWorkerScreen> {
       workerType = null;
       task = null;
       amount = 0;
-      //_photo = null;
       nameController.clear();
       idController.clear();
       phoneController.clear();
@@ -81,7 +80,7 @@ class _AddWorkerScreenState extends State<AddWorkerScreen> {
         elevation: 0,
         title: const Text(
           'Add Worker',
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+          style: TextStyle(color: Colors.black, fontWeight: FontWeight.normal),
         ),
       ),
       body: SingleChildScrollView(
@@ -89,7 +88,7 @@ class _AddWorkerScreenState extends State<AddWorkerScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            MaterialPhotoSection(),
+            MaterialPhotoSection(title: "Worker Photo"),
             const SizedBox(height: 20),
 
             FormLabel(label: "Select Site *"),
@@ -111,10 +110,10 @@ class _AddWorkerScreenState extends State<AddWorkerScreen> {
             const SizedBox(height: 16),
 
             FormLabel(label: "Worker Name *"),
-            CustomTextField(
-              hint: "Enter worker name",
+            CustomTextInput(
               controller: nameController,
               onChanged: (_) => setState(() {}),
+              hintText: "Enter worker name",
             ),
 
             FormLabel(label: "Worker ID *"),
@@ -229,7 +228,7 @@ class FormLabel extends StatelessWidget {
       child: RichText(
         text: TextSpan(
           style: const TextStyle(
-            fontWeight: FontWeight.w600,
+            fontWeight: FontWeight.normal,
             color: Colors.black,
           ),
           children: [
@@ -347,6 +346,16 @@ class FormActions extends StatelessWidget {
             height: 48,
             child: ElevatedButton(
               onPressed: isEnabled ? onSubmit : null,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: isEnabled ? Colors.blue : Colors.grey.shade300,
+                foregroundColor: isEnabled ? Colors.white : Colors.grey,
+                disabledBackgroundColor: Colors.grey.shade300,
+                disabledForegroundColor: Colors.grey,
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(24),
+                ),
+              ),
               child: const Text("Add Worker"),
             ),
           ),
