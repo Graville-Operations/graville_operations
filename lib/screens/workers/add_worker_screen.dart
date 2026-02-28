@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:graville_operations/models/addworker.dart';
 import 'package:graville_operations/screens/commons/widgets/custom_image_picker.dart';
 import 'package:graville_operations/screens/commons/widgets/custom_text_input.dart';
 import 'package:graville_operations/screens/workers/workers_screen.dart';
-
-void main() => runApp(const MaterialApp(home: AddWorkerScreen()));
 
 class AddWorkerScreen extends StatefulWidget {
   const AddWorkerScreen({super.key});
@@ -299,7 +298,7 @@ class CustomDropdownField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DropdownButtonFormField<String>(
-      value: value,
+      initialValue: value,
       hint: Text(hint),
       items: options
           .map((e) => DropdownMenuItem(value: e, child: Text(e)))
