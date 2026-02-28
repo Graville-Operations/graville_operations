@@ -58,7 +58,6 @@ class _InventoryScreenState extends State<InventoryScreen> {
   @override
   void initState() {
     super.initState();
-    // Optional: start with first site selected
     if (inventoryData.isNotEmpty) {
       selectedInventory = inventoryData.first;
     }
@@ -74,6 +73,12 @@ class _InventoryScreenState extends State<InventoryScreen> {
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.white,
+          leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
+          onPressed: () {
+             Navigator.pop(context);
+          },
+        ),
         title: const Text(
           'Inventory',
           style: TextStyle(
@@ -201,6 +206,73 @@ class _InventoryScreenState extends State<InventoryScreen> {
     return Icons.construction;
   }
 }
+
+class InventoryCard extends StatelessWidget {
+  final List<Widget> children;
+  const InventoryCard({super.key, required this.children});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.shade100),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.03),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(children: children),
+    );
+  }
+}
+
+class InventoryTile extends StatelessWidget {
+  final IconData icon;
+  final Color color;
+  final String title;
+  final String value;
+
+  const InventoryTile({
+    super.key,
+    required this.icon,
+    required this.color,
+    required this.title,
+    required this.value,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      leading: Container(
+        padding: const EdgeInsets.all(6),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Icon(icon, color: color, size: 20),
+      ),
+      title: Text(
+        title,
+        style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 14),
+      ),
+      trailing: Text(
+        value,
+        style: const TextStyle(
+          fontWeight: FontWeight.bold,
+          color: Color(0xFF2C3E50),
+          fontSize: 14,
+        ),
+      ),
+    );
+  }
+}
+
+
 
 class AddButton extends StatelessWidget {
   final String label;
