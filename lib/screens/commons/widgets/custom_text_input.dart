@@ -13,6 +13,7 @@ class CustomTextInput extends StatelessWidget {
   final InputDecoration? decoration;
   final int? maxLines;
   final bool readOnly;
+  final ValueChanged<String>? onChanged;
 
   final String? Function(String?)? validator;
   const CustomTextInput({
@@ -30,6 +31,7 @@ class CustomTextInput extends StatelessWidget {
     this.decoration,
     this.maxLines = 1,
     this.readOnly = false,
+    this.onChanged,
   });
 
   @override

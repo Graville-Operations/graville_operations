@@ -1,10 +1,12 @@
 import 'dart:io';
+//import 'dart:nativewrappers/_internal/vm/lib/ffi_allocation_patch(1).dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:graville_operations/screens/commons/widgets/sections/form_section.dart';
 
 class MaterialPhotoSection extends StatefulWidget {
-  const MaterialPhotoSection({super.key});
+  final ValueChanged<bool>? onPhotoChanged;
+  const MaterialPhotoSection({super.key, this.onPhotoChanged});
 
   @override
   State<MaterialPhotoSection> createState() => _MaterialPhotoSectionState();
@@ -23,6 +25,7 @@ class _MaterialPhotoSectionState extends State<MaterialPhotoSection> {
       setState(() {
         _imageFile = File(pickedFile.path);
       });
+      widget.onPhotoChanged?.call(true);
     }
   }
 
