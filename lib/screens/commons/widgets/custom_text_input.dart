@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/src/services/text_formatter.dart';
 
 class CustomTextInput extends StatelessWidget {
   final TextEditingController controller;
   final bool isPassword;
   final bool isObscure;
   final VoidCallback? onSuffixIconPressed;
+  final VoidCallback? onTap;
   final String? labelText;
   final IconData? prefixIcon;
   final IconData? suffixIcon;
@@ -13,7 +15,7 @@ class CustomTextInput extends StatelessWidget {
   final InputDecoration? decoration;
   final int? maxLines;
   final bool readOnly;
-
+  final ValueChanged<String>? onChanged;
   final String? Function(String?)? validator;
   const CustomTextInput({
     super.key,
@@ -30,6 +32,10 @@ class CustomTextInput extends StatelessWidget {
     this.decoration,
     this.maxLines = 1,
     this.readOnly = false,
+    this.onChanged,
+    this.onTap,
+    required List<TextInputFormatter> inputFormatters,
+    //required Null Function() onTap,
   });
 
   @override
