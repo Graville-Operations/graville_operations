@@ -1,6 +1,9 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:graville_operations/models/addworker.dart';
+import 'package:graville_operations/screens/commons/widgets/custom_image_picker.dart';
+import 'package:graville_operations/screens/commons/widgets/custom_text_input.dart';
+import 'package:graville_operations/screens/workers/workers_screen.dart';
 
 class AddWorkerScreen extends StatefulWidget {
   const AddWorkerScreen({super.key});
@@ -10,9 +13,6 @@ class AddWorkerScreen extends StatefulWidget {
 }
 
 class _AddWorkerScreenState extends State<AddWorkerScreen> {
-  File? _photo;
-  final ImagePicker _picker = ImagePicker();
-
   String? workerType;
   String? task;
   String? selectedSite;
@@ -31,14 +31,7 @@ class _AddWorkerScreenState extends State<AddWorkerScreen> {
     super.dispose();
   }
 
-  Future<void> _openCamera() async {
-    final XFile? image = await _picker.pickImage(source: ImageSource.camera);
-    if (image != null) {
-      setState(() => _photo = File(image.path));
-    }
-  }
-
-  void _updateAmount() {
+  void updateAmount() {
     setState(() {
       if (workerType == "Skilled") {
         if (task == "Roadworks") {
@@ -66,55 +59,16 @@ class _AddWorkerScreenState extends State<AddWorkerScreen> {
         amount > 0;
   }
 
-  void _clearForm() {
+  void clearForm() {
     setState(() {
       selectedSite = null;
       workerType = null;
       task = null;
       amount = 0;
-      _photo = null;
-
       nameController.clear();
       idController.clear();
       phoneController.clear();
     });
-  }
-
-  Widget _photoCard() {
-    return GestureDetector(
-      onTap: _openCamera,
-      child: Container(
-        height: 120,
-        width: double.infinity,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.grey.shade300),
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(12),
-          child: _photo == null
-              ? Container(
-                  color: const Color(0xFFF8F9FA),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
-                      CircleAvatar(
-                        radius: 26,
-                        backgroundColor: Color(0xFFE6F0FF),
-                        child: Icon(Icons.camera_alt, color: Colors.blue),
-                      ),
-                      SizedBox(height: 8),
-                      Text(
-                        "Tap to capture photo",
-                        style: TextStyle(color: Colors.grey),
-                      ),
-                    ],
-                  ),
-                )
-              : Image.file(_photo!, fit: BoxFit.cover),
-        ),
-      ),
-    );
   }
 
   @override
@@ -126,7 +80,7 @@ class _AddWorkerScreenState extends State<AddWorkerScreen> {
         elevation: 0,
         title: const Text(
           'Add Worker',
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+          style: TextStyle(color: Colors.black, fontWeight: FontWeight.normal),
         ),
       ),
       body: SingleChildScrollView(
@@ -134,7 +88,7 @@ class _AddWorkerScreenState extends State<AddWorkerScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _photoCard(),
+            MaterialPhotoSection(title: "Worker Photo"),
             const SizedBox(height: 20),
 
             FormLabel(label: "Select Site *"),
@@ -148,11 +102,7 @@ class _AddWorkerScreenState extends State<AddWorkerScreen> {
                 "Huruma",
               ],
               value: selectedSite,
-              onSelected: (val) {
-                setState(() {
-                  selectedSite = val;
-                });
-              },
+              onSelected: (val) => setState(() => selectedSite = val),
             ),
 
             const SizedBox(height: 24),
@@ -160,24 +110,26 @@ class _AddWorkerScreenState extends State<AddWorkerScreen> {
             const SizedBox(height: 16),
 
             FormLabel(label: "Worker Name *"),
-            CustomTextField(
-              hint: "Enter worker name",
+            CustomTextInput(
               controller: nameController,
               onChanged: (_) => setState(() {}),
+              hintText: "Enter worker name",
             ),
 
             FormLabel(label: "Worker ID *"),
-            CustomTextField(
-              hint: "e.g. 40635223",
+            CustomTextInput(
+              keyboardType: TextInputType.number,
               controller: idController,
-              onChanged: (_) => setState(() {}),
+              onChanged: (value) => setState(() {}),
+              hintText: "e.g. 11111111",
             ),
 
             FormLabel(label: "Phone Number *"),
-            CustomTextField(
-              hint: "e.g. +254 769902927",
+            CustomTextInput(
+              keyboardType: TextInputType.phone,
               controller: phoneController,
               onChanged: (_) => setState(() {}),
+              hintText: "e.g. +254 712345678",
             ),
 
             const SizedBox(height: 24),
@@ -190,10 +142,8 @@ class _AddWorkerScreenState extends State<AddWorkerScreen> {
               options: const ["Skilled", "Unskilled"],
               value: workerType,
               onSelected: (val) {
-                setState(() {
-                  workerType = val;
-                });
-                _updateAmount();
+                setState(() => workerType = val);
+                updateAmount();
               },
             ),
 
@@ -211,33 +161,29 @@ class _AddWorkerScreenState extends State<AddWorkerScreen> {
               ],
               value: task,
               onSelected: (val) {
-                setState(() {
-                  task = val;
-                });
-                _updateAmount();
+                setState(() => task = val);
+                updateAmount();
               },
             ),
 
             FormLabel(label: "Amount *"),
-            Card(
-              elevation: 0,
-              color: const Color(0xFFF5F6FA),
-              shape: RoundedRectangleBorder(
+            const SizedBox(height: 6),
+            Container(
+              width: double.infinity,
+              height: 50,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: const Color(0xFFF5F6FA),
                 borderRadius: BorderRadius.circular(8),
-                side: BorderSide(color: Colors.grey.shade300),
+                border: Border.all(color: Colors.grey.shade300),
               ),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 16,
-                ),
-                child: Text(
-                  amount > 0 ? "KES $amount" : "Amount will be calculated",
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: amount > 0 ? Colors.black : Colors.grey,
-                  ),
+              child: Text(
+                amount > 0 ? "KES $amount" : "Amount will be calculated",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: amount > 0 ? Colors.black : Colors.grey,
                 ),
               ),
             ),
@@ -247,12 +193,17 @@ class _AddWorkerScreenState extends State<AddWorkerScreen> {
             FormActions(
               isEnabled: isFormValid,
               onSubmit: () {
-                /// ScaffoldMessenger.of(context).showSnackBar(
-                //const SnackBar(content: Text("Worker Added Successfully")),
-                // );
-                //_clearForm();
+                final worker = Worker(
+                  name: nameController.text.trim(),
+                  id: idController.text.trim(),
+                  skillLevel: workerType!,
+                  phone: phoneController.text.trim(),
+                  specialty: task!,
+                  rate: "KES $amount",
+                );
+                Navigator.pop(context, worker);
               },
-              onCancel: _clearForm,
+              onCancel: clearForm,
             ),
           ],
         ),
@@ -267,9 +218,27 @@ class FormLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final hasAsterisk = label.contains('*');
+    final text = label.replaceAll('*', '');
+
     return Padding(
       padding: const EdgeInsets.only(top: 12, bottom: 6),
-      child: Text(label, style: const TextStyle(fontWeight: FontWeight.w600)),
+      child: RichText(
+        text: TextSpan(
+          style: const TextStyle(
+            fontWeight: FontWeight.normal,
+            color: Colors.black,
+          ),
+          children: [
+            TextSpan(text: text),
+            if (hasAsterisk)
+              const TextSpan(
+                text: '*',
+                style: TextStyle(color: Colors.red),
+              ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -364,21 +333,8 @@ class FormActions extends StatelessWidget {
           child: SizedBox(
             height: 48,
             child: OutlinedButton(
-              onPressed: () {},
-              style: OutlinedButton.styleFrom(
-                backgroundColor: Colors.grey.shade100,
-                side: BorderSide(color: Colors.grey.shade300),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-              child: const Text(
-                "Cancel",
-                style: TextStyle(
-                  color: Colors.black87,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
+              onPressed: onCancel,
+              child: const Text("Cancel"),
             ),
           ),
         ),
@@ -389,19 +345,16 @@ class FormActions extends StatelessWidget {
             child: ElevatedButton(
               onPressed: isEnabled ? onSubmit : null,
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFA9B9DB),
+                backgroundColor: isEnabled ? Colors.blue : Colors.grey.shade300,
+                foregroundColor: isEnabled ? Colors.white : Colors.grey,
+                disabledBackgroundColor: Colors.grey.shade300,
+                disabledForegroundColor: Colors.grey,
                 elevation: 0,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(24),
                 ),
               ),
-              child: const Text(
-                "Add Worker",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
+              child: const Text("Add Worker"),
             ),
           ),
         ),

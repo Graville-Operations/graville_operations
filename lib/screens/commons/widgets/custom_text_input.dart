@@ -33,9 +33,6 @@ class CustomTextInput extends StatelessWidget {
     this.maxLines = 1,
     this.readOnly = false,
     this.onChanged,
-    this.onTap,
-    required List<TextInputFormatter> inputFormatters,
-    //required Null Function() onTap,
   });
 
   @override

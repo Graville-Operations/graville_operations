@@ -1,24 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:graville_operations/screens/commons/widgets/custom_button.dart';
-import 'package:graville_operations/screens/commons/widgets/custom_text_input.dart';
-
-class Worker {
-  final String name;
-  final String id;
-  final String skillLevel;
-  final String phone;
-  final String specialty;
-  final String rate;
-
-  Worker({
-    required this.name,
-    required this.id,
-    required this.skillLevel,
-    required this.phone,
-    required this.specialty,
-    required this.rate,
-  });
-}
+import 'worker_profile_screen.dart';
+import 'package:graville_operations/models/worker.dart';
 
 class WorkersScreen extends StatefulWidget {
   const WorkersScreen({super.key});
@@ -32,6 +15,10 @@ class _WorkersScreenState extends State<WorkersScreen> {
 
   final TextEditingController searchController = TextEditingController();
 
+  // Overlay variables
+  final LayerLink _layerLink = LayerLink();
+  OverlayEntry? _overlayEntry;
+
   final List<String> sites = [
     'Mabatini',
     'Mishi Mboko',
@@ -44,69 +31,154 @@ class _WorkersScreenState extends State<WorkersScreen> {
   final List<Worker> workers = [
     Worker(
       name: "John Mitchell",
-      id: "98765432",
-      skillLevel: "Unskilled",
-      phone: "+254712345678",
+      id: "W001",
+      skillLevel: "Skilled",
+      phone: "+1 555-0123",
       specialty: "Brickwork",
-      rate: "KSH 600",
+      rate: "\$250",
+      joinDate: DateTime(2023, 1, 15),
     ),
     Worker(
       name: "Robert Chen",
-      id: "98765432",
+      id: "W002",
       skillLevel: "Skilled",
-      phone: "+254712345678",
+      phone: "+1 555-0124",
       specialty: "Carpentry",
-      rate: "KSH 1000",
+      rate: "\$280",
+      joinDate: DateTime(2023, 2, 20),
     ),
     Worker(
       name: "Maria Garcia",
-      id: "98765432",
-      skillLevel: "Unskilled",
-      phone: "+254712345678",
+      id: "W003",
+      skillLevel: "Skilled",
+      phone: "+1 555-0125",
       specialty: "Electrical",
-      rate: "KSH 600",
+      rate: "\$300",
+      joinDate: DateTime(2023, 3, 10),
     ),
     Worker(
       name: "David Thompson",
-      id: "98765432",
+      id: "W004",
       skillLevel: "Skilled",
-      phone: "+254712345678",
+      phone: "+1 555-0126",
       specialty: "Plumbing",
-      rate: "KSH 1000",
+      rate: "\$275",
+      joinDate: DateTime(2023, 4, 5),
     ),
     Worker(
       name: "Sarah Williams",
-      id: "98765432",
+      id: "W005",
       skillLevel: "Unskilled",
-      phone: "+254712345678",
+      phone: "+1 555-0127",
       specialty: "Labor",
-      rate: "KSH 600",
+      rate: "\$150",
+      joinDate: DateTime(2023, 5, 12),
     ),
     Worker(
       name: "James Anderson",
-      id: "98765432",
+      id: "W006",
       skillLevel: "Skilled",
-      phone: "+254712345678",
+      phone: "+1 555-0128",
       specialty: "Woodwork",
-      rate: "KSH 1000",
+      rate: "\$260",
+      joinDate: DateTime(2023, 6, 18),
     ),
     Worker(
       name: "Lisa Brown",
-      id: "98765432",
+      id: "W007",
       skillLevel: "Skilled",
-      phone: "+254712345678",
+      phone: "+1 555-0129",
       specialty: "Supervision",
-      rate: "KSH 1000",
+      rate: "\$350",
+      joinDate: DateTime(2023, 7, 1),
     ),
     Worker(
       name: "Michael Davis",
-      id: "98765432",
+      id: "W008",
       skillLevel: "Skilled",
-      phone: "+254712345678",
+      phone: "+1 555-0130",
       specialty: "Welding",
-      rate: "KSH 1000",
+      rate: "\$290",
+      joinDate: DateTime(2023, 8, 15),
     ),
   ];
+
+  // Show overlay
+  void _showOverlay() {
+    _removeOverlay();
+
+    _overlayEntry = OverlayEntry(
+      builder: (context) {
+        final query = searchController.text.toLowerCase();
+
+        final results = workers.where((worker) {
+          return worker.name.toLowerCase().contains(query);
+        }).toList();
+
+        return Positioned(
+          width: 240,
+          child: CompositedTransformFollower(
+            link: _layerLink,
+            offset: const Offset(0, 50),
+            showWhenUnlinked: false,
+            child: Material(
+              elevation: 4,
+              borderRadius: BorderRadius.circular(8),
+              child: Container(
+                constraints: const BoxConstraints(maxHeight: 200),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: results.isEmpty
+                    ? const Padding(
+                        padding: EdgeInsets.all(12),
+                        child: Text("No result"),
+                      )
+                    : ListView.builder(
+                        padding: EdgeInsets.zero,
+                        shrinkWrap: true,
+                        itemCount: results.length,
+                        itemBuilder: (context, index) {
+                          final worker = results[index];
+                          return ListTile(
+                            title: Text(worker.name),
+                            onTap: () {
+                              _removeOverlay();
+                              searchController.clear();
+
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      WorkerProfileScreen(worker: worker),
+                                ),
+                              );
+                            },
+                          );
+                        },
+                      ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+
+    Overlay.of(context).insert(_overlayEntry!);
+  }
+
+  void _removeOverlay() {
+    _overlayEntry?.remove();
+    _overlayEntry = null;
+  }
+
+  @override
+  void dispose() {
+    _removeOverlay();
+    searchController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -134,7 +206,6 @@ class _WorkersScreenState extends State<WorkersScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // LABEL OUTSIDE CARD
             const Text(
               "Construction Site",
               style: TextStyle(
@@ -145,7 +216,6 @@ class _WorkersScreenState extends State<WorkersScreen> {
             ),
             const SizedBox(height: 6),
 
-            // REDUCED SIZE CARD
             Card(
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -222,26 +292,35 @@ class _WorkersScreenState extends State<WorkersScreen> {
                 ),
                 const SizedBox(width: 12),
                 SizedBox(
-                  width: 220,
-                  child: CustomTextInput(
-                    controller: searchController,
-                    hintText: "Search worker .....",
-                    decoration: InputDecoration(
-                      isDense: true,
-                      filled: true,
-                      fillColor: Colors.white,
-                      prefixIcon: const Icon(Icons.search),
-                      hintText: "Search",
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(color: Colors.grey.shade400),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: const BorderSide(color: Colors.blue),
+                  width: 240,
+                  child: CompositedTransformTarget(
+                    link: _layerLink,
+                    child: TextField(
+                      controller: searchController,
+                      onChanged: (value) {
+                        if (value.isEmpty) {
+                          _removeOverlay();
+                        } else {
+                          _showOverlay();
+                        }
+                      },
+                      decoration: InputDecoration(
+                        isDense: true,
+                        filled: true,
+                        fillColor: Colors.white,
+                        prefixIcon: const Icon(Icons.search),
+                        hintText: "Search",
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: BorderSide(color: Colors.grey.shade400),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: const BorderSide(color: Colors.blue),
+                        ),
                       ),
                     ),
                   ),
@@ -268,7 +347,7 @@ class _WorkersScreenState extends State<WorkersScreen> {
                   scrollDirection: Axis.horizontal,
                   child: DataTable(
                     showCheckboxColumn: false,
-                    headingRowColor: WidgetStateProperty.all(
+                    headingRowColor: MaterialStateProperty.all(
                       Colors.grey.shade200,
                     ),
                     columnSpacing: 30,
@@ -301,7 +380,16 @@ class _WorkersScreenState extends State<WorkersScreen> {
   List<DataRow> _buildWorkerRows() {
     return workers.map((worker) {
       return DataRow(
-        onSelectChanged: (selected) {},
+        onSelectChanged: (selected) {
+          if (selected == true) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => WorkerProfileScreen(worker: worker),
+              ),
+            );
+          }
+        },
         cells: [
           DataCell(Text(worker.name)),
           DataCell(Text(worker.id)),
@@ -334,6 +422,8 @@ class _WorkersScreenState extends State<WorkersScreen> {
     }).toList();
   }
 }
+
+class InvalidType {}
 
 Widget _statCard({
   required String title,

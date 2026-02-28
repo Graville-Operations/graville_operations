@@ -79,7 +79,7 @@ class CustomDropdown<T> extends StatelessWidget {
       ),
       items: items.map((T item) {
         final displayText = displayMapper(item);
-        final itemValue = valueMapper != null ? valueMapper!(item) : item;
+       // final itemValue = valueMapper != null ? valueMapper!(item) : item;
 
         return DropdownMenuItem<T>(
           value: item,

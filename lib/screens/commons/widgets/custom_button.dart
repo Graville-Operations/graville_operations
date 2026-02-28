@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class CustomButton extends StatelessWidget {
   final String label;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
   final bool isLoading;
   final Color? backgroundColor;
   final Color? textColor;
@@ -24,7 +24,6 @@ class CustomButton extends StatelessWidget {
     this.icon,
     this.width,
     this.buttonStyle,
-    required String text,
   });
 
   @override

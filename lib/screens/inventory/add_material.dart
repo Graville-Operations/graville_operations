@@ -1,217 +1,203 @@
 import 'package:flutter/material.dart';
+import 'package:graville_operations/models/material/inventory_material.dart';
+import 'package:graville_operations/models/material/material_data.dart';
 import 'package:graville_operations/screens/commons/widgets/custom_button.dart';
+import 'package:graville_operations/screens/commons/widgets/custom_dropdown.dart';
+//import 'package:graville_operations/screens/inventory_screen/inventory_screen.dart';
+//import 'package:graville_operations/widgets/custom_button.dart';
+
+void main() {
+  runApp(
+    const MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: AddMaterialScreen(),
+    ),
+  );
+}
 
 class AddMaterialScreen extends StatefulWidget {
   const AddMaterialScreen({super.key});
 
   @override
-  AddMaterialScreenState createState() => AddMaterialScreenState();
+  State<AddMaterialScreen> createState() => AddMaterialScreenState();
 }
 
 class AddMaterialScreenState extends State<AddMaterialScreen> {
+  List<String> allCategories = [
+    "Electrical",
+    "Plumbing",
+    "Masonry",
+    "Carpentry",
+  ];
+
+  List<String> allUnits = ["kg", "pcs", "liters", "meters"];
+
   String? selectedCategory;
   String? selectedUnit;
 
-  final List<String> categories = [
-    "Electrical",
-    "Plumbing",
-    "Hardware",
-    "Tools",
-  ];
-
-  final List<String> units = ["Pieces", "Kg", "Liters", "Meters"];
+  InventoryMaterial? selectedMaterial;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey.shade200,
+      backgroundColor: Colors.grey[200],
       appBar: AppBar(
-        backgroundColor: Colors.blue,
-        title: const Text("Add Material"),
-        leading: const BackButton(),
+        backgroundColor: Colors.grey[200],
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        title: const Text(
+          "Add Material",
+          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+        ),
+        centerTitle: false,
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 10,
-                    ),
-                  ],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+      body: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              "Material Name",
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            CustomDropdown<InventoryMaterial>(
+              value: selectedMaterial,
+              items: allMaterials,
+              displayMapper: (material) => material.name,
+              onChanged: (InventoryMaterial? material) {
+                setState(() {
+                  selectedMaterial = material;
+                });
+              },
+              hint: "Select Material",
+              isExpanded: true,
+              isDense: true,
+              border: InputBorder.none,
+              fillColor: Colors.white,
+              borderRadius: BorderRadius.circular(14),
+            ),
+
+            const SizedBox(height: 20),
+
+            const Text(
+              "Category",
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+
+            CustomDropdown<String>(
+              value: selectedCategory,
+              items: allCategories,
+              displayMapper: (cat) => cat,
+              onChanged: (String? cat) {
+                setState(() {
+                  selectedCategory = cat;
+                });
+              },
+              isExpanded: true,
+              isDense: true,
+              border: InputBorder.none,
+              fillColor: Colors.white,
+              borderRadius: BorderRadius.circular(14),
+            ),
+            const SizedBox(height: 20),
+
+            const Text(
+              "Unit",
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+
+            CustomDropdown<String>(
+              value: selectedUnit,
+              items: allUnits,
+              displayMapper: (unit) => unit,
+              onChanged: (String? unit) {
+                setState(() {
+                  selectedUnit = unit;
+                });
+              },
+              isExpanded: true,
+              isDense: true,
+              border: InputBorder.none,
+              fillColor: Colors.white,
+              borderRadius: BorderRadius.circular(14),
+            ),
+
+            const SizedBox(height: 40),
+
+            Column(
+              children: [
+                Row(
                   children: [
-                    const Text(
-                      "Material Name",
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 6),
-                    TextField(
-                      decoration: inputDecoration("Enter material name"),
-                    ),
+                    Expanded(
+                      child: CustomButton(
+                        label: "Save Material",
+                        backgroundColor: Colors.orange,
+                        textColor: Colors.white,
+                        height: 55,
+                        borderRadius: 14,
+                        onPressed: () {
+                          if (selectedMaterial == null ||
+                              selectedCategory == null ||
+                              selectedUnit == null) {
+                            return;
+                          }
 
-                    const SizedBox(height: 20),
+                          final newMaterial = MaterialData(
+                            name: selectedMaterial!.name,
+                            unit: selectedUnit!,
+                            quantity: '',
+                          );
 
-                    const Text(
-                      "Category",
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 6),
-                    DropdownButtonFormField<String>(
-                      initialValue: selectedCategory,
-                      items: categories
-                          .map(
-                            (e) => DropdownMenuItem(value: e, child: Text(e)),
-                          )
-                          .toList(),
-                      onChanged: (val) {
-                        setState(() {
-                          selectedCategory = val;
-                        });
-                      },
-                      decoration: inputDecoration("Select Category"),
-                    ),
-
-                    const SizedBox(height: 20),
-
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text(
-                                "Quantity",
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                              const SizedBox(height: 6),
-                              TextField(
-                                keyboardType: TextInputType.number,
-                                decoration: inputDecoration("Enter quantity"),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text(
-                                "Unit",
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                              const SizedBox(height: 6),
-                              DropdownButtonFormField<String>(
-                                initialValue: selectedUnit,
-                                items: units
-                                    .map(
-                                      (e) => DropdownMenuItem(
-                                        value: e,
-                                        child: Text(e),
-                                      ),
-                                    )
-                                    .toList(),
-                                onChanged: (val) {
-                                  setState(() {
-                                    selectedUnit = val;
-                                  });
-                                },
-                                decoration: inputDecoration("Select Unit"),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 20),
-
-                    const Text(
-                      "Supplier",
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 6),
-                    TextField(
-                      decoration: inputDecoration("Enter supplier name"),
-                    ),
-
-                    const SizedBox(height: 20),
-
-                    const Text(
-                      "Unit Price",
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 6),
-                    TextField(
-                      keyboardType: TextInputType.number,
-                      decoration: inputDecoration("Enter price"),
-                    ),
-
-                    const SizedBox(height: 20),
-
-                    const Text(
-                      "Description (Optional)",
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 6),
-                    TextField(
-                      maxLines: 4,
-                      decoration: inputDecoration("Enter description"),
+                          debugPrint(
+                            "Saved: ${newMaterial.name} -${newMaterial.unit}",
+                          );
+                        },
+                      ),
                     ),
                   ],
                 ),
-              ),
 
-              const SizedBox(height: 25),
+                const SizedBox(height: 15),
 
-              Row(
-                children: [
-                  Expanded(
-                    child: CustomButton(
-                      label: "Save",
-                      backgroundColor: Colors.blue,
-                      onPressed: () {
-                        // TODO: Add save logic
-                      },
+                GestureDetector(
+                  onTap: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Text(
+                    "Cancel",
+                    style: TextStyle(
+                      color: Colors.blue,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: CustomButton(
-                      label: "Cancel",
-                      backgroundColor: Colors.grey,
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+          ],
         ),
       ),
     );
   }
 
-  InputDecoration inputDecoration(String hint) {
+  InputDecoration inputDecoration({String? hintText, String? prefixText}) {
     return InputDecoration(
-      hintText: hint,
+      hintText: hintText,
+      prefixText: prefixText,
       filled: true,
-      fillColor: Colors.grey.shade100,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+      fillColor: Colors.white,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(14),
         borderSide: BorderSide.none,
       ),
     );

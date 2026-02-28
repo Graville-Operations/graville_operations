@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:graville_operations/models/material/material_data.dart';
 import 'package:graville_operations/screens/commons/widgets/custom_button.dart';
+import 'package:graville_operations/models/material/inventory_material.dart';
+import 'package:graville_operations/screens/commons/widgets/custom_button.dart';
+import 'package:graville_operations/screens/commons/widgets/custom_dropdown.dart';
 import 'package:graville_operations/screens/inventory/inventory_screen.dart';
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
 
 class UpdateInventoryScreen extends StatefulWidget {
   const UpdateInventoryScreen({super.key});
@@ -9,14 +15,15 @@ class UpdateInventoryScreen extends StatefulWidget {
   UpdateInventoryScreenState createState() => UpdateInventoryScreenState();
 }
 
+List<String> allSites = ["PLAZA 2000", "Kimnojun", "Dcc Kibra", "Huruma"];
+
+String? selectedSite;
+
 class UpdateInventoryScreenState extends State<UpdateInventoryScreen> {
-  String? selectedMaterial = "Cement";
-  String? selectedUnit = "Bags";
-  int quantity = 0;
-
-  final List<String> materials = ["Bricks", "Cement", "Sand", "Steel"];
-
-  final List<String> units = ["Bags", "Liters", "Kg", "Meters"];
+  InventoryMaterial? selectedMaterial;
+  final TextEditingController unitController = TextEditingController();
+  final TextEditingController categoryController = TextEditingController();
+  final TextEditingController quantityController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -27,10 +34,7 @@ class UpdateInventoryScreenState extends State<UpdateInventoryScreen> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
-          onPressed: () => Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => InventoryScreen()),
-          ),
+          onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
           "Update Inventory",
@@ -43,100 +47,89 @@ class UpdateInventoryScreenState extends State<UpdateInventoryScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            GestureDetector(
-              onTap: () {},
-              child: Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(vertical: 30),
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade100,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: Colors.grey.shade300),
-                ),
-                child: Column(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(18),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.blue.shade100,
-                      ),
-                      child: const Icon(
-                        Icons.camera_alt,
-                        color: Colors.blue,
-                        size: 28,
-                      ),
-                    ),
+            const Text(
+              "Construction Site*",
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 6),
 
-                    const SizedBox(height: 15),
-
-                    const Text(
-                      "Tap to capture photo",
-                      style: TextStyle(fontWeight: FontWeight.w600),
-                    ),
-
-                    const SizedBox(height: 6),
-
-                    Text(
-                      "Select from gallery",
-                      style: TextStyle(
-                        color: Colors.grey.shade600,
-                        fontSize: 13,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+            CustomDropdown<String>(
+              value: selectedSite,
+              items: allSites,
+              displayMapper: (site) => site,
+              onChanged: (String? site) {
+                setState(() {
+                  selectedSite = site;
+                });
+              },
+              hint: "Select site",
+              isExpanded: true,
+              isDense: true,
+              border: InputBorder.none,
+              fillColor: Colors.white,
+              borderRadius: BorderRadius.circular(14),
             ),
 
             const SizedBox(height: 30),
 
             const Text(
-              "Material Name",
+              "Material Name*",
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 6),
-            DropdownButtonFormField<String>(
-              initialValue: selectedMaterial,
-              items: materials
-                  .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                  .toList(),
-              onChanged: (val) {
+
+            CustomDropdown<InventoryMaterial>(
+              value: selectedMaterial,
+              items: allMaterials,
+              displayMapper: (material) => material.name,
+              onChanged: (InventoryMaterial? material) {
                 setState(() {
-                  selectedMaterial = val;
+                  selectedMaterial = material;
+                  unitController.text = material?.unit ?? "";
+                  categoryController.text = material?.category ?? "";
                 });
               },
+              hint: "Select Material",
+              isExpanded: true,
+              isDense: true,
+              border: InputBorder.none,
+              fillColor: Colors.white,
+              borderRadius: BorderRadius.circular(14),
+            ),
+
+            const SizedBox(height: 20),
+            const Text(
+              "Unit type*",
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            TextField(
+              controller: unitController,
+              readOnly: true,
               decoration: inputDecoration(),
             ),
 
             const SizedBox(height: 20),
 
             const Text(
-              "Unit Type",
-              style: TextStyle(fontWeight: FontWeight.bold),
+              "Category",
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 6),
-            DropdownButtonFormField<String>(
-              initialValue: selectedUnit,
-              items: units
-                  .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                  .toList(),
-              onChanged: (val) {
-                setState(() {
-                  selectedUnit = val;
-                });
-              },
+            TextField(
+              controller: categoryController,
+              readOnly: true,
               decoration: inputDecoration(),
             ),
 
             const SizedBox(height: 20),
 
             const Text(
-              "Quantity",
+              "Quantity*",
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 6),
             TextField(
+              controller: quantityController,
               keyboardType: TextInputType.number,
               decoration: inputDecoration(hintText: "Enter quantity"),
             ),
@@ -168,28 +161,51 @@ class UpdateInventoryScreenState extends State<UpdateInventoryScreen> {
             ),
 
             const SizedBox(height: 30),
-
-            Row(
+            Column(
               children: [
-                Expanded(
-                  child: CustomButton(
-                    label: "cancel",
-                    backgroundColor: Colors.white10,
-                    textColor: Colors.blue,
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                  ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: CustomButton(
+                        label: "Save Material",
+                        backgroundColor: Colors.orange,
+                        textColor: Colors.white,
+                        height: 55,
+                        borderRadius: 14,
+                        onPressed: () {
+                          if (selectedMaterial == null ||
+                              quantityController.text.isEmpty) {
+                            return;
+                          }
+
+                          final newMaterial = MaterialData(
+                            name: selectedMaterial!.name,
+                            quantity: quantityController.text,
+                            unit: selectedMaterial!.unit,
+                          );
+
+                          debugPrint(
+                            "Saved: ${newMaterial.name} - ${newMaterial.quantity} ${newMaterial.unit}",
+                          );
+                        },
+                      ),
+                    ),
+                  ],
                 ),
 
-                const SizedBox(width: 15),
-                Expanded(
-                  child: CustomButton(
-                    label: "Save Material",
-                    backgroundColor: Colors.blue,
-                    onPressed: () {
-                      debugPrint("saved");
-                    },
+                const SizedBox(height: 15),
+
+                GestureDetector(
+                  onTap: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Text(
+                    "Cancel",
+                    style: TextStyle(
+                      color: Colors.blue,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ),
               ],

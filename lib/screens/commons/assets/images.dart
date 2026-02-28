@@ -1,4 +1,3 @@
-
 class CommonImages {
   CommonImages._();
   static const String background = "assets/images/background.png";
@@ -6,4 +5,5 @@ class CommonImages {
   static const String forgotpassword = "assets/images/forgotpassword.png";
   static const String otpverification = "assets/images/otpverification.png";
   static const String resetpassword = "assets/images/resetpassword.png";
+  static  const String  worker = "assets/images/worker.jpg";
 }
