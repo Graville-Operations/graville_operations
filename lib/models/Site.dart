@@ -1,7 +1,10 @@
+// ignore: file_names
 import 'dart:ffi';
+import 'package:graville_operations/models/worker.dart';
 
 import 'package:graville_operations/models/Inventory.dart';
-import 'package:graville_operations/screens/workers/workers_screen.dart';
+
+
 
 class Site {
   final String name;
