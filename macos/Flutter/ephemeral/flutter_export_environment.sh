@@ -1,7 +1,12 @@
 #!/bin/sh
 # This is a generated file; do not edit or check into version control.
+<<<<<<< HEAD
+export "FLUTTER_ROOT=C:\Android\flutter"
+export "FLUTTER_APPLICATION_PATH=C:\Users\Admin\Desktop\GravilleOp\graville_operations"
+=======
 export "FLUTTER_ROOT=F:\FLUTTER\flutter"
 export "FLUTTER_APPLICATION_PATH=F:\GRAVILLEENT\graville_operations"
+>>>>>>> a56475222d806959dadba87586e62684fd183fa8
 export "COCOAPODS_PARALLEL_CODE_SIGN=true"
 export "FLUTTER_BUILD_DIR=build"
 export "FLUTTER_BUILD_NAME=1.0.0"

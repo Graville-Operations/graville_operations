@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:graville_operations/models/worker.dart';
+
 
 
 class AddWorkerScreen extends StatefulWidget {
@@ -74,7 +76,6 @@ class _AddWorkerScreenState extends State<AddWorkerScreen> {
       task = null;
       amount = 0;
       _photo = null;
-
       nameController.clear();
       idController.clear();
       phoneController.clear();
@@ -84,35 +85,45 @@ class _AddWorkerScreenState extends State<AddWorkerScreen> {
   Widget _photoCard() {
     return GestureDetector(
       onTap: _openCamera,
-      child: Container(
-        height: 120,
-        width: double.infinity,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.grey.shade300),
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(12),
-          child: _photo == null
-              ? Container(
-                  color: const Color(0xFFF8F9FA),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
-                      CircleAvatar(
-                        radius: 26,
-                        backgroundColor: Color(0xFFE6F0FF),
-                        child: Icon(Icons.camera_alt, color: Colors.blue),
-                      ),
-                      SizedBox(height: 8),
-                      Text(
-                        "Tap to capture photo",
-                        style: TextStyle(color: Colors.grey),
-                      ),
-                    ],
-                  ),
-                )
-              : Image.file(_photo!, fit: BoxFit.cover),
+      child: Center(
+        child: SizedBox(
+          width: 120, // 👈 controls size
+          height: 120, // 👈 controls size
+          child: Container(
+            decoration: BoxDecoration(
+              color: const Color(0xFFF8F9FA),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: Colors.grey.shade400, // 👈 clearly visible border
+                width: 1.2,
+              ),
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: _photo == null
+                  ? Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: const [
+                        CircleAvatar(
+                          radius: 20,
+                          backgroundColor: Color(0xFFE6F0FF),
+                          child: Icon(
+                            Icons.camera_alt,
+                            color: Colors.blue,
+                            size: 20,
+                          ),
+                        ),
+                        SizedBox(height: 6),
+                        Text(
+                          "Tap to capture photo",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 12, color: Colors.grey),
+                        ),
+                      ],
+                    )
+                  : Image.file(_photo!, fit: BoxFit.cover),
+            ),
+          ),
         ),
       ),
     );
@@ -149,11 +160,7 @@ class _AddWorkerScreenState extends State<AddWorkerScreen> {
                 "Huruma",
               ],
               value: selectedSite,
-              onSelected: (val) {
-                setState(() {
-                  selectedSite = val;
-                });
-              },
+              onSelected: (val) => setState(() => selectedSite = val),
             ),
 
             const SizedBox(height: 24),
@@ -191,9 +198,7 @@ class _AddWorkerScreenState extends State<AddWorkerScreen> {
               options: const ["Skilled", "Unskilled"],
               value: workerType,
               onSelected: (val) {
-                setState(() {
-                  workerType = val;
-                });
+                setState(() => workerType = val);
                 _updateAmount();
               },
             ),
@@ -212,9 +217,7 @@ class _AddWorkerScreenState extends State<AddWorkerScreen> {
               ],
               value: task,
               onSelected: (val) {
-                setState(() {
-                  task = val;
-                });
+                setState(() => task = val);
                 _updateAmount();
               },
             ),
@@ -248,10 +251,16 @@ class _AddWorkerScreenState extends State<AddWorkerScreen> {
             FormActions(
               isEnabled: isFormValid,
               onSubmit: () {
-                /// ScaffoldMessenger.of(context).showSnackBar(
-                //const SnackBar(content: Text("Worker Added Successfully")),
-                // );
-                //_clearForm();
+                final worker = Worker(
+                  name: nameController.text.trim(),
+                  id: idController.text.trim(),
+                  skillLevel: workerType!,
+                  phone: phoneController.text.trim(),
+                  specialty: task!,
+                  rate: "KES $amount",
+                  joinDate: DateTime.now(),
+                );
+                Navigator.pop(context, worker);
               },
               onCancel: _clearForm,
             ),
@@ -268,9 +277,27 @@ class FormLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final hasAsterisk = label.contains('*');
+    final text = label.replaceAll('*', '');
+
     return Padding(
       padding: const EdgeInsets.only(top: 12, bottom: 6),
-      child: Text(label, style: const TextStyle(fontWeight: FontWeight.w600)),
+      child: RichText(
+        text: TextSpan(
+          style: const TextStyle(
+            fontWeight: FontWeight.w600,
+            color: Colors.black,
+          ),
+          children: [
+            TextSpan(text: text),
+            if (hasAsterisk)
+              const TextSpan(
+                text: '*',
+                style: TextStyle(color: Colors.red),
+              ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -330,7 +357,7 @@ class CustomDropdownField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DropdownButtonFormField<String>(
-      value: value,
+      initialValue: value,
       hint: Text(hint),
       items: options
           .map((e) => DropdownMenuItem(value: e, child: Text(e)))
@@ -365,21 +392,8 @@ class FormActions extends StatelessWidget {
           child: SizedBox(
             height: 48,
             child: OutlinedButton(
-              onPressed: () {},
-              style: OutlinedButton.styleFrom(
-                backgroundColor: Colors.grey.shade100,
-                side: BorderSide(color: Colors.grey.shade300),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-              child: const Text(
-                "Cancel",
-                style: TextStyle(
-                  color: Colors.black87,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
+              onPressed: onCancel,
+              child: const Text("Cancel"),
             ),
           ),
         ),
@@ -389,20 +403,7 @@ class FormActions extends StatelessWidget {
             height: 48,
             child: ElevatedButton(
               onPressed: isEnabled ? onSubmit : null,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFA9B9DB),
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-              child: const Text(
-                "Add Worker",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
+              child: const Text("Add Worker"),
             ),
           ),
         ),
