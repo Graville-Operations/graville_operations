@@ -6,7 +6,6 @@ class CustomTextInput extends StatelessWidget {
   final bool isPassword;
   final bool isObscure;
   final VoidCallback? onSuffixIconPressed;
-  final VoidCallback? onTap;
   final String? labelText;
   final IconData? prefixIcon;
   final IconData? suffixIcon;

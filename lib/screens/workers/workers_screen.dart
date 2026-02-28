@@ -226,7 +226,7 @@ class _WorkersScreenState extends State<WorkersScreen> {
                   vertical: 8,
                 ),
                 child: DropdownButtonFormField<String>(
-                  initialValue: selectedSite,
+                  value: selectedSite,
                   hint: const Text("Select Site"),
                   isDense: true,
                   items: sites

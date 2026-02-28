@@ -298,7 +298,7 @@ class CustomDropdownField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DropdownButtonFormField<String>(
-      initialValue: value,
+      value: value,
       hint: Text(hint),
       items: options
           .map((e) => DropdownMenuItem(value: e, child: Text(e)))
