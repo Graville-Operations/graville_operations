@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class CustomButton extends StatelessWidget {
   final String label;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
   final bool isLoading;
   final Color? backgroundColor;
   final Color? textColor;
@@ -22,21 +22,24 @@ class CustomButton extends StatelessWidget {
     this.height,
     this.borderRadius,
     this.icon,
-    this.width, this.buttonStyle,
+    this.width,
+    this.buttonStyle,
   });
 
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
       onPressed: isLoading ? null : onPressed,
-      style: buttonStyle ?? ElevatedButton.styleFrom(
-        backgroundColor: backgroundColor ?? Colors.green,
-        foregroundColor: textColor ?? Colors.white,
-        minimumSize: Size(width??50, height ?? 50),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(borderRadius ?? 20),
-        ),
-      ),
+      style:
+          buttonStyle ??
+          ElevatedButton.styleFrom(
+            backgroundColor: backgroundColor ?? Colors.green,
+            foregroundColor: textColor ?? Colors.white,
+            minimumSize: Size(width ?? 50, height ?? 50),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(borderRadius ?? 20),
+            ),
+          ),
       child: isLoading
           ? const SizedBox(
               height: 20,
