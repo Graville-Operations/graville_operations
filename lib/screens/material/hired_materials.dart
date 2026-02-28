@@ -1,9 +1,55 @@
 import 'package:flutter/material.dart';
 import 'package:graville_operations/screens/commons/widgets/custom_dropdown.dart';
-// ignore: unused_import
-import 'package:graville_operations/screens/commons/widgets/custom_text_input.dart';
-import 'package:flutter/services.dart';
 import 'package:graville_operations/screens/commons/widgets/custom_button.dart';
+import 'package:graville_operations/screens/commons/widgets/custom_text_input.dart';
+
+// 🔹 Updated CustomTextInput
+class CustomTextInput extends StatelessWidget {
+  final TextEditingController controller;
+  final String? hintText;
+  final bool readOnly;
+  final IconData? prefixIcon;
+  final IconData? suffixIcon;
+  final void Function()? onSuffixIconPressed;
+  final void Function()? onTap;
+  final TextInputType? keyboardType;
+  final int? maxLines;
+  final void Function(String)? onChanged;
+
+  const CustomTextInput({
+    Key? key,
+    required this.controller,
+    this.hintText,
+    this.readOnly = false,
+    this.prefixIcon,
+    this.suffixIcon,
+    this.onSuffixIconPressed,
+    this.onTap,
+    this.keyboardType,
+    this.maxLines = 1,
+    this.onChanged,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      controller: controller,
+      readOnly: readOnly,
+      keyboardType: keyboardType,
+      maxLines: maxLines,
+      onChanged: onChanged,
+      onTap: onTap,
+      decoration: InputDecoration(
+        hintText: hintText,
+        prefixIcon: prefixIcon != null ? Icon(prefixIcon) : null,
+        suffixIcon: suffixIcon != null
+            ? IconButton(icon: Icon(suffixIcon), onPressed: onSuffixIconPressed)
+            : null,
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+      ),
+    );
+  }
+}
 
 class HiredMaterialScreen extends StatefulWidget {
   const HiredMaterialScreen({super.key});
@@ -21,75 +67,45 @@ class _HiredMaterialScreenState extends State<HiredMaterialScreen> {
   final TextEditingController rateController = TextEditingController();
   final TextEditingController supplierController = TextEditingController();
   final TextEditingController notesController = TextEditingController();
+  final TextEditingController hireDateController = TextEditingController();
+  final TextEditingController returnDateController = TextEditingController();
 
   DateTime? hireDate;
   DateTime? returnDate;
-
   double totalCost = 0.0;
 
   String? selectedConstruction;
   String? selectedEquipment;
   String billingType = "Per Day";
 
-  final List<String> ConstructionSite = [
-    "Mabatini",
-    "Kware",
-    "Huruma",
-    "Kwa Njenga",
-    "Embakasi Girls",
-    "Ngei",
-    "Mathare North",
-  ];
+  final List<String> constructionSites = ["Mabatini", "Kware", "Huruma"];
   final List<String> equipmentList = [
-    "Air Compressors and Pneumatic Tools",
-    "Asphalt Pavers",
-    "Backhoe Loaders",
-    "Boom Lifts / Aerial Work Platforms",
     "Bulldozers",
-    "Cold Planers",
     "Concrete Mixer",
-    "Concrete Pumps",
     "Concrete Vibrators",
-    "Cranes (Mobile or Tower)",
     "Drill Machine",
-    "Dump Trailers",
-    "Dump Trucks",
     "Excavator",
-    "Forklifts",
-    "Generator",
-    "Lighting / Floodlights",
-    "Motor Graders",
-    "Portable Restrooms",
-    "Power Trowels",
-    "Road Graders",
-    "Rollers",
-    "Scaffolding",
-    "Scissor Lifts",
-    "Skid Steer Loaders",
-    "Telehandlers",
-    "Temporary Fencing / Hoarding",
-    "Water Pump",
-    "Wheelbarrow",
   ];
-  void saveMaterial() {
-    if (_formKey.currentState!.validate()) {
-      print("Material saved");
-    }
-  }
 
   final List<String> billingOptions = ["Per Day", "Per Hour"];
 
-  // 🔢 Calculate total
+  void saveMaterial() {
+    if (_formKey.currentState!.validate()) {
+      print("Material saved successfully!");
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Material saved successfully!")),
+      );
+    }
+  }
+
   void calculateTotal() {
     final double days = double.tryParse(daysController.text) ?? 0;
     final double rate = double.tryParse(rateController.text) ?? 0;
-
     setState(() {
       totalCost = days * rate;
     });
   }
 
-  // 📅 Pick date
   Future<void> pickDate(bool isHireDate) async {
     final DateTime? picked = await showDatePicker(
       context: context,
@@ -102,16 +118,17 @@ class _HiredMaterialScreenState extends State<HiredMaterialScreen> {
       setState(() {
         if (isHireDate) {
           hireDate = picked;
+          hireDateController.text = formatDate(picked);
         } else {
           returnDate = picked;
+          returnDateController.text = formatDate(picked);
         }
       });
     }
   }
 
-  // 📆 Format date without intl
   String formatDate(DateTime? date) {
-    if (date == null) return "Select date";
+    if (date == null) return "";
     return "${date.day}/${date.month}/${date.year}";
   }
 
@@ -123,6 +140,8 @@ class _HiredMaterialScreenState extends State<HiredMaterialScreen> {
     rateController.dispose();
     supplierController.dispose();
     notesController.dispose();
+    hireDateController.dispose();
+    returnDateController.dispose();
     super.dispose();
   }
 
@@ -134,7 +153,6 @@ class _HiredMaterialScreenState extends State<HiredMaterialScreen> {
           "Hired Material",
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        //backgroundColor: Colors.blue,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -143,17 +161,17 @@ class _HiredMaterialScreenState extends State<HiredMaterialScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              /// Construction
+              /// Construction Site
               const Text(
                 "Construction",
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 6),
               CustomDropdown<String>(
-                items: ConstructionSite,
+                items: constructionSites,
                 value: selectedConstruction,
                 hint: "Select construction site",
-                prefixIcon: Icon(Icons.location_city),
+                prefixIcon: const Icon(Icons.location_city),
                 displayMapper: (item) => item,
                 onChanged: (value) {
                   setState(() {
@@ -161,10 +179,9 @@ class _HiredMaterialScreenState extends State<HiredMaterialScreen> {
                   });
                 },
               ),
-
               const SizedBox(height: 20),
 
-              /// Tool / Material
+              /// Equipment / Material
               const Text(
                 "Equipment/ Material",
                 style: TextStyle(fontWeight: FontWeight.bold),
@@ -182,7 +199,6 @@ class _HiredMaterialScreenState extends State<HiredMaterialScreen> {
                   });
                 },
               ),
-
               const SizedBox(height: 20),
 
               /// Billing Type
@@ -203,7 +219,6 @@ class _HiredMaterialScreenState extends State<HiredMaterialScreen> {
                   });
                 },
               ),
-
               const SizedBox(height: 20),
 
               /// Number of Days
@@ -212,42 +227,27 @@ class _HiredMaterialScreenState extends State<HiredMaterialScreen> {
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 6),
-              TextFormField(
+              CustomTextInput(
                 controller: daysController,
+                hintText: "Enter duration",
+                prefixIcon: Icons.calendar_today,
                 keyboardType: TextInputType.number,
-                inputFormatters: [
-                  FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
-                ],
                 onChanged: (_) => calculateTotal(),
-                decoration: const InputDecoration(
-                  prefixIcon: Icon(Icons.calendar_today),
-                  hintText: "Enter duration",
-                  border: OutlineInputBorder(),
-                ),
               ),
-
               const SizedBox(height: 20),
 
               /// Rate
               const Text("Rate", style: TextStyle(fontWeight: FontWeight.bold)),
               const SizedBox(height: 6),
-              TextFormField(
+              CustomTextInput(
                 controller: rateController,
+                hintText: "Enter cost per unit",
                 keyboardType: TextInputType.number,
-                inputFormatters: [
-                  FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
-                ],
                 onChanged: (_) => calculateTotal(),
-                decoration: const InputDecoration(
-                  prefixText: "Ksh",
-                  hintText: "Enter cost per unit",
-                  border: OutlineInputBorder(),
-                ),
               ),
-
               const SizedBox(height: 20),
 
-              /// Total Cost Box
+              /// Total Cost
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(16),
@@ -274,7 +274,6 @@ class _HiredMaterialScreenState extends State<HiredMaterialScreen> {
                   ],
                 ),
               ),
-
               const SizedBox(height: 20),
 
               /// Hire Date
@@ -283,16 +282,13 @@ class _HiredMaterialScreenState extends State<HiredMaterialScreen> {
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 6),
-              TextFormField(
+              CustomTextInput(
+                controller: hireDateController,
+                hintText: "Select date",
                 readOnly: true,
+                prefixIcon: Icons.calendar_today,
                 onTap: () => pickDate(true),
-                decoration: InputDecoration(
-                  prefixIcon: const Icon(Icons.calendar_today),
-                  hintText: formatDate(hireDate),
-                  border: const OutlineInputBorder(),
-                ),
               ),
-
               const SizedBox(height: 20),
 
               /// Return Date
@@ -301,16 +297,13 @@ class _HiredMaterialScreenState extends State<HiredMaterialScreen> {
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 6),
-              TextFormField(
+              CustomTextInput(
+                controller: returnDateController,
+                hintText: "Select date",
                 readOnly: true,
+                prefixIcon: Icons.calendar_today,
                 onTap: () => pickDate(false),
-                decoration: InputDecoration(
-                  prefixIcon: const Icon(Icons.calendar_today),
-                  hintText: formatDate(returnDate),
-                  border: const OutlineInputBorder(),
-                ),
               ),
-
               const SizedBox(height: 20),
 
               /// Supplier
@@ -319,15 +312,11 @@ class _HiredMaterialScreenState extends State<HiredMaterialScreen> {
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 6),
-              TextFormField(
+              CustomTextInput(
                 controller: supplierController,
-                decoration: const InputDecoration(
-                  prefixIcon: Icon(Icons.business),
-                  hintText: "e.g. ABC Equipment Rentals",
-                  border: OutlineInputBorder(),
-                ),
+                hintText: "e.g. ABC Equipment Rentals",
+                prefixIcon: Icons.business,
               ),
-
               const SizedBox(height: 20),
 
               /// Notes
@@ -336,21 +325,20 @@ class _HiredMaterialScreenState extends State<HiredMaterialScreen> {
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 6),
-              TextFormField(
+              CustomTextInput(
                 controller: notesController,
+                hintText: "Add any special notes or conditions",
                 maxLines: 3,
-                decoration: const InputDecoration(
-                  hintText: "Add any special notes or conditions",
-                  border: OutlineInputBorder(),
-                ),
               ),
-
               const SizedBox(height: 30),
+
+              /// Save Button
               CustomButton(
                 label: "Save",
                 backgroundColor: Colors.green,
                 textColor: Colors.black,
                 onPressed: saveMaterial,
+                text: '',
               ),
             ],
           ),
