@@ -31,7 +31,7 @@ class _AddWorkerScreenState extends State<AddWorkerScreen> {
     super.dispose();
   }
 
-  void _updateAmount() {
+  void updateAmount() {
     setState(() {
       if (workerType == "Skilled") {
         if (task == "Roadworks") {
@@ -59,7 +59,7 @@ class _AddWorkerScreenState extends State<AddWorkerScreen> {
         amount > 0;
   }
 
-  void _clearForm() {
+  void clearForm() {
     setState(() {
       selectedSite = null;
       workerType = null;
@@ -143,7 +143,7 @@ class _AddWorkerScreenState extends State<AddWorkerScreen> {
               value: workerType,
               onSelected: (val) {
                 setState(() => workerType = val);
-                _updateAmount();
+                updateAmount();
               },
             ),
 
@@ -162,7 +162,7 @@ class _AddWorkerScreenState extends State<AddWorkerScreen> {
               value: task,
               onSelected: (val) {
                 setState(() => task = val);
-                _updateAmount();
+                updateAmount();
               },
             ),
 
@@ -203,7 +203,7 @@ class _AddWorkerScreenState extends State<AddWorkerScreen> {
                 );
                 Navigator.pop(context, worker);
               },
-              onCancel: _clearForm,
+              onCancel: clearForm,
             ),
           ],
         ),
