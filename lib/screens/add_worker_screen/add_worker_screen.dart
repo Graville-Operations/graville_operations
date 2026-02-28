@@ -2,26 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
-void main() => runApp(const MaterialApp(home: AddWorkerScreen()));
-
-/// ✅ Worker model (needed for Navigator.pop)
-class Worker {
-  final String name;
-  final String id;
-  final String skillLevel;
-  final String phone;
-  final String specialty;
-  final String rate;
-
-  Worker({
-    required this.name,
-    required this.id,
-    required this.skillLevel,
-    required this.phone,
-    required this.specialty,
-    required this.rate,
-  });
-}
+import 'package:graville_operations/models/worker.dart';
 
 class AddWorkerScreen extends StatefulWidget {
   const AddWorkerScreen({super.key});
@@ -105,13 +86,16 @@ class _AddWorkerScreenState extends State<AddWorkerScreen> {
       onTap: _openCamera,
       child: Center(
         child: SizedBox(
-          width: 120,
-          height: 120,
+          width: 120, // 👈 controls size
+          height: 120, // 👈 controls size
           child: Container(
             decoration: BoxDecoration(
               color: const Color(0xFFF8F9FA),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.grey.shade400, width: 1.2),
+              border: Border.all(
+                color: Colors.grey.shade400, // 👈 clearly visible border
+                width: 1.2,
+              ),
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(12),
@@ -273,6 +257,7 @@ class _AddWorkerScreenState extends State<AddWorkerScreen> {
                   phone: phoneController.text.trim(),
                   specialty: task!,
                   rate: "KES $amount",
+                  joinDate: DateTime.now(),
                 );
                 Navigator.pop(context, worker);
               },
@@ -285,7 +270,6 @@ class _AddWorkerScreenState extends State<AddWorkerScreen> {
   }
 }
 
-/// ✅ Red asterisk implementation
 class FormLabel extends StatelessWidget {
   final String label;
   const FormLabel({super.key, required this.label});
@@ -372,7 +356,7 @@ class CustomDropdownField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DropdownButtonFormField<String>(
-      value: value,
+      initialValue: value,
       hint: Text(hint),
       items: options
           .map((e) => DropdownMenuItem(value: e, child: Text(e)))
