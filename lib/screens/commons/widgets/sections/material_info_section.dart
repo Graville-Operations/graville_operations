@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:graville_operations/models/material/app_material.dart';
 import 'package:graville_operations/screens/commons/widgets/sections/form_section.dart';
 import 'package:graville_operations/screens/commons/widgets/custom_dropdown.dart';
 import 'package:graville_operations/screens/commons/widgets/custom_text_input.dart';
 import 'package:graville_operations/models/material/app_material.dart';
+
 
 class MaterialInfoSection extends StatelessWidget {
   final AppMaterial? selectedMaterial;
@@ -64,7 +64,7 @@ class MaterialInfoSection extends StatelessWidget {
           ),
         ),
 
-        const SizedBox(height: 16),
+        //const SizedBox(height: 16),
         FormSection(
           title: "Material Category",
           icon: Icons.category,
