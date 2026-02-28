@@ -1,4 +1,3 @@
-
 class CommonImages {
   CommonImages._();
   static const String background = "assets/images/background.png";

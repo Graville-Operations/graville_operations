@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:graville_operations/screens/commons/widgets/custom_button.dart';
 import 'worker_profile_screen.dart';
 import 'package:graville_operations/models/worker.dart';
-import 'package:graville_operations/screens/add_worker_screen/add_worker_screen.dart';
-
 
 class WorkersScreen extends StatefulWidget {
   const WorkersScreen({super.key});
@@ -38,7 +37,6 @@ class _WorkersScreenState extends State<WorkersScreen> {
       specialty: "Brickwork",
       rate: "\$250",
       joinDate: DateTime(2023, 1, 15),
-
     ),
     Worker(
       name: "Robert Chen",
@@ -81,7 +79,7 @@ class _WorkersScreenState extends State<WorkersScreen> {
       id: "W006",
       skillLevel: "Skilled",
       phone: "+1 555-0128",
-      specialty: "Woodwork", 
+      specialty: "Woodwork",
       rate: "\$260",
       joinDate: DateTime(2023, 6, 18),
     ),
@@ -287,41 +285,12 @@ class _WorkersScreenState extends State<WorkersScreen> {
 
             Row(
               children: [
-                ElevatedButton(
-                  onPressed: () async {
-                    final newWorker = await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const AddWorkerScreen(),
-                      ),
-                    );
-
-                    if (newWorker != null && newWorker is Worker) {
-                      setState(() {
-                        workers.add(newWorker);
-                      });
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF3366FF),
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 24,
-                      vertical: 12,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  child: const Text(
-                    "Add Worker",
-                    style: TextStyle(
-                      fontWeight: FontWeight.normal,
-                      fontSize: 10,
-                    ),
-                  ),
+                CustomButton(
+                  label: "Add Worker",
+                  onPressed: () {},
+                  backgroundColor: const Color(0xFF3366FF),
                 ),
-                const Spacer(),
+                const SizedBox(width: 12),
                 SizedBox(
                   width: 240,
                   child: CompositedTransformTarget(
@@ -346,13 +315,11 @@ class _WorkersScreenState extends State<WorkersScreen> {
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
-                          borderSide:
-                              BorderSide(color: Colors.grey.shade400),
+                          borderSide: BorderSide(color: Colors.grey.shade400),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
-                          borderSide:
-                              const BorderSide(color: Colors.blue),
+                          borderSide: const BorderSide(color: Colors.blue),
                         ),
                       ),
                     ),
@@ -454,42 +421,44 @@ class _WorkersScreenState extends State<WorkersScreen> {
       );
     }).toList();
   }
+}
 
-  Widget _statCard({
-    required String title,
-    required String subtitle,
-    required Color color,
-    required Color textColor,
-    required VoidCallback onTap,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: color,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Column(
-          children: [
-            Text(
-              title,
-              style: TextStyle(
-                fontSize: 26,
-                fontWeight: FontWeight.bold,
-                color: textColor,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              subtitle,
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 13),
-            ),
-          ],
-        ),
+class InvalidType {}
+
+Widget _statCard({
+  required String title,
+  required String subtitle,
+  required Color color,
+  required Color textColor,
+  required VoidCallback onTap,
+}) {
+  return InkWell(
+    onTap: onTap,
+    borderRadius: BorderRadius.circular(12),
+    child: Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(12),
       ),
-    );
-  }
+      child: Column(
+        children: [
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 26,
+              fontWeight: FontWeight.bold,
+              color: textColor,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            subtitle,
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 13),
+          ),
+        ],
+      ),
+    ),
+  );
 }

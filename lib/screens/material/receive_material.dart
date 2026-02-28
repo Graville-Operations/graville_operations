@@ -58,13 +58,7 @@ class _ReceiveMaterialScreenState extends State<ReceiveMaterialScreen> {
             padding: EdgeInsets.all(16),
             sliver: SliverList(
               delegate: SliverChildListDelegate([
-                MaterialPhotoSection(
-                  onPhotoChanged: (hasPhoto) {
-                    setState(() {
-                      this.hasPhoto = hasPhoto;
-                    });
-                  },
-                ),
+                MaterialPhotoSection(title: "Material Photo"),
                 MaterialInfoSection(
                   selectedMaterial: selectedMaterial,
                   onChanged: (material) {
