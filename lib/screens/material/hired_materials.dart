@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:graville_operations/screens/commons/widgets/custom_dropdown.dart';
 import 'package:graville_operations/screens/commons/widgets/custom_button.dart';
-import 'package:graville_operations/screens/commons/widgets/custom_text_input.dart';
+//import 'package:graville_operations/screens/commons/widgets/custom_text_input.dart';
 
 // 🔹 Updated CustomTextInput
 class CustomTextInput extends StatelessWidget {
@@ -338,7 +338,7 @@ class _HiredMaterialScreenState extends State<HiredMaterialScreen> {
                 backgroundColor: Colors.green,
                 textColor: Colors.black,
                 onPressed: saveMaterial,
-                text: '',
+                //text: '',
               ),
             ],
           ),
