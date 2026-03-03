@@ -125,7 +125,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                   height: 80,
                   width: 80,
                   child: Image.asset(
-                    CommonImages.otpverification,
+                    CommonImages.otpVerification,
                     fit: BoxFit.cover,
                   ),
                 ),
