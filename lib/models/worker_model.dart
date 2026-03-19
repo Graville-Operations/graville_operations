@@ -44,7 +44,7 @@ class Worker {
       //if (siteId != null) 'site_id': siteId,
     };
   }
-
+  
   factory Worker.fromJson(Map<String, dynamic> json) {
     return Worker(
       id: json['id'],
@@ -52,7 +52,7 @@ class Worker {
       lastName: json['last_name'] ?? '',
       nationalId: json['national_id'] ?? 0,
       skillType: json['skill_type'] ?? '',
-      phoneNumber: json['phone_number'] ?? '',
+      phoneNumber: json['phone'] ?? '',
       amount: 0.0, 
       imageUrl: json['image_url'],
       site: json['site'],

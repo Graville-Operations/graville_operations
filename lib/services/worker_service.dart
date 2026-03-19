@@ -27,7 +27,7 @@ class WorkerService {
   }
 
   static Future<List<Worker>> fetchWorkers() async {
-    final url = Uri.parse('$_baseUrl/');
+    final url = Uri.parse('$_baseUrl/list');
 
     final response = await http.get(url, headers: _headers);
 
@@ -41,7 +41,7 @@ class WorkerService {
   }
 
   static Future<Worker> getWorkerById(int workerId) async {
-    final url = Uri.parse('$_baseUrl/$workerId/');
+    final url = Uri.parse('$_baseUrl/$workerId');
 
     final response = await http.get(url, headers: _headers);
 
@@ -61,6 +61,8 @@ class WorkerService {
       return response.statusCode.toString();
     }
   }
+
+  //static Future<Object?> getWorkers() async {}
 }
 
 class WorkerServiceException implements Exception {
