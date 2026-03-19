@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:graville_operations/models/addworker.dart';
+import 'package:graville_operations/models/worker_model.dart';
 import 'package:graville_operations/screens/commons/widgets/custom_image_picker.dart';
 import 'package:graville_operations/screens/commons/widgets/custom_text_input.dart';
-import 'package:graville_operations/screens/workers/workers_screen.dart';
+import 'package:graville_operations/services/worker_service.dart';
 
 class AddWorkerScreen extends StatefulWidget {
   const AddWorkerScreen({super.key});
@@ -18,14 +17,17 @@ class _AddWorkerScreenState extends State<AddWorkerScreen> {
   String? selectedSite;
 
   int amount = 0;
+  bool _isLoading = false;
 
-  final TextEditingController nameController = TextEditingController();
+  final TextEditingController firstNameController = TextEditingController();
+  final TextEditingController lastNameController = TextEditingController();
   final TextEditingController idController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
 
   @override
   void dispose() {
-    nameController.dispose();
+    firstNameController.dispose();
+    lastNameController.dispose();
     idController.dispose();
     phoneController.dispose();
     super.dispose();
@@ -51,7 +53,8 @@ class _AddWorkerScreenState extends State<AddWorkerScreen> {
 
   bool get isFormValid {
     return selectedSite != null &&
-        nameController.text.isNotEmpty &&
+        firstNameController.text.isNotEmpty &&
+        lastNameController.text.isNotEmpty &&
         idController.text.isNotEmpty &&
         phoneController.text.isNotEmpty &&
         workerType != null &&
@@ -65,10 +68,70 @@ class _AddWorkerScreenState extends State<AddWorkerScreen> {
       workerType = null;
       task = null;
       amount = 0;
-      nameController.clear();
+      firstNameController.clear();
+      lastNameController.clear();
       idController.clear();
       phoneController.clear();
     });
+  }
+
+  Future<void> _submit() async {
+    if (!isFormValid) return;
+
+    final nationalId = int.tryParse(idController.text.trim());
+    if (nationalId == null) {
+      _showError('National ID must be a valid number.');
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    final worker = Worker(
+      firstName: firstNameController.text.trim(),
+      lastName: lastNameController.text.trim(),
+      nationalId: nationalId,
+      skillType: workerType!,
+      phoneNumber: phoneController.text.trim(),
+      amount: amount.toDouble(),
+      site: selectedSite,
+      taskId: null,
+    );
+
+    try {
+      final created = await WorkerService.createWorker(worker);
+      if (!mounted) return;
+      _showSuccess('Worker "${created.fullName}" added successfully!');
+      clearForm();
+      Navigator.pop(context, created);
+    } on WorkerServiceException catch (e) {
+      if (!mounted) return;
+      _showError(e.message);
+    } catch (e) {
+      if (!mounted) return;
+      _showError('An unexpected error occurred. Please try again.');
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  void _showError(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red.shade600,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
+  void _showSuccess(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.green.shade600,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
   }
 
   @override
@@ -109,19 +172,26 @@ class _AddWorkerScreenState extends State<AddWorkerScreen> {
             const SectionHeader(title: "Worker Information"),
             const SizedBox(height: 16),
 
-            FormLabel(label: "Worker Name *"),
+            FormLabel(label: "First Name *"),
             CustomTextInput(
-              controller: nameController,
+              controller: firstNameController,
               onChanged: (_) => setState(() {}),
-              hintText: "Enter worker name",
+              hintText: "Enter first name",
             ),
 
-            FormLabel(label: "Worker ID *"),
+            FormLabel(label: "Last Name *"),
+            CustomTextInput(
+              controller: lastNameController,
+              onChanged: (_) => setState(() {}),
+              hintText: "Enter last name",
+            ),
+
+            FormLabel(label: "National ID *"),
             CustomTextInput(
               keyboardType: TextInputType.number,
               controller: idController,
-              onChanged: (value) => setState(() {}),
-              hintText: "e.g. 11111111",
+              onChanged: (_) => setState(() {}),
+              hintText: "e.g. 12345678",
             ),
 
             FormLabel(label: "Phone Number *"),
@@ -191,26 +261,20 @@ class _AddWorkerScreenState extends State<AddWorkerScreen> {
             const SizedBox(height: 32),
 
             FormActions(
-              isEnabled: isFormValid,
-              onSubmit: () {
-                final worker = Worker(
-                  name: nameController.text.trim(),
-                  id: idController.text.trim(),
-                  skillLevel: workerType!,
-                  phone: phoneController.text.trim(),
-                  specialty: task!,
-                  rate: "KES $amount",
-                );
-                Navigator.pop(context, worker);
-              },
+              isEnabled: isFormValid && !_isLoading,
+              isLoading: _isLoading,
+              onSubmit: _submit,
               onCancel: clearForm,
             ),
+
+            const SizedBox(height: 40),
           ],
         ),
       ),
     );
   }
 }
+
 
 class FormLabel extends StatelessWidget {
   final String label;
@@ -256,31 +320,6 @@ class SectionHeader extends StatelessWidget {
   }
 }
 
-class CustomTextField extends StatelessWidget {
-  final String hint;
-  final TextEditingController controller;
-  final Function(String)? onChanged;
-
-  const CustomTextField({
-    super.key,
-    required this.hint,
-    required this.controller,
-    this.onChanged,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return TextField(
-      controller: controller,
-      onChanged: onChanged,
-      decoration: InputDecoration(
-        hintText: hint,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-      ),
-    );
-  }
-}
-
 class CustomDropdownField extends StatelessWidget {
   final String hint;
   final List<String> options;
@@ -315,6 +354,7 @@ class CustomDropdownField extends StatelessWidget {
 
 class FormActions extends StatelessWidget {
   final bool isEnabled;
+  final bool isLoading;
   final VoidCallback onSubmit;
   final VoidCallback onCancel;
 
@@ -323,6 +363,7 @@ class FormActions extends StatelessWidget {
     required this.isEnabled,
     required this.onSubmit,
     required this.onCancel,
+    this.isLoading = false,
   });
 
   @override
@@ -333,7 +374,7 @@ class FormActions extends StatelessWidget {
           child: SizedBox(
             height: 48,
             child: OutlinedButton(
-              onPressed: onCancel,
+              onPressed: isLoading ? null : onCancel,
               child: const Text("Cancel"),
             ),
           ),
@@ -345,7 +386,8 @@ class FormActions extends StatelessWidget {
             child: ElevatedButton(
               onPressed: isEnabled ? onSubmit : null,
               style: ElevatedButton.styleFrom(
-                backgroundColor: isEnabled ? Colors.blue : Colors.grey.shade300,
+                backgroundColor:
+                    isEnabled ? Colors.blue : Colors.grey.shade300,
                 foregroundColor: isEnabled ? Colors.white : Colors.grey,
                 disabledBackgroundColor: Colors.grey.shade300,
                 disabledForegroundColor: Colors.grey,
@@ -354,7 +396,16 @@ class FormActions extends StatelessWidget {
                   borderRadius: BorderRadius.circular(24),
                 ),
               ),
-              child: const Text("Add Worker"),
+              child: isLoading
+                  ? const SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                  : const Text("Add Worker"),
             ),
           ),
         ),
