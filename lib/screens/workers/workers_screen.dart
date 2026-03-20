@@ -212,7 +212,7 @@ class _WorkersScreenState extends State<WorkersScreen> {
 
             const SizedBox(height: 16),
 
-            // Stat cards — now driven by live data
+          
             Row(
               children: [
                 Expanded(
@@ -301,7 +301,7 @@ class _WorkersScreenState extends State<WorkersScreen> {
             ),
             const SizedBox(height: 10),
 
-            // ── Main content area ──────────────────────────────────────────
+            
             if (_isLoading)
               const Center(
                 child: Padding(
