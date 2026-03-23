@@ -76,7 +76,6 @@ class _LoginScreenState extends State<LoginScreen> {
                       height: 100,
                       width: 500,
                     ),
-
                     SizedBox(height: 10),
                     Text(
                       'Welcome to Graville Enterprises Limited!',

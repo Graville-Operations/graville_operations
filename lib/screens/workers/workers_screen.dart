@@ -284,6 +284,7 @@ class _WorkersScreenState extends State<WorkersScreen> {
             const SizedBox(height: 16),
 
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 CustomButton(
                   label: "Add Worker",
@@ -292,7 +293,7 @@ class _WorkersScreenState extends State<WorkersScreen> {
                 ),
                 const SizedBox(width: 12),
                 SizedBox(
-                  width: 240,
+                  width: 200,
                   child: CompositedTransformTarget(
                     link: _layerLink,
                     child: TextField(

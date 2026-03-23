@@ -16,6 +16,10 @@ dependencies:
 
  
   image_picker: ^1.0.7
+  cookie_jar: ^4.0.9
+  dio: ^5.9.2
+  dio_cookie_manager: ^3.4.0
+  flutter_easyloading: ^3.0.5
 
 
 
