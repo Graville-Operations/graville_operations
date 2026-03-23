@@ -97,7 +97,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                   height: 80,
                   width: 80,
                   child: Image.asset(
-                    CommonImages.resetpassword,
+                    CommonImages.resetPassword,
                     fit: BoxFit.cover,
                   ),
                 ),
