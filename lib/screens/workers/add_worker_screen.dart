@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:graville_operations/models/addworker.dart';
 import 'package:graville_operations/screens/commons/widgets/custom_image_picker.dart';
 import 'package:graville_operations/screens/commons/widgets/custom_text_input.dart';
-import 'package:graville_operations/screens/workers/workers_screen.dart';
 
 void main() => runApp(const MaterialApp(home: AddWorkerScreen()));
 

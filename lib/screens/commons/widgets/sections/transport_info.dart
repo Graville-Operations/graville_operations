@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:graville_operations/models/material/app_material.dart';
 import 'package:graville_operations/models/material/transport_mode.dart';
 import 'package:graville_operations/screens/commons/widgets/sections/form_section.dart';
 import 'package:graville_operations/screens/commons/widgets/custom_dropdown.dart';
-import 'package:graville_operations/screens/commons/widgets/custom_text_input.dart';
-import 'package:graville_operations/models/material/app_material.dart';
 
 class TransportInfo extends StatelessWidget {
   final TransportMode? selectedMode;
@@ -12,16 +9,16 @@ class TransportInfo extends StatelessWidget {
   const TransportInfo({
     super.key,
     required this.onChanged,
-    required this.selectedMode
+    required this.selectedMode,
   });
 
   @override
   Widget build(BuildContext context) {
     final List<TransportMode> mode = const [
-     TransportMode(id: "1", name: "Truck"),
-     TransportMode(id: "2", name: "Tipper"),
-     TransportMode(id: "3", name: "Pickup"),
-     TransportMode(id: "4", name: "Lorry"),
+      TransportMode(id: "1", name: "Truck"),
+      TransportMode(id: "2", name: "Tipper"),
+      TransportMode(id: "3", name: "Pickup"),
+      TransportMode(id: "4", name: "Lorry"),
     ];
 
     return Column(

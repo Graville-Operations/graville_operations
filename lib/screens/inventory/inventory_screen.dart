@@ -3,8 +3,6 @@ import 'package:graville_operations/models/Inventory.dart';
 import 'package:graville_operations/models/material/material_data.dart';
 import 'package:graville_operations/navigation/custom_navigator.dart';
 import 'package:graville_operations/screens/commons/widgets/custom_dropdown.dart';
-import 'package:graville_operations/screens/inventory/widgets/inventory_card.dart';
-import 'package:graville_operations/screens/inventory/widgets/inventory_tile.dart';
 import 'package:graville_operations/screens/material/hired_materials.dart';
 
 class InventoryScreen extends StatefulWidget {
@@ -73,10 +71,10 @@ class _InventoryScreenState extends State<InventoryScreen> {
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.white,
-          leading: IconButton(
+        leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
           onPressed: () {
-             Navigator.pop(context);
+            Navigator.pop(context);
           },
         ),
         title: const Text(
@@ -271,8 +269,6 @@ class InventoryTile extends StatelessWidget {
     );
   }
 }
-
-
 
 class AddButton extends StatelessWidget {
   final String label;
