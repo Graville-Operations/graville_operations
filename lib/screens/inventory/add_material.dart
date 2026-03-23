@@ -1,19 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:graville_operations/models/material/inventory_material.dart';
-import 'package:graville_operations/models/material/material_data.dart';
+//import 'package:graville_operations/models/material/material_model.dart';
+import 'package:graville_operations/lib/models/inventory/inventory_model.dart';
+import 'package:graville_operations/models/inventory/inventory%20_model.dart';
 import 'package:graville_operations/screens/commons/widgets/custom_button.dart';
 import 'package:graville_operations/screens/commons/widgets/custom_dropdown.dart';
-//import 'package:graville_operations/screens/inventory_screen/inventory_screen.dart';
-//import 'package:graville_operations/widgets/custom_button.dart';
-
-void main() {
-  runApp(
-    const MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: AddMaterialScreen(),
-    ),
-  );
-}
+import 'package:graville_operations/lib/models/inventory/inventory_model.dart';
+import 'package:graville_operations/services/inventory_service.dart';
+//import 'package:graville_operations/services/material_service.dart';
 
 class AddMaterialScreen extends StatefulWidget {
   const AddMaterialScreen({super.key});
@@ -23,19 +16,80 @@ class AddMaterialScreen extends StatefulWidget {
 }
 
 class AddMaterialScreenState extends State<AddMaterialScreen> {
-  List<String> allCategories = [
-    "Electrical",
-    "Plumbing",
-    "Masonry",
-    "Carpentry",
+ 
+  final List<String> allCategories = [
+    'Electrical',
+    'Plumbing',
+    'Masonry',
+    'Carpentry',
   ];
 
-  List<String> allUnits = ["kg", "pcs", "liters", "meters"];
+  final List<String> allUnits = ['kg', 'pcs', 'liters', 'meters', 'bags', 'tons'];
 
   String? selectedCategory;
   String? selectedUnit;
 
-  InventoryMaterial? selectedMaterial;
+  
+  final TextEditingController nameController = TextEditingController();
+
+  bool _isLoading = false;
+
+  @override
+  void dispose() {
+    nameController.dispose();
+    super.dispose();
+  }
+
+  bool get _isFormValid =>
+      nameController.text.isNotEmpty &&
+      selectedCategory != null &&
+      selectedUnit != null;
+
+  Future<void> _submit() async {
+    if (!_isFormValid) return;
+
+    setState(() => _isLoading = true);
+
+    final material = MaterialModel(
+      name: nameController.text.trim(),
+      category: selectedCategory!,
+      unit: selectedUnit!,
+    );
+
+    try {
+      final created = await MaterialService.createMaterial(material);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Material "${created.name}" added successfully!'),
+          backgroundColor: Colors.green.shade600,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      Navigator.pop(context, created);
+    } on MaterialServiceException catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.message),
+          backgroundColor: Colors.red.shade600,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('An unexpected error occurred. Please try again.'),
+          backgroundColor: Colors.red.shade600,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -46,12 +100,10 @@ class AddMaterialScreenState extends State<AddMaterialScreen> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+          onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
-          "Add Material",
+          'Add Material',
           style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
         ),
         centerTitle: false,
@@ -61,68 +113,53 @@ class AddMaterialScreenState extends State<AddMaterialScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Material name — free text input
             const Text(
-              "Material Name",
+              'Material Name *',
               style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
-            CustomDropdown<InventoryMaterial>(
-              value: selectedMaterial,
-              items: allMaterials,
-              displayMapper: (material) => material.name,
-              onChanged: (InventoryMaterial? material) {
-                setState(() {
-                  selectedMaterial = material;
-                });
-              },
-              hint: "Select Material",
-              isExpanded: true,
-              isDense: true,
-              border: InputBorder.none,
-              fillColor: Colors.white,
-              borderRadius: BorderRadius.circular(14),
+            TextField(
+              controller: nameController,
+              onChanged: (_) => setState(() {}),
+              decoration: _inputDecoration(hintText: 'e.g. Cement, Steel Rods'),
             ),
 
             const SizedBox(height: 20),
 
+            // Category dropdown
             const Text(
-              "Category",
+              'Category *',
               style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
-
             CustomDropdown<String>(
               value: selectedCategory,
               items: allCategories,
               displayMapper: (cat) => cat,
-              onChanged: (String? cat) {
-                setState(() {
-                  selectedCategory = cat;
-                });
-              },
+              onChanged: (val) => setState(() => selectedCategory = val),
+              hint: 'Select category',
               isExpanded: true,
               isDense: true,
               border: InputBorder.none,
               fillColor: Colors.white,
               borderRadius: BorderRadius.circular(14),
             ),
+
             const SizedBox(height: 20),
 
+            // Unit dropdown
             const Text(
-              "Unit",
+              'Unit *',
               style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
-
             CustomDropdown<String>(
               value: selectedUnit,
               items: allUnits,
               displayMapper: (unit) => unit,
-              onChanged: (String? unit) {
-                setState(() {
-                  selectedUnit = unit;
-                });
-              },
+              onChanged: (val) => setState(() => selectedUnit = val),
+              hint: 'Select unit',
               isExpanded: true,
               isDense: true,
               border: InputBorder.none,
@@ -132,70 +169,51 @@ class AddMaterialScreenState extends State<AddMaterialScreen> {
 
             const SizedBox(height: 40),
 
-            Column(
+            // Actions
+            Row(
               children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: CustomButton(
-                        label: "Save Material",
-                        backgroundColor: Colors.orange,
-                        textColor: Colors.white,
-                        height: 55,
-                        borderRadius: 14,
-                        onPressed: () {
-                          if (selectedMaterial == null ||
-                              selectedCategory == null ||
-                              selectedUnit == null) {
-                            return;
-                          }
-
-                          final newMaterial = MaterialData(
-                            name: selectedMaterial!.name,
-                            unit: selectedUnit!,
-                            quantity: '',
-                          );
-
-                          debugPrint(
-                            "Saved: ${newMaterial.name} -${newMaterial.unit}",
-                          );
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 15),
-
-                GestureDetector(
-                  onTap: () {
-                    Navigator.pop(context);
-                  },
-                  child: const Text(
-                    "Cancel",
-                    style: TextStyle(
-                      color: Colors.blue,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                    ),
+                Expanded(
+                  child: CustomButton(
+                    label: 'Save Material',
+                    backgroundColor: Colors.orange,
+                    textColor: Colors.white,
+                    height: 55,
+                    borderRadius: 14,
+                    isLoading: _isLoading,
+                    onPressed: _isFormValid && !_isLoading ? _submit : null,
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 20),
+
+            const SizedBox(height: 15),
+
+            Center(
+              child: GestureDetector(
+                onTap: _isLoading ? null : () => Navigator.pop(context),
+                child: const Text(
+                  'Cancel',
+                  style: TextStyle(
+                    color: Colors.blue,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 
-  InputDecoration inputDecoration({String? hintText, String? prefixText}) {
+  InputDecoration _inputDecoration({String? hintText}) {
     return InputDecoration(
       hintText: hintText,
-      prefixText: prefixText,
       filled: true,
       fillColor: Colors.white,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+      contentPadding:
+          const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
         borderSide: BorderSide.none,

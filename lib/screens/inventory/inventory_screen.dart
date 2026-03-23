@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:graville_operations/models/Inventory.dart';
-import 'package:graville_operations/models/material/material_data.dart';
+import 'package:graville_operations/models/inventory/inventory%20_model.dart';
+//import 'package:graville_operations/models/material/material_model.dart';
 import 'package:graville_operations/navigation/custom_navigator.dart';
 import 'package:graville_operations/screens/commons/widgets/custom_dropdown.dart';
 import 'package:graville_operations/screens/material/hired_materials.dart';
+import 'package:graville_operations/services/inventory_service.dart';
+//import 'package:graville_operations/services/material_service.dart';
 
 class InventoryScreen extends StatefulWidget {
   const InventoryScreen({super.key});
@@ -13,69 +15,71 @@ class InventoryScreen extends StatefulWidget {
 }
 
 class _InventoryScreenState extends State<InventoryScreen> {
-  Inventory? selectedInventory;
 
-  final List<Inventory> inventoryData = [
-    Inventory(
-      site: "Plaza 2000 - Nairobi",
-      materials: [
-        MaterialData(name: "Cement", quantity: "450", unit: "bags"),
-        MaterialData(name: "Steel Rods", quantity: "2,340", unit: "units"),
-        MaterialData(name: "Sand", quantity: "85", unit: "tons"),
-        MaterialData(name: "Bricks", quantity: "12,500", unit: "units"),
-      ],
-      hiredTools: [
-        MaterialData(name: "Concrete Mixer", quantity: "3", unit: "units"),
-        MaterialData(name: "Electric Drill", quantity: "8", unit: "units"),
-        MaterialData(name: "Scaffolding", quantity: "12", unit: "units"),
-        MaterialData(name: "Generator", quantity: "2", unit: "units"),
-      ],
-      createdAt: DateTime.now(),
-    ),
-    Inventory(
-      site: "Huruma",
-      materials: [
-        MaterialData(name: "Cement", quantity: "300", unit: "bags"),
-        MaterialData(name: "Steel Rods", quantity: "1,500", unit: "units"),
-        MaterialData(name: "Sand", quantity: "50", unit: "tons"),
-        MaterialData(name: "Bricks", quantity: "8,000", unit: "units"),
-        MaterialData(name: "Bricks", quantity: "8,000", unit: "units"),
-        MaterialData(name: "Bricks", quantity: "8,000", unit: "units"),
-        MaterialData(name: "Bricks", quantity: "8,000", unit: "units"),
-        MaterialData(name: "Bricks", quantity: "8,000", unit: "units"),
-        MaterialData(name: "Bricks", quantity: "8,000", unit: "units"),
-        MaterialData(name: "Bricks", quantity: "8,000", unit: "units"),
-      ],
-      hiredTools: [
-        MaterialData(name: "Concrete Mixer", quantity: "2", unit: "units"),
-      ],
-      createdAt: DateTime.now(),
-    ),
+  final List<String> sites = [
+    'Plaza 2000 - Nairobi',
+    'Huruma',
+    'Mabatini',
+    'Mishi Mboko',
+    'DCC Kibra',
+    'Iremele',
   ];
+  String? selectedSite;
+
+  
+  List<InventoryModel> _inventory = [];
+  List<MaterialModel> _materials = [];
+  bool _isLoading = true;
+  String? _errorMessage;
 
   @override
   void initState() {
     super.initState();
-    if (inventoryData.isNotEmpty) {
-      selectedInventory = inventoryData.first;
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    try {
+  
+      final results = await Future.wait([
+        MaterialService.getAllInventory(),
+        MaterialService.getMaterials(),
+      ]);
+
+      setState(() {
+        _inventory = results[0] as List<InventoryModel>;
+        _materials = results[1] as List<MaterialModel>;
+        _isLoading = false;
+      });
+    } on MaterialServiceException catch (e) {
+      setState(() {
+        _errorMessage = e.message;
+        _isLoading = false;
+      });
+    } catch (_) {
+      setState(() {
+        _errorMessage = 'Failed to load inventory. Please try again.';
+        _isLoading = false;
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final materials = selectedInventory?.materials ?? [];
-    final tools = selectedInventory?.hiredTools ?? [];
-
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.white,
-          leading: IconButton(
+        leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
-          onPressed: () {
-             Navigator.pop(context);
-          },
+          onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
           'Inventory',
@@ -85,104 +89,168 @@ class _InventoryScreenState extends State<InventoryScreen> {
             fontWeight: FontWeight.bold,
           ),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh, color: Colors.blue),
+            onPressed: _loadData,
+            tooltip: 'Refresh',
+          ),
+        ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              "Construction Site",
-              style: TextStyle(color: Colors.grey, fontSize: 12),
-            ),
-            const SizedBox(height: 6),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              decoration: BoxDecoration(
-                color: const Color(0xFFF5F7F9),
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: Colors.grey.shade200),
-              ),
-              child: CustomDropdown<Inventory>(
-                value: selectedInventory,
-                items: inventoryData,
-                displayMapper: (inv) => inv.site,
-                onChanged: (Inventory? newValue) {
-                  setState(() => selectedInventory = newValue);
-                },
-                hint: "Select site",
-                isExpanded: true,
-                isDense: true,
-                border: InputBorder.none,
-                fillColor: Colors.transparent,
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
-
-            const SizedBox(height: 20),
-            const Text(
-              "Materials",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF34495E),
-              ),
-            ),
-            const SizedBox(height: 10),
-
-            InventoryCard(
-              children: [
-                ...materials.map(
-                  (m) => Column(
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : _errorMessage != null
+              ? Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.error_outline,
+                            color: Colors.red.shade400, size: 48),
+                        const SizedBox(height: 12),
+                        Text(
+                          _errorMessage!,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.red.shade600),
+                        ),
+                        const SizedBox(height: 16),
+                        TextButton.icon(
+                          onPressed: _loadData,
+                          icon: const Icon(Icons.refresh),
+                          label: const Text('Try Again'),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              : SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      InventoryTile(
-                        icon: _getMaterialIcon(m.name),
-                        color: Colors.blue,
-                        title: m.name,
-                        value: "${m.quantity} ${m.unit}",
+                      
+                      const Text(
+                        'Construction Site',
+                        style: TextStyle(color: Colors.grey, fontSize: 12),
                       ),
-                      const Divider(height: 1),
+                      const SizedBox(height: 6),
+                      Container(
+                        padding:
+                            const EdgeInsets.symmetric(horizontal: 12),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF5F7F9),
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: Colors.grey.shade200),
+                        ),
+                        child: CustomDropdown<String>(
+                          value: selectedSite,
+                          items: sites,
+                          displayMapper: (s) => s,
+                          onChanged: (val) =>
+                              setState(() => selectedSite = val),
+                          hint: 'Select site',
+                          isExpanded: true,
+                          isDense: true,
+                          border: InputBorder.none,
+                          fillColor: Colors.transparent,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+
+                      const SizedBox(height: 20),
+
+                    
+                      const Text(
+                        'Materials',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF34495E),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+
+                      _InventoryCard(
+                        children: [
+                          if (_materials.isEmpty)
+                            const Padding(
+                              padding: EdgeInsets.all(16),
+                              child: Text(
+                                'No materials found.',
+                                style: TextStyle(color: Colors.grey),
+                              ),
+                            )
+                          else
+                            ..._materials.map(
+                              (m) => Column(
+                                children: [
+                                  _InventoryTile(
+                                    icon: _getMaterialIcon(m.name),
+                                    color: Colors.blue,
+                                    title: m.name,
+                                    value: m.unit,
+                                  ),
+                                  const Divider(height: 1),
+                                ],
+                              ),
+                            ),
+                          _AddButton(
+                            label: 'Add Material',
+                            onTap: () async {
+                              await context.push(const AddMaterialScreenRoute());
+                              _loadData();
+                            },
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 25),
+
+                      const Text(
+                        'Inventory Stock',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF34495E),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+
+                      _InventoryCard(
+                        children: [
+                          if (_inventory.isEmpty)
+                            const Padding(
+                              padding: EdgeInsets.all(16),
+                              child: Text(
+                                'No inventory records found.',
+                                style: TextStyle(color: Colors.grey),
+                              ),
+                            )
+                          else
+                            ..._inventory.map(
+                              (item) => Column(
+                                children: [
+                                  _InventoryTile(
+                                    icon: _getMaterialIcon(item.name),
+                                    color: Colors.orange,
+                                    title: item.name,
+                                    value:
+                                        '${item.quantity} ${item.unitType}',
+                                  ),
+                                  const Divider(height: 1),
+                                ],
+                              ),
+                            ),
+                          _AddButton(
+                            label: 'Add Hired Tool',
+                            onTap: () => context.push(HiredMaterialScreen()),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 30),
                     ],
                   ),
                 ),
-                AddButton(label: "Add Material", onTap: () {}),
-              ],
-            ),
-
-            const SizedBox(height: 25),
-            const Text(
-              "Hired Tools",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF34495E),
-              ),
-            ),
-            const SizedBox(height: 10),
-            InventoryCard(
-              children: [
-                ...tools.map(
-                  (t) => Column(
-                    children: [
-                      InventoryTile(
-                        icon: _getToolIcon(t.name),
-                        color: Colors.orange,
-                        title: t.name,
-                        value: "${t.quantity} ${t.unit}",
-                      ),
-                      const Divider(height: 1),
-                    ],
-                  ),
-                ),
-                AddButton(
-                  label: "Add Hired Tool",
-                  onTap: () => context.push(HiredMaterialScreen()),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 30),
-          ],
-        ),
-      ),
     );
   }
 
@@ -194,20 +262,13 @@ class _InventoryScreenState extends State<InventoryScreen> {
     if (lower.contains('brick')) return Icons.layers;
     return Icons.inventory_2_outlined;
   }
-
-  IconData _getToolIcon(String name) {
-    final lower = name.toLowerCase();
-    if (lower.contains('mixer')) return Icons.build_circle_outlined;
-    if (lower.contains('drill')) return Icons.electric_bolt_outlined;
-    if (lower.contains('scaffold')) return Icons.architecture;
-    if (lower.contains('generator') || lower.contains('gen')) return Icons.bolt;
-    return Icons.construction;
-  }
 }
 
-class InventoryCard extends StatelessWidget {
+
+
+class _InventoryCard extends StatelessWidget {
   final List<Widget> children;
-  const InventoryCard({super.key, required this.children});
+  const _InventoryCard({required this.children});
 
   @override
   Widget build(BuildContext context) {
@@ -229,14 +290,13 @@ class InventoryCard extends StatelessWidget {
   }
 }
 
-class InventoryTile extends StatelessWidget {
+class _InventoryTile extends StatelessWidget {
   final IconData icon;
   final Color color;
   final String title;
   final String value;
 
-  const InventoryTile({
-    super.key,
+  const _InventoryTile({
     required this.icon,
     required this.color,
     required this.title,
@@ -270,18 +330,16 @@ class InventoryTile extends StatelessWidget {
   }
 }
 
-
-
-class AddButton extends StatelessWidget {
+class _AddButton extends StatelessWidget {
   final String label;
   final VoidCallback onTap;
 
-  const AddButton({super.key, required this.label, required this.onTap});
+  const _AddButton({required this.label, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(12.0),
+      padding: const EdgeInsets.all(12),
       child: SizedBox(
         width: double.infinity,
         child: OutlinedButton.icon(
@@ -299,4 +357,11 @@ class AddButton extends StatelessWidget {
       ),
     );
   }
+}
+
+class AddMaterialScreenRoute extends StatelessWidget {
+  const AddMaterialScreenRoute({super.key});
+
+  @override
+  Widget build(BuildContext context) => const SizedBox.shrink();
 }

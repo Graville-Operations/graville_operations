@@ -36,7 +36,7 @@ class _MaterialPhotoSectionState extends State<MaterialPhotoSection> {
       title: widget.title ?? "Photo",
       icon: Icons.image_outlined,
       child: Align(
-        alignment: AlignmentGeometry.topCenter,
+        alignment: Alignment.topCenter,
         child: InkWell(
           onTap: _pickImage,
           borderRadius: BorderRadius.circular(16),
