@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/src/services/text_formatter.dart';
 
 class CustomTextInput extends StatelessWidget {
   final TextEditingController controller;
