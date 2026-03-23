@@ -1,9 +1,10 @@
-import 'dart:math';
+// import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:graville_operations/screens/auth/forgot_password/otp_verification_screen.dart';
 import 'package:graville_operations/screens/commons/assets/images.dart';
 import 'package:graville_operations/screens/commons/widgets/custom_button.dart';
 import 'package:graville_operations/screens/commons/widgets/custom_text_input.dart';
+import 'package:graville_operations/services/api_service.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -24,25 +25,52 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     super.dispose();
   }
 
-  String _generateOtp() {
-    final random = Random();
-    return (100000 + random.nextInt(900000)).toString();
-  }
+  // String _generateOtp() {
+  //   final random = Random();
+  //   return (100000 + random.nextInt(900000)).toString();
+  // }
 
-  void _sendOtp() {
-    if (_formKey.currentState!.validate()) {
-      generatedOtp = _generateOtp();
+  void _sendOtp() async {
+  if (_formKey.currentState!.validate()) {
+    // Show loading
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => Center(child: CircularProgressIndicator()),
+    );
 
-      debugPrint('OTP sent to email: $generatedOtp');
+    final result = await ApiService.forgotPassword(_emailController.text.trim());
 
+    // Hide loading
+    Navigator.pop(context);
+
+    if (result['success']) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(result['message']),
+          backgroundColor: Colors.green,
+        ),
+      );
+
+      // Navigate to OTP screen passing the email
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (_) => OtpVerificationScreen(generatedOtp: generatedOtp!),
+          builder: (_) => OtpVerificationScreen(
+            email: _emailController.text.trim(),
+          ),
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(result['message'] ?? 'Something went wrong'),
+          backgroundColor: Colors.red,
         ),
       );
     }
   }
+}
 
   @override
   Widget build(BuildContext context) {
