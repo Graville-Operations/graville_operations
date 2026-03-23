@@ -41,7 +41,7 @@ class CustomDropdown<T> extends StatelessWidget {
     //     : value;
 
     return DropdownButtonFormField<T>(
-      initialValue: value,
+      value: value,
       isExpanded: isExpanded,
       isDense: isDense,
       elevation: elevation!.toInt(),

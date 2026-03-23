@@ -66,7 +66,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     width: 80,
                     decoration: const BoxDecoration(shape: BoxShape.circle),
                     child: Image.asset(
-                      CommonImages.forgotpassword,
+                      CommonImages.forgotPassword,
                       fit: BoxFit.cover,
                     ),
                   ),
