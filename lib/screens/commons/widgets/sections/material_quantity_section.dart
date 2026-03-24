@@ -73,7 +73,7 @@ class _MaterialQuantitySectionState extends State<MaterialQuantitySection> {
               controller: unitController,
               hintText: "",
               readOnly: true,
-              inputFormatters: [],
+              
             ),
           ),
         ),

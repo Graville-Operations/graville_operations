@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:graville_operations/navigation/custom_navigator.dart';
 import 'package:graville_operations/screens/commons/widgets/custom_button.dart';
+import 'package:graville_operations/screens/workers/add_worker_screen.dart';
 import 'worker_profile_screen.dart';
 import 'package:graville_operations/models/worker.dart';
 
@@ -287,10 +289,12 @@ class _WorkersScreenState extends State<WorkersScreen> {
               children: [
                 CustomButton(
                   label: "Add Worker",
-                  onPressed: () {},
+                   onPressed: () => context.push(AddWorkerScreen()),
                   backgroundColor: const Color(0xFF3366FF),
                 ),
-                const SizedBox(width: 12),
+
+                const SizedBox(width: 100),
+
                 SizedBox(
                   width: 240,
                   child: CompositedTransformTarget(
@@ -347,7 +351,7 @@ class _WorkersScreenState extends State<WorkersScreen> {
                   scrollDirection: Axis.horizontal,
                   child: DataTable(
                     showCheckboxColumn: false,
-                    headingRowColor: MaterialStateProperty.all(
+                    headingRowColor: WidgetStateProperty.all(
                       Colors.grey.shade200,
                     ),
                     columnSpacing: 30,

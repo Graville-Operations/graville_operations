@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:graville_operations/screens/commons/widgets/custom_dropdown.dart';
 import 'package:graville_operations/screens/commons/widgets/custom_button.dart';
-import 'package:graville_operations/screens/commons/widgets/custom_text_input.dart';
 
 // 🔹 Updated CustomTextInput
 class CustomTextInput extends StatelessWidget {
@@ -17,7 +16,7 @@ class CustomTextInput extends StatelessWidget {
   final void Function(String)? onChanged;
 
   const CustomTextInput({
-    Key? key,
+    super.key,
     required this.controller,
     this.hintText,
     this.readOnly = false,
@@ -28,7 +27,7 @@ class CustomTextInput extends StatelessWidget {
     this.keyboardType,
     this.maxLines = 1,
     this.onChanged,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -338,7 +337,6 @@ class _HiredMaterialScreenState extends State<HiredMaterialScreen> {
                 backgroundColor: Colors.green,
                 textColor: Colors.black,
                 onPressed: saveMaterial,
-                text: '',
               ),
             ],
           ),
