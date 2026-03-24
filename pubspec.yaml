@@ -10,22 +10,15 @@ dependencies:
   flutter:
     sdk: flutter
   http: ^1.2.0
-
   pinput: ^5.0.0
   font_awesome_flutter: ^10.7.0
   cupertino_icons: ^1.0.8
   image_picker: ^1.0.7
-<<<<<<< HEAD
   cookie_jar: ^4.0.9
   dio: ^5.9.2
   dio_cookie_manager: ^3.4.0
   flutter_easyloading: ^3.0.5
-
-
-=======
-  http: ^1.2.0
   shared_preferences: ^2.2.2
->>>>>>> 42f18fd34110393021a5c6ed81133e00696b7722
 
 dev_dependencies:
   flutter_test:
