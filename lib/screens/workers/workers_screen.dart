@@ -1,9 +1,11 @@
+
 import 'package:flutter/material.dart';
+import 'package:graville_operations/models/worker_model.dart';
 import 'package:graville_operations/navigation/custom_navigator.dart';
 import 'package:graville_operations/screens/commons/widgets/custom_button.dart';
 import 'package:graville_operations/screens/workers/add_worker_screen.dart';
-import 'worker_profile_screen.dart';
-import 'package:graville_operations/models/worker.dart';
+import 'package:graville_operations/screens/workers/worker_profile_screen.dart';
+import 'package:graville_operations/services/worker_service.dart';
 
 class WorkersScreen extends StatefulWidget {
   const WorkersScreen({super.key});
@@ -14,12 +16,15 @@ class WorkersScreen extends StatefulWidget {
 
 class _WorkersScreenState extends State<WorkersScreen> {
   String? selectedSite;
-
   final TextEditingController searchController = TextEditingController();
 
-  // Overlay variables
   final LayerLink _layerLink = LayerLink();
   OverlayEntry? _overlayEntry;
+
+  List<Worker> _workers = [];
+  List<Worker> _filteredWorkers = [];
+  bool _isLoading = true;
+  String? _errorMessage;
 
   final List<String> sites = [
     'Mabatini',
@@ -30,91 +35,47 @@ class _WorkersScreenState extends State<WorkersScreen> {
     'Iremele',
   ];
 
-  final List<Worker> workers = [
-    Worker(
-      name: "John Mitchell",
-      id: "W001",
-      skillLevel: "Skilled",
-      phone: "+1 555-0123",
-      specialty: "Brickwork",
-      rate: "\$250",
-      joinDate: DateTime(2023, 1, 15),
-    ),
-    Worker(
-      name: "Robert Chen",
-      id: "W002",
-      skillLevel: "Skilled",
-      phone: "+1 555-0124",
-      specialty: "Carpentry",
-      rate: "\$280",
-      joinDate: DateTime(2023, 2, 20),
-    ),
-    Worker(
-      name: "Maria Garcia",
-      id: "W003",
-      skillLevel: "Skilled",
-      phone: "+1 555-0125",
-      specialty: "Electrical",
-      rate: "\$300",
-      joinDate: DateTime(2023, 3, 10),
-    ),
-    Worker(
-      name: "David Thompson",
-      id: "W004",
-      skillLevel: "Skilled",
-      phone: "+1 555-0126",
-      specialty: "Plumbing",
-      rate: "\$275",
-      joinDate: DateTime(2023, 4, 5),
-    ),
-    Worker(
-      name: "Sarah Williams",
-      id: "W005",
-      skillLevel: "Unskilled",
-      phone: "+1 555-0127",
-      specialty: "Labor",
-      rate: "\$150",
-      joinDate: DateTime(2023, 5, 12),
-    ),
-    Worker(
-      name: "James Anderson",
-      id: "W006",
-      skillLevel: "Skilled",
-      phone: "+1 555-0128",
-      specialty: "Woodwork",
-      rate: "\$260",
-      joinDate: DateTime(2023, 6, 18),
-    ),
-    Worker(
-      name: "Lisa Brown",
-      id: "W007",
-      skillLevel: "Skilled",
-      phone: "+1 555-0129",
-      specialty: "Supervision",
-      rate: "\$350",
-      joinDate: DateTime(2023, 7, 1),
-    ),
-    Worker(
-      name: "Michael Davis",
-      id: "W008",
-      skillLevel: "Skilled",
-      phone: "+1 555-0130",
-      specialty: "Welding",
-      rate: "\$290",
-      joinDate: DateTime(2023, 8, 15),
-    ),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _loadWorkers();
+  }
 
-  // Show overlay
+  
+  Future<void> _loadWorkers() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    try {
+      final List<Worker> workers = await WorkerService.fetchWorkers();
+      setState(() {
+        _workers = workers;
+        _filteredWorkers = workers;
+        _isLoading = false;
+      });
+    } on WorkerServiceException catch (e) {
+      setState(() {
+        _errorMessage = e.message;
+        _isLoading = false;
+      });
+    } catch (_) {
+      setState(() {
+        _errorMessage = 'Failed to load workers. Please try again.';
+        _isLoading = false;
+      });
+    }
+  }
+
   void _showOverlay() {
     _removeOverlay();
 
     _overlayEntry = OverlayEntry(
       builder: (context) {
         final query = searchController.text.toLowerCase();
-
-        final results = workers.where((worker) {
-          return worker.name.toLowerCase().contains(query);
+        final results = _workers.where((worker) {
+          return worker.fullName.toLowerCase().contains(query);
         }).toList();
 
         return Positioned(
@@ -144,18 +105,11 @@ class _WorkersScreenState extends State<WorkersScreen> {
                         itemBuilder: (context, index) {
                           final worker = results[index];
                           return ListTile(
-                            title: Text(worker.name),
+                            title: Text(worker.fullName),
                             onTap: () {
                               _removeOverlay();
                               searchController.clear();
-
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      WorkerProfileScreen(worker: worker),
-                                ),
-                              );
+                              context.push(WorkerProfileScreen(worker: worker));
                             },
                           );
                         },
@@ -202,12 +156,21 @@ class _WorkersScreenState extends State<WorkersScreen> {
             ),
           ],
         ),
+        actions: [
+          // Refresh button
+          IconButton(
+            icon: const Icon(Icons.refresh, color: Colors.blue),
+            onPressed: _loadWorkers,
+            tooltip: "Refresh",
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Site dropdown
             const Text(
               "Construction Site",
               style: TextStyle(
@@ -217,37 +180,27 @@ class _WorkersScreenState extends State<WorkersScreen> {
               ),
             ),
             const SizedBox(height: 6),
-
             Card(
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 8,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 child: DropdownButtonFormField<String>(
-                  initialValue: selectedSite,
+                  value: selectedSite,
                   hint: const Text("Select Site"),
                   isDense: true,
                   items: sites
-                      .map(
-                        (site) =>
-                            DropdownMenuItem(value: site, child: Text(site)),
-                      )
+                      .map((site) =>
+                          DropdownMenuItem(value: site, child: Text(site)))
                       .toList(),
-                  onChanged: (value) {
-                    setState(() => selectedSite = value);
-                  },
+                  onChanged: (value) => setState(() => selectedSite = value),
                   decoration: InputDecoration(
                     isDense: true,
                     filled: true,
                     fillColor: Colors.grey.shade100,
                     contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 8,
-                    ),
+                        horizontal: 12, vertical: 8),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
                       borderSide: BorderSide.none,
@@ -259,11 +212,12 @@ class _WorkersScreenState extends State<WorkersScreen> {
 
             const SizedBox(height: 16),
 
+          
             Row(
               children: [
                 Expanded(
                   child: _statCard(
-                    title: "10",
+                    title: _isLoading ? '...' : '${_workers.length}',
                     subtitle: "Total Workers Assigned",
                     color: Colors.blue.shade100,
                     textColor: Colors.blue,
@@ -273,7 +227,7 @@ class _WorkersScreenState extends State<WorkersScreen> {
                 const SizedBox(width: 12),
                 Expanded(
                   child: _statCard(
-                    title: "8",
+                    title: _isLoading ? '...' : '${_workers.length}',
                     subtitle: "Workers Present Today",
                     color: Colors.orange.shade100,
                     textColor: Colors.orange,
@@ -285,45 +239,52 @@ class _WorkersScreenState extends State<WorkersScreen> {
 
             const SizedBox(height: 16),
 
+            // Actions row
             Row(
               children: [
                 CustomButton(
                   label: "Add Worker",
-                   onPressed: () => context.push(AddWorkerScreen()),
+                  onPressed: () async {
+                    final result =
+                        await context.push(const AddWorkerScreen());
+                    if (result != null) _loadWorkers(); // refresh after adding
+                  },
                   backgroundColor: const Color(0xFF3366FF),
                 ),
-
-                const SizedBox(width: 100),
-
-                SizedBox(
-                  width: 240,
-                  child: CompositedTransformTarget(
-                    link: _layerLink,
-                    child: TextField(
-                      controller: searchController,
-                      onChanged: (value) {
-                        if (value.isEmpty) {
-                          _removeOverlay();
-                        } else {
-                          _showOverlay();
-                        }
-                      },
-                      decoration: InputDecoration(
-                        isDense: true,
-                        filled: true,
-                        fillColor: Colors.white,
-                        prefixIcon: const Icon(Icons.search),
-                        hintText: "Search",
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: BorderSide(color: Colors.grey.shade400),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: const BorderSide(color: Colors.blue),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: SizedBox(
+                    width: 240,
+                    child: CompositedTransformTarget(
+                      link: _layerLink,
+                      child: TextField(
+                        controller: searchController,
+                        onChanged: (value) {
+                          if (value.isEmpty) {
+                            _removeOverlay();
+                          } else {
+                            _showOverlay();
+                          }
+                        },
+                        decoration: InputDecoration(
+                          isDense: true,
+                          filled: true,
+                          fillColor: Colors.white,
+                          prefixIcon: const Icon(Icons.search),
+                          hintText: "Search",
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide:
+                                BorderSide(color: Colors.grey.shade400),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide:
+                                const BorderSide(color: Colors.blue),
+                          ),
                         ),
                       ),
                     ),
@@ -335,32 +296,74 @@ class _WorkersScreenState extends State<WorkersScreen> {
             const SizedBox(height: 20),
 
             const Text(
-              "Worker List",
+              "Workers List",
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
             ),
-
             const SizedBox(height: 10),
 
-            Card(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(12),
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: DataTable(
-                    showCheckboxColumn: false,
-                    headingRowColor: WidgetStateProperty.all(
-                      Colors.grey.shade200,
+            
+            if (_isLoading)
+              const Center(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(vertical: 60),
+                  child: CircularProgressIndicator(),
+                ),
+              )
+            else if (_errorMessage != null)
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 40),
+                  child: Column(
+                    children: [
+                      Icon(Icons.error_outline,
+                          color: Colors.red.shade400, size: 48),
+                      const SizedBox(height: 12),
+                      Text(
+                        _errorMessage!,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: Colors.red.shade600),
+                      ),
+                      const SizedBox(height: 16),
+                      TextButton.icon(
+                        onPressed: _loadWorkers,
+                        icon: const Icon(Icons.refresh),
+                        label: const Text("Try Again"),
+                      ),
+                    ],
+                  ),
+                ),
+              )
+            else if (_workers.isEmpty)
+              const Center(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(vertical: 60),
+                  child: Text(
+                    "No workers found.",
+                    style: TextStyle(color: Colors.grey),
+                  ),
+                ),
+              )
+            else
+              Card(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: DataTable(
+                      showCheckboxColumn: false,
+                      headingRowColor: MaterialStatePropertyAll(
+                        Colors.grey.shade200,
+                      ),
+                      columnSpacing: 30,
+                      columns: _buildHeaderColumns(),
+                      rows: _buildWorkerRows(),
                     ),
-                    columnSpacing: 30,
-                    columns: _buildHeaderColumns(),
-                    rows: _buildWorkerRows(),
                   ),
                 ),
               ),
-            ),
           ],
         ),
       ),
@@ -368,7 +371,7 @@ class _WorkersScreenState extends State<WorkersScreen> {
   }
 
   List<DataColumn> _buildHeaderColumns() {
-    final headers = ["NAME", "ID", "TYPE", "PHONE NO", "TASK", "AMOUNT"];
+    final headers = ["NAME", "ID", "TYPE", "PHONE NO", "SITE", "JOINED"];
     return headers
         .map(
           (title) => DataColumn(
@@ -382,34 +385,30 @@ class _WorkersScreenState extends State<WorkersScreen> {
   }
 
   List<DataRow> _buildWorkerRows() {
-    return workers.map((worker) {
+    return _workers.map((worker) {
       return DataRow(
         onSelectChanged: (selected) {
           if (selected == true) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => WorkerProfileScreen(worker: worker),
-              ),
-            );
+            context.push(WorkerProfileScreen(worker: worker));
           }
         },
         cells: [
-          DataCell(Text(worker.name)),
-          DataCell(Text(worker.id)),
+          DataCell(Text(worker.fullName)),
+          DataCell(Text(worker.nationalId.toString())),
           DataCell(
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
-                color: worker.skillLevel.toLowerCase() == 'skilled'
+                color: worker.skillType.toLowerCase() == 'skilled'
                     ? Colors.blue.shade100
                     : Colors.grey.shade300,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Text(
-                worker.skillLevel,
+                worker.skillType,
                 style: TextStyle(
-                  color: worker.skillLevel.toLowerCase() == 'skilled'
+                  color: worker.skillType.toLowerCase() == 'skilled'
                       ? Colors.blue.shade800
                       : Colors.grey.shade800,
                   fontWeight: FontWeight.bold,
@@ -418,16 +417,18 @@ class _WorkersScreenState extends State<WorkersScreen> {
               ),
             ),
           ),
-          DataCell(Text(worker.phone)),
-          DataCell(Text(worker.specialty)),
-          DataCell(Text(worker.rate)),
+          DataCell(Text(worker.phoneNumber)),
+          DataCell(Text(worker.siteId?.toString() ?? '—')),
+          DataCell(Text(
+            worker.createdAt != null
+                ? '${worker.createdAt!.day}/${worker.createdAt!.month}/${worker.createdAt!.year}'
+                : '—',
+          )),
         ],
       );
     }).toList();
   }
 }
-
-class InvalidType {}
 
 Widget _statCard({
   required String title,
