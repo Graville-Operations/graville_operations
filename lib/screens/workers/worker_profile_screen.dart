@@ -1,15 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:graville_operations/screens/commons/assets/images.dart';
-import 'package:graville_operations/models/worker.dart';
- 
+import 'package:graville_operations/models/worker_model.dart';
 
 class WorkerProfileScreen extends StatelessWidget {
   final Worker worker;
 
-  const WorkerProfileScreen({
-    super.key,
-    required this.worker,
-  });
+  const WorkerProfileScreen({super.key, required this.worker});
 
   @override
   Widget build(BuildContext context) {
@@ -21,49 +16,48 @@ class WorkerProfileScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-
-              
               ClipRRect(
                 borderRadius: BorderRadius.circular(24),
-                child: Image.asset(
-                  CommonImages.worker,
-                  height: 220,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                ),
+                child: worker.imageUrl != null
+                    ? Image.network(
+                        worker.imageUrl!,
+                        height: 220,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => _placeholderImage(),
+                      )
+                    : _placeholderImage(),
               ),
 
               const SizedBox(height: 20),
 
-              
               _buildSectionCard(
                 title: "CONTACT INFORMATION",
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-
-                   Text(
-                       worker.name,
-                      style: TextStyle(
+                    Text(
+                      worker.fullName,
+                      style: const TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-
                     const SizedBox(height: 20),
-
                     _buildInfoRow(
                       icon: Icons.phone,
                       label: "Phone Number",
-                      value: worker.phone,
+                      value: worker.phoneNumber.isNotEmpty
+                          ? worker.phoneNumber
+                          : '—',
                     ),
-
                     const SizedBox(height: 16),
-
                     _buildInfoRow(
                       icon: Icons.badge,
                       label: "National ID",
-                     value: worker.id,
+                      value: worker.nationalId > 0
+                          ? worker.nationalId.toString()
+                          : '—',
                     ),
                   ],
                 ),
@@ -71,51 +65,50 @@ class WorkerProfileScreen extends StatelessWidget {
 
               const SizedBox(height: 20),
 
-              
               _buildSectionCard(
                 title: "PROFESSIONAL DETAILS",
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-
                     _buildInfoRow(
                       icon: Icons.apartment,
-                      label: "Department",
-                      value: worker.specialty,
+                      label: "Task / Specialty",
+                      value: worker.taskId != null
+                          ? 'Task #${worker.taskId}'
+                          : '—',
                     ),
-
                     const SizedBox(height: 20),
-
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Icon(Icons.verified, color: Colors.blue),
                         const SizedBox(width: 12),
-
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-
-                             Text(
+                            const Text(
                               "Skill Level",
                               style: TextStyle(
                                 fontSize: 13,
                                 color: Colors.grey,
                               ),
                             ),
-
                             const SizedBox(height: 6),
-
                             Container(
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 14, vertical: 6),
                               decoration: BoxDecoration(
-                                color: Colors.blue,
+                                color:
+                                    worker.skillType.toLowerCase() == 'skilled'
+                                        ? Colors.blue
+                                        : Colors.grey.shade500,
                                 borderRadius: BorderRadius.circular(20),
                               ),
-                              child: const Text(
-                                "Skilled",
-                                style: TextStyle(
+                              child: Text(
+                                worker.skillType.isNotEmpty
+                                    ? worker.skillType
+                                    : 'Unknown',
+                                style: const TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -125,27 +118,29 @@ class WorkerProfileScreen extends StatelessWidget {
                         ),
                       ],
                     ),
-
                     const SizedBox(height: 20),
-_buildInfoRow(
-  icon: Icons.calendar_month,
-  label: "Join Date",
-  value:
-      "${worker.joinDate.day}/${worker.joinDate.month}/${worker.joinDate.year}",
-),
+                    _buildInfoRow(
+                      icon: Icons.calendar_month,
+                      label: "Joined Date",
+                      value: worker.createdAt != null
+                          ? '${worker.createdAt!.day}/${worker.createdAt!.month}/${worker.createdAt!.year}'
+                          : '—',
+                    ),
                   ],
                 ),
               ),
 
               const SizedBox(height: 20),
 
-             
+              // Site assignment
               _buildSectionCard(
                 title: "CURRENT ASSIGNMENT",
                 child: _buildInfoRow(
-                  icon: Icons.trending_up,
-                  label: "Active Project",
-                  value: "Riverside Plaza - Tower B",
+                  icon: Icons.location_on,
+                  label: "Site ID",
+                  value: worker.siteId != null
+                      ? 'Site #${worker.siteId}'
+                      : 'Not assigned',
                   iconColor: Colors.orange,
                 ),
               ),
@@ -156,7 +151,18 @@ _buildInfoRow(
     );
   }
 
-  
+  Widget _placeholderImage() {
+    return Container(
+      height: 220,
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: Colors.grey.shade200,
+        borderRadius: BorderRadius.circular(24),
+      ),
+      child: const Icon(Icons.person, size: 80, color: Colors.grey),
+    );
+  }
+
   Widget _buildSectionCard({
     required String title,
     required Widget child,
@@ -171,13 +177,12 @@ _buildInfoRow(
             color: Colors.black.withOpacity(0.05),
             blurRadius: 12,
             offset: const Offset(0, 6),
-          )
+          ),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-
           Text(
             title,
             style: const TextStyle(
@@ -187,16 +192,13 @@ _buildInfoRow(
               letterSpacing: 0.5,
             ),
           ),
-
           const SizedBox(height: 20),
-
           child,
         ],
       ),
     );
   }
 
-  
   Widget _buildInfoRow({
     required IconData icon,
     required String label,
@@ -206,25 +208,16 @@ _buildInfoRow(
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-
         Icon(icon, color: iconColor),
-
         const SizedBox(width: 12),
-
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-
             Text(
               label,
-              style: const TextStyle(
-                fontSize: 13,
-                color: Colors.grey,
-              ),
+              style: const TextStyle(fontSize: 13, color: Colors.grey),
             ),
-
             const SizedBox(height: 4),
-
             Text(
               value,
               style: const TextStyle(
