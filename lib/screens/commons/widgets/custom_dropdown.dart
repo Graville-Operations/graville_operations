@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 
 class CustomDropdown<T> extends StatelessWidget {
@@ -42,38 +41,41 @@ class CustomDropdown<T> extends StatelessWidget {
     //     : value;
 
     return DropdownButtonFormField<T>(
-      initialValue: value,
+      value: value,
       isExpanded: isExpanded,
       isDense: isDense,
       elevation: elevation!.toInt(),
       borderRadius: borderRadius ?? BorderRadius.circular(12),
       hint: hint != null
-          ? Text(
-        hint!,
-        style: TextStyle(color: Colors.grey.shade600),
-      )
+          ? Text(hint!, style: TextStyle(color: Colors.grey.shade600))
           : null,
       decoration: InputDecoration(
         labelText: label,
         prefixIcon: prefixIcon,
         filled: fillColor != null,
         fillColor: fillColor,
-        border: border ??
+        border:
+            border ??
             OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(color: Colors.grey.shade400),
             ),
-        enabledBorder: border ??
+        enabledBorder:
+            border ??
             OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(color: Colors.grey.shade400),
             ),
-        focusedBorder: border ??
+        focusedBorder:
+            border ??
             OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: const BorderSide(color: Colors.blue, width: 2),
             ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 14,
+          vertical: 14,
+        ),
       ),
       items: items.map((T item) {
         final displayText = displayMapper(item);

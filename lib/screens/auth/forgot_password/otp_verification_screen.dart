@@ -1,15 +1,15 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:graville_operations/screens/auth/forgot_password/reset_password_screen.dart';
 import 'package:graville_operations/screens/commons/assets/images.dart';
 import 'package:graville_operations/screens/commons/widgets/custom_button.dart';
+import 'package:graville_operations/services/api_service.dart';
 import 'package:pinput/pinput.dart';
 
 class OtpVerificationScreen extends StatefulWidget {
-  final String generatedOtp;
+  final String email;
 
-  const OtpVerificationScreen({super.key, required this.generatedOtp});
+  const OtpVerificationScreen({super.key, required this.email});
 
   @override
   State<OtpVerificationScreen> createState() => _OtpVerificationScreenState();
@@ -19,7 +19,6 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _otpController = TextEditingController();
 
-  late String currentOtp;
   Timer? _timer;
   int _secondsRemaining = 60;
   bool _isExpired = false;
@@ -27,14 +26,12 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
   @override
   void initState() {
     super.initState();
-    currentOtp = widget.generatedOtp;
     _startTimer();
   }
 
   void _startTimer() {
     _secondsRemaining = 60;
     _isExpired = false;
-
     _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (_secondsRemaining == 0) {
@@ -46,7 +43,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
     });
   }
 
-  void _verifyOtp() {
+  void _verifyOtp() async {
     if (_isExpired) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('OTP has expired. Please resend.')),
@@ -55,40 +52,70 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
     }
 
     if (_formKey.currentState!.validate()) {
-      if (_otpController.text == currentOtp) {
+      // Show loading
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => Center(child: CircularProgressIndicator()),
+      );
+
+      final result = await ApiService.verifyOtp(
+        widget.email,
+        _otpController.text.trim(),
+      );
+
+      // Hide loading
+      Navigator.pop(context);
+
+      if (result['success']) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('OTP verified successfully')),
+          SnackBar(
+            content: Text(result['message']),
+            backgroundColor: Colors.green,
+          ),
         );
 
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (_) => const ResetPasswordScreen()),
+          MaterialPageRoute(
+            builder: (_) => ResetPasswordScreen(
+              email: widget.email,
+              otpCode: _otpController.text.trim(),
+            ),
+          ),
         );
       } else {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('Invalid OTP')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(result['message'] ?? 'Invalid OTP'),
+            backgroundColor: Colors.red,
+          ),
+        );
       }
     }
   }
 
-  void _resendOtp() {
-    setState(() {
-      currentOtp = _generateOtp();
-      _otpController.clear();
-    });
+  void _resendOtp() async {
+    _otpController.clear();
 
-    debugPrint('Resend OTP: $currentOtp');
+    final result = await ApiService.forgotPassword(widget.email);
 
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text('New OTP sent')));
-
-    _startTimer();
-  }
-
-  String _generateOtp() {
-    return (100000 + DateTime.now().millisecondsSinceEpoch % 900000).toString();
+    if (result['success']) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('New OTP sent to your email'),
+          backgroundColor: Colors.green,
+        ),
+      );
+      _startTimer();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(result['message'] ?? 'Failed to resend OTP'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   @override
@@ -125,22 +152,23 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                   height: 80,
                   width: 80,
                   child: Image.asset(
-                    CommonImages.otpverification,
+                    CommonImages.otpVerification,
                     fit: BoxFit.cover,
                   ),
                 ),
-
                 const SizedBox(height: 20),
-
                 Text(
                   'OTP Verification',
                   style: theme.textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-
                 const SizedBox(height: 8),
-
+                Text(
+                  'OTP sent to ${widget.email}',
+                  style: theme.textTheme.bodyMedium,
+                ),
+                const SizedBox(height: 4),
                 Text(
                   _isExpired
                       ? 'OTP expired'
@@ -151,9 +179,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                         : theme.hintColor,
                   ),
                 ),
-
                 const SizedBox(height: 30),
-
                 Pinput(
                   controller: _otpController,
                   length: 6,
@@ -167,21 +193,11 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                   submittedPinTheme: basePinTheme,
                   validator: (value) =>
                       value?.length == 6 ? null : 'Enter a valid 6-digit OTP',
-                  //onCompleted: (_) => _verifyOtp(),
                 ),
-
                 const SizedBox(height: 24),
-
                 CustomButton(label: "Verify OTP", onPressed: _verifyOtp),
-
                 const SizedBox(height: 12),
-
                 CustomButton(label: "Resend OTP", onPressed: _resendOtp),
-
-                // TextButton(
-                //   onPressed: _isExpired ? _resendOtp : null,
-                //   child: const Text('Resend OTP'),
-                // ),
               ],
             ),
           ),

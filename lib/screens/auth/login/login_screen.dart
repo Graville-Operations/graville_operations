@@ -1,11 +1,16 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:graville_operations/core/remote/api/auth_api.dart';
+import 'package:graville_operations/core/remote/dto/requests/login.dart';
+import 'package:graville_operations/core/remote/dto/response/auth_response.dart';
 import 'package:graville_operations/navigation/navigation.dart';
 import 'package:graville_operations/screens/auth/forgot_password/forgot_password.dart';
 import 'package:graville_operations/screens/auth/signup/signup_screen.dart';
 import 'package:graville_operations/screens/commons/widgets/custom_button.dart';
 import 'package:graville_operations/screens/commons/widgets/custom_text_input.dart';
+import 'package:graville_operations/services/api_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -76,7 +81,6 @@ class _LoginScreenState extends State<LoginScreen> {
                       height: 100,
                       width: 500,
                     ),
-
                     SizedBox(height: 10),
                     Text(
                       'Welcome to Graville Enterprises Limited!',
@@ -110,22 +114,39 @@ class _LoginScreenState extends State<LoginScreen> {
                   controller: emailController,
                   labelText: "Email",
                   hintText: "example@gmail.com",
-                  prefixIcon: Icons.email, onSuffixIconPressed: () {  },
+                  prefixIcon: Icons.email,
+                  onSuffixIconPressed: () {},
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your email';
+                    }
+                    if (!value.contains('@')) {
+                      return 'Please enter a valid email';
+                    }
+                      return null;
+                  },
                 ),
                 CustomTextInput(
                   controller: passwordController,
                   labelText: "Password",
                   hintText: "at least 8 characters",
                   prefixIcon: Icons.lock,
-                  suffixIcon: _obscurePassword
-                      ? Icons.visibility_off
-                      : Icons.visibility,
+                  suffixIcon: _obscurePassword ? Icons.visibility_off : Icons.visibility,
                   isObscure: _obscurePassword,
                   isPassword: _obscurePassword,
                   onSuffixIconPressed: () {
                     setState(() {
                       _obscurePassword = !_obscurePassword;
                     });
+                  },
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your password';
+                    }
+                    if (value.length < 8) {
+                      return 'Password must be at least 8 characters';
+                    }
+                    return null;
                   },
                 ),
                 Align(
@@ -144,9 +165,71 @@ class _LoginScreenState extends State<LoginScreen> {
                    ),
                  ),
                 const SizedBox(height: 8),
-                CustomButton(label: "log in",
-                      width: double.infinity,
-                    onPressed: () => Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>MainNavigationScreen())),
+                CustomButton(
+                  label: "log in",
+                  width: double.infinity,
+                  onPressed: () async {
+                    // if (_formKey.currentState!.validate()) {
+                    //   // Show loading indicator
+                    //   showDialog(
+                    //     context: context,
+                    //     barrierDismissible: false,
+                    //     builder: (context) => Center(
+                    //       child: CircularProgressIndicator(),
+                    //     ),
+                    //   );
+                    //
+                    //   final result = await ApiService.login(
+                    //     emailController.text.trim(),
+                    //     passwordController.text.trim(),
+                    //   );
+                    //
+                    //   // Hide loading indicator
+                    //   Navigator.pop(context);
+                    //
+                    //   if (result['success']) {
+                    //     final role = result['data']['role'];
+                    //
+                    //     // Navigate based on role
+                    //   if (role == 'admin' || role == 'field_engineer' || role == 'auditor') {
+                    //    Navigator.pushReplacement(
+                    //      context,
+                    //      MaterialPageRoute(
+                    //        builder: (context) => MainNavigationScreen(),
+                    //      ),
+                    //     );
+                    //   }
+                    //  } else {
+                    //   // Show error message
+                    //   ScaffoldMessenger.of(context).showSnackBar(
+                    //     SnackBar(
+                    //       content: Text(result['message'] ?? 'Login failed'),
+                    //       backgroundColor: Colors.red,
+                    //     ),
+                    //   );
+                    //  }
+                    // }
+                    EasyLoading.show(status: "Logging you in");
+                    LoginRequest loginRequest =  LoginRequest(username: emailController.text, password: passwordController.text);
+                    AuthLoginResponse response = await AuthApi.login(loginRequest);
+                    // await UserStore.to.saveProfile(result.data!);
+                    EasyLoading.dismiss();
+                    if(response.accessToken.isNotEmpty){
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text("Logged in successfully"),
+                            backgroundColor: Colors.green,
+                          ),
+                        );
+                    }else{
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Login failed'),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                    }
+                  },
                 ),
 
                 const SizedBox(height: 20),

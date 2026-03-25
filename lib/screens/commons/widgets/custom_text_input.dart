@@ -14,7 +14,6 @@ class CustomTextInput extends StatelessWidget {
   final int? maxLines;
   final bool readOnly;
   final ValueChanged<String>? onChanged;
-
   final String? Function(String?)? validator;
   const CustomTextInput({
     super.key,
