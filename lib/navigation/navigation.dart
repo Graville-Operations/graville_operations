@@ -39,9 +39,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         label: "Workers",
       ),
       BottomNavigationBarItem(
-        icon: Icon(Icons.inventory_2_outlined, color: inActiveColor),
-        activeIcon: Icon(Icons.inventory, color: activeColor),
-        label: "Inventory",
+        icon: Icon(Icons.store, color: inActiveColor),
+        activeIcon: Icon(Icons.store, color: activeColor),
+        label: "Store",
       ),
       BottomNavigationBarItem(
         icon: Icon(Icons.person_2_outlined, color: inActiveColor),

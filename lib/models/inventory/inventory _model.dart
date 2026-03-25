@@ -1,43 +1,3 @@
-
-class MaterialModel {
-  final int? id;
-  final String name;
-  final String category;
-  final String unit;
-  final DateTime? createdAt;
-
-  MaterialModel({
-    this.id,
-    required this.name,
-    required this.category,
-    required this.unit,
-    this.createdAt,
-  });
-
-
-
-  Map<String, dynamic> toCreateJson() {
-    return {
-      'name': name,
-      'category': category,
-      'unit': unit,
-    };
-  }
-
-
-  factory MaterialModel.fromJson(Map<String, dynamic> json) {
-    return MaterialModel(
-      id: json['id'],
-      name: json['name'] ?? '',
-      category: json['category'] ?? '',
-      unit: json['unit'] ?? '',
-      createdAt: json['created_at'] != null
-          ? DateTime.tryParse(json['created_at'])
-          : null,
-    );
-  }
-}
-
 class InventoryModel {
   final int? id;
   final String name;
@@ -46,6 +6,8 @@ class InventoryModel {
   final String unitType;
   final double unitPrice;
   final String description;
+  
+  final String operation;
 
   InventoryModel({
     this.id,
@@ -55,8 +17,9 @@ class InventoryModel {
     required this.unitType,
     required this.unitPrice,
     required this.description,
+    
+    this.operation = 'subtract',
   });
-
 
   Map<String, dynamic> toUpdateJson() {
     return {
@@ -66,9 +29,10 @@ class InventoryModel {
       'unit_type': unitType,
       'unit_price': unitPrice,
       'description': description,
+      
+      'operation': operation,
     };
   }
-
 
   factory InventoryModel.fromJson(Map<String, dynamic> json) {
     return InventoryModel(
@@ -81,6 +45,10 @@ class InventoryModel {
           ? (json['unit_price'] as num).toDouble()
           : 0.0,
       description: json['description'] ?? '',
+     
+      operation: 'subtract',
     );
   }
+
+  String? get unit => null;
 }

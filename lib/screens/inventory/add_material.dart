@@ -18,13 +18,10 @@ class AddMaterialScreen extends StatefulWidget {
 class AddMaterialScreenState extends State<AddMaterialScreen> {
  
   final List<String> allCategories = [
-    'Electrical',
-    'Plumbing',
-    'Masonry',
-    'Carpentry',
+    'Structure and Foundation', 'Wall Assembly and Openings', 'Roof Finish and Support Layers', 'Interior Build-Out and Finishes', 'Service Rough-In Materials(e.g pipe,wiring,vents)', 'Exterior Works and Drainage(e.g. gutters, downspouts)', 'Tools and Equipment', 'Safety and Protective Gear', 'Other'
   ];
 
-  final List<String> allUnits = ['kg', 'pcs', 'liters', 'meters', 'bags', 'tons'];
+  final List<String> allUnits = ['pieces', 'meters', 'Bags', 'Tons' ,'m²', 'm³', 'ft²', 'unit count', 'rolls', 'sheets', 'yd³', 'gallons', 'pounds', 'kilograms', 'liters', 'meters', 'feet', 'inches', 'boxes', 'bundles', 'pallets'];
 
   String? selectedCategory;
   String? selectedUnit;
@@ -50,10 +47,13 @@ class AddMaterialScreenState extends State<AddMaterialScreen> {
 
     setState(() => _isLoading = true);
 
-    final material = MaterialModel(
+    final material = InventoryModel(
       name: nameController.text.trim(),
       category: selectedCategory!,
-      unit: selectedUnit!,
+      unitType: selectedUnit!,
+      quantity: 0,
+      unitPrice: 0.0,
+      description: '',
     );
 
     try {

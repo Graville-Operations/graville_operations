@@ -112,6 +112,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   hintText: "example@gmail.com",
                   prefixIcon: Icons.email, onSuffixIconPressed: () {  },
                 ),
+                const SizedBox(height: 16),
                 CustomTextInput(
                   controller: passwordController,
                   labelText: "Password",
