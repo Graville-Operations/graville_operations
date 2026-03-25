@@ -1,59 +1,48 @@
 import 'package:flutter/material.dart';
 import 'package:graville_operations/models/inventory/inventory%20_model.dart';
 import 'package:graville_operations/navigation/custom_navigator.dart';
-import 'package:graville_operations/screens/commons/widgets/custom_dropdown.dart';
-import 'package:graville_operations/screens/inventory/list_of_materials.dart';
-import 'package:graville_operations/screens/material/hired_materials.dart';
+import 'package:graville_operations/screens/inventory/add_material.dart';
 import 'package:graville_operations/services/inventory_service.dart';
 
-class InventoryScreen extends StatefulWidget {
-  const InventoryScreen({super.key});
+class MaterialsListScreen extends StatefulWidget {
+  const MaterialsListScreen({super.key});
 
   @override
-  State<InventoryScreen> createState() => _InventoryScreenState();
+  State<MaterialsListScreen> createState() => _MaterialsListScreenState();
 }
 
-class _InventoryScreenState extends State<InventoryScreen> {
+class _MaterialsListScreenState extends State<MaterialsListScreen> {
 
-  final List<String> sites = [
-    'Plaza 2000 - Nairobi',
-    'Huruma',
-    'Mabatini',
-    'Mishi Mboko',
-    'DCC Kibra',
-    'Iremele',
-  ];
-  String? selectedSite;
-
-  List<InventoryModel> _inventory = [];
+  List<InventoryModel> _materials = [];
+  List<InventoryModel> _filteredMaterials = [];
   bool _isLoading = true;
   String? _errorMessage;
 
-  final TextEditingController _inventorySearchController = TextEditingController();
-  List<InventoryModel> _filteredInventory = [];
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     _loadData();
-    _inventorySearchController.addListener(_onInventorySearch);
+    _searchController.addListener(_onSearch);
   }
 
   @override
   void dispose() {
-    _inventorySearchController.dispose();
+    _searchController.dispose();
     super.dispose();
   }
 
-  void _onInventorySearch() {
-    final query = _inventorySearchController.text.toLowerCase().trim();
+  void _onSearch() {
+    final query = _searchController.text.toLowerCase().trim();
     setState(() {
-      _filteredInventory = query.isEmpty
-          ? _inventory
-          : _inventory
-              .where((item) =>
-                  item.name.toLowerCase().contains(query) ||
-                  item.unitType.toLowerCase().contains(query))
+      _filteredMaterials = query.isEmpty
+          ? _materials
+          : _materials
+              .where((m) =>
+                  m.name.toLowerCase().contains(query) ||
+                  m.unitType.toLowerCase().contains(query) ||
+                  m.category.toLowerCase().contains(query))
               .toList();
     });
   }
@@ -65,10 +54,10 @@ class _InventoryScreenState extends State<InventoryScreen> {
     });
 
     try {
-      final inventory = await MaterialService.getAllInventory();
+      final materials = await MaterialService.getMaterials();
       setState(() {
-        _inventory = inventory;
-        _filteredInventory = inventory;
+        _materials = materials;
+        _filteredMaterials = materials;
         _isLoading = false;
       });
     } on MaterialServiceException catch (e) {
@@ -78,7 +67,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
       });
     } catch (_) {
       setState(() {
-        _errorMessage = 'Failed to load inventory. Please try again.';
+        _errorMessage = 'Failed to load materials. Please try again.';
         _isLoading = false;
       });
     }
@@ -91,48 +80,25 @@ class _InventoryScreenState extends State<InventoryScreen> {
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.white,
-        title: const Row(
-          children: [
-            Icon(Icons.store, color: Colors.blue),
-            SizedBox(width: 10),
-            Text(
-              "Store",
-              style: TextStyle(
-                color: Colors.black,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ],
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: const Text(
+          'Materials List',
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 26,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh, color: Colors.blue),
             onPressed: _loadData,
-            tooltip: 'Refresh Inventory',
+            tooltip: 'Refresh',
           ),
         ],
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(56),
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
-            child: SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: () => context.push(const MaterialsListScreen()),
-                icon: const Icon(Icons.inventory_2_outlined, size: 18),
-                label: const Text('View Materials List'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF2C3E50),
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -161,47 +127,20 @@ class _InventoryScreenState extends State<InventoryScreen> {
                     ),
                   ),
                 )
-              : SingleChildScrollView(
+              : Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
 
-                      const SizedBox(height: 16),
-                      const Text(
-                        'Construction Site',
-                        style: TextStyle(color: Colors.grey, fontSize: 12),
-                      ),
-                      const SizedBox(height: 6),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFF5F7F9),
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: Colors.grey.shade200),
-                        ),
-                        child: CustomDropdown<String>(
-                          value: selectedSite,
-                          items: sites,
-                          displayMapper: (s) => s,
-                          onChanged: (val) =>
-                              setState(() => selectedSite = val),
-                          hint: 'Select site',
-                          isExpanded: true,
-                          isDense: true,
-                          border: InputBorder.none,
-                          fillColor: Colors.transparent,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
+                      const SizedBox(height: 8),
 
-                      const SizedBox(height: 25),
-
+                      // Search field
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           const Text(
-                            'Inventory Stock',
+                            'List of Materials in the system',
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               color: Color(0xFF34495E),
@@ -210,65 +149,55 @@ class _InventoryScreenState extends State<InventoryScreen> {
                           SizedBox(
                             width: 160,
                             child: _SearchField(
-                              controller: _inventorySearchController,
-                              hint: 'Search stock...',
+                              controller: _searchController,
+                              hint: 'Search material...',
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 10),
-                      _InventoryCard(
-                        children: [
-                          const _TableHeader(
-                              columns: ['Material', 'Quantity', 'Status']),
-                          if (_filteredInventory.isEmpty)
-                            const Padding(
-                              padding: EdgeInsets.all(16),
-                              child: Text(
-                                'No inventory records found.',
-                                style: TextStyle(color: Colors.grey),
-                              ),
-                            )
-                          else
-                            ..._filteredInventory.map(
-                              (item) => Column(
-                                children: [
-                                  _InventoryTile(
-                                    icon: _getMaterialIcon(item.name),
-                                    color: Colors.orange,
-                                    title: item.name,
-                                    value: '${item.quantity} ${item.unitType}',
-                                    extra: item.quantity > 10
-                                        ? 'In Stock'
-                                        : 'Low Stock',
-                                  ),
-                                  const Divider(height: 1),
-                                ],
-                              ),
-                            ),
-                        ],
-                      ),
 
-                      const SizedBox(height: 25),
-                      const Text(
-                        'Hired Tools',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF34495E),
+                      const SizedBox(height: 10),
+
+                      // Materials card
+                      Expanded(
+                        child: _MaterialsCard(
+                          children: [
+                            const _TableHeader(
+                                columns: ['Material', 'Unit', 'Category']),
+                            if (_filteredMaterials.isEmpty)
+                              const Padding(
+                                padding: EdgeInsets.all(16),
+                                child: Text(
+                                  'No materials found.',
+                                  style: TextStyle(color: Colors.grey),
+                                ),
+                              )
+                            else
+                              ..._filteredMaterials.map(
+                                (m) => Column(
+                                  children: [
+                                    _MaterialTile(
+                                      icon: _getMaterialIcon(m.name),
+                                      title: m.name,
+                                      value: m.unitType,
+                                      extra: m.category,
+                                    ),
+                                    const Divider(height: 1),
+                                  ],
+                                ),
+                              ),
+                            _AddButton(
+                              label: 'Add Material',
+                              onTap: () async {
+                                await context.push(const AddMaterialScreen());
+                                _loadData();
+                              },
+                            ),
+                          ],
                         ),
                       ),
-                      const SizedBox(height: 10),
 
-                      _InventoryCard(
-                        children: [
-                          _AddButton(
-                            label: 'Add Hired Tool',
-                            onTap: () => context.push(HiredMaterialScreen()),
-                          ),
-                        ],
-                      ),
-
-                      const SizedBox(height: 30),
+                      const SizedBox(height: 20),
                     ],
                   ),
                 ),
@@ -286,9 +215,9 @@ class _InventoryScreenState extends State<InventoryScreen> {
 }
 
 
-class _InventoryCard extends StatelessWidget {
+class _MaterialsCard extends StatelessWidget {
   final List<Widget> children;
-  const _InventoryCard({required this.children});
+  const _MaterialsCard({required this.children});
 
   @override
   Widget build(BuildContext context) {
@@ -305,21 +234,21 @@ class _InventoryCard extends StatelessWidget {
           ),
         ],
       ),
-      child: Column(children: children),
+      child: SingleChildScrollView(
+        child: Column(children: children),
+      ),
     );
   }
 }
 
-class _InventoryTile extends StatelessWidget {
+class _MaterialTile extends StatelessWidget {
   final IconData icon;
-  final Color color;
   final String title;
   final String value;
   final String? extra;
 
-  const _InventoryTile({
+  const _MaterialTile({
     required this.icon,
-    required this.color,
     required this.title,
     required this.value,
     this.extra,
@@ -337,10 +266,10 @@ class _InventoryTile extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
+                color: Colors.blue.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: Icon(icon, color: color, size: 20),
+              child: Icon(icon, color: Colors.blue, size: 20),
             ),
           ),
           const SizedBox(width: 10),
@@ -368,14 +297,10 @@ class _InventoryTile extends StatelessWidget {
             child: Text(
               extra ?? '-',
               textAlign: TextAlign.right,
-              style: TextStyle(
+              style: const TextStyle(
                 fontWeight: FontWeight.w500,
                 fontSize: 14,
-                color: extra == 'In Stock'
-                    ? Colors.green
-                    : extra == 'Low Stock'
-                        ? Colors.red
-                        : Colors.black,
+                color: Colors.black,
               ),
             ),
           ),
