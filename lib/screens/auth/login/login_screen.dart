@@ -5,12 +5,10 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:graville_operations/core/remote/api/auth_api.dart';
 import 'package:graville_operations/core/remote/dto/requests/login.dart';
 import 'package:graville_operations/core/remote/dto/response/auth_response.dart';
-import 'package:graville_operations/navigation/navigation.dart';
 import 'package:graville_operations/screens/auth/forgot_password/forgot_password.dart';
 import 'package:graville_operations/screens/auth/signup/signup_screen.dart';
 import 'package:graville_operations/screens/commons/widgets/custom_button.dart';
 import 'package:graville_operations/screens/commons/widgets/custom_text_input.dart';
-import 'package:graville_operations/services/api_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
