@@ -1,14 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:graville_operations/screens/commons/assets/images.dart';
 import 'package:graville_operations/screens/commons/widgets/custom_button.dart';
+import 'package:graville_operations/services/api_service.dart';
 
 class ResetPasswordScreen extends StatefulWidget {
-  const ResetPasswordScreen({super.key});
+  final String email;
+  final String otpCode;
+
+  const ResetPasswordScreen({
+    super.key,
+    required this.email,
+    required this.otpCode,
+  });
 
   @override
   State<ResetPasswordScreen> createState() => _ResetPasswordScreenState();
 }
-
 class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   final _formKey = GlobalKey<FormState>();
 
@@ -30,13 +37,48 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     super.dispose();
   }
 
-  void _resetPassword() {
-    if (_formKey.currentState!.validate()) {
+  void _resetPassword() async {
+  if (_formKey.currentState!.validate()) {
+    // Show loading
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => Center(child: CircularProgressIndicator()),
+    );
+
+    final result = await ApiService.resetPassword(
+      widget.email,
+      widget.otpCode,
+      _passwordController.text.trim(),
+    );
+
+    // Hide loading
+    Navigator.pop(context);
+
+    if (result['success']) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Password reset successful')),
+        SnackBar(
+          content: Text(result['message']),
+          backgroundColor: Colors.green,
+        ),
+      );
+
+      // Navigate back to login
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        '/',
+        (route) => false,
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(result['message'] ?? 'Password reset failed'),
+          backgroundColor: Colors.red,
+        ),
       );
     }
   }
+}
 
   @override
   Widget build(BuildContext context) {
