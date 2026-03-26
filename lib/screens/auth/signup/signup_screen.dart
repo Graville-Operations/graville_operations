@@ -132,7 +132,7 @@ class _SignupState extends State<Signup> {
                         SizedBox(width: 8),
                         Expanded(
                           child: CustomTextInput(
-                            controller: firstNameController,
+                            controller: lastNameController,
                             labelText: "Last Name",
                             hintText: "Doe",
                             prefixIcon: Icons.person, onSuffixIconPressed: () {  },

@@ -126,6 +126,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       return null;
                   },
                 ),
+
+                const SizedBox(height: 15),
+                
                 CustomTextInput(
                   controller: passwordController,
                   labelText: "Password",
@@ -169,46 +172,46 @@ class _LoginScreenState extends State<LoginScreen> {
                   label: "log in",
                   width: double.infinity,
                   onPressed: () async {
-                    // if (_formKey.currentState!.validate()) {
-                    //   // Show loading indicator
-                    //   showDialog(
-                    //     context: context,
-                    //     barrierDismissible: false,
-                    //     builder: (context) => Center(
-                    //       child: CircularProgressIndicator(),
-                    //     ),
-                    //   );
-                    //
-                    //   final result = await ApiService.login(
-                    //     emailController.text.trim(),
-                    //     passwordController.text.trim(),
-                    //   );
-                    //
-                    //   // Hide loading indicator
-                    //   Navigator.pop(context);
-                    //
-                    //   if (result['success']) {
-                    //     final role = result['data']['role'];
-                    //
-                    //     // Navigate based on role
-                    //   if (role == 'admin' || role == 'field_engineer' || role == 'auditor') {
-                    //    Navigator.pushReplacement(
-                    //      context,
-                    //      MaterialPageRoute(
-                    //        builder: (context) => MainNavigationScreen(),
-                    //      ),
-                    //     );
-                    //   }
-                    //  } else {
-                    //   // Show error message
-                    //   ScaffoldMessenger.of(context).showSnackBar(
-                    //     SnackBar(
-                    //       content: Text(result['message'] ?? 'Login failed'),
-                    //       backgroundColor: Colors.red,
-                    //     ),
-                    //   );
-                    //  }
-                    // }
+                    if (_formKey.currentState!.validate()) {
+                      // Show loading indicator
+                      showDialog(
+                        context: context,
+                        barrierDismissible: false,
+                        builder: (context) => Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                      );
+                    
+                      final result = await ApiService.login(
+                        emailController.text.trim(),
+                        passwordController.text.trim(),
+                      );
+                    
+                      // Hide loading indicator
+                      Navigator.pop(context);
+                    
+                      if (result['success']) {
+                        final role = result['data']['role'];
+                    
+                        // Navigate based on role
+                      if (role == 'admin' || role == 'field_engineer' || role == 'auditor') {
+                       Navigator.pushReplacement(
+                         context,
+                         MaterialPageRoute(
+                           builder: (context) => MainNavigationScreen(),
+                         ),
+                        );
+                      }
+                     } else {
+                      // Show error message
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(result['message'] ?? 'Login failed'),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                     }
+                    }
                     EasyLoading.show(status: "Logging you in");
                     LoginRequest loginRequest =  LoginRequest(username: emailController.text, password: passwordController.text);
                     AuthLoginResponse response = await AuthApi.login(loginRequest);
