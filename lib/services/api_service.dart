@@ -1,12 +1,12 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-//import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
   // Use 10.0.2.2 for Android emulator, your PC IP for physical device
   static const String baseUrl = 'http://localhost:8000/api/v1';
   
-  static get SharedPreferences => null;
+ // static get SharedPreferences => null;
 
   // Token Management 
   static Future<void> saveToken(String token) async {
