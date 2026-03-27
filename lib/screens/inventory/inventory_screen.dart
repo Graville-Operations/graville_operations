@@ -3,8 +3,11 @@ import 'package:graville_operations/models/inventory/inventory%20_model.dart';
 import 'package:graville_operations/navigation/custom_navigator.dart';
 import 'package:graville_operations/screens/commons/widgets/custom_dropdown.dart';
 import 'package:graville_operations/screens/inventory/list_of_materials.dart';
+import 'package:graville_operations/screens/inventory/update_inventory.dart';
 import 'package:graville_operations/screens/material/hired_materials.dart';
 import 'package:graville_operations/services/inventory_service.dart';
+
+
 
 class InventoryScreen extends StatefulWidget {
   const InventoryScreen({super.key});
@@ -216,6 +219,30 @@ class _InventoryScreenState extends State<InventoryScreen> {
                           ),
                         ],
                       ),
+
+                      SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton.icon(
+                              onPressed: () async {
+                                final updated = await context.push(
+                                  const UpdateInventoryScreen(preSelectedItem: null,), 
+                                );
+                                if (updated == true) _loadData();
+                              },
+                              icon: const Icon(Icons.remove_circle_outline, size: 18),
+                              label: const Text('Subtract Stock'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.red,
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(vertical: 12),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                            ),
+                          ),
+
+
                       const SizedBox(height: 10),
                       _InventoryCard(
                         children: [
@@ -230,22 +257,31 @@ class _InventoryScreenState extends State<InventoryScreen> {
                               ),
                             )
                           else
-                            ..._filteredInventory.map(
-                              (item) => Column(
-                                children: [
-                                  _InventoryTile(
-                                    icon: _getMaterialIcon(item.name),
-                                    color: Colors.orange,
-                                    title: item.name,
-                                    value: '${item.quantity} ${item.unitType}',
-                                    extra: item.quantity > 10
-                                        ? 'In Stock'
-                                        : 'Low Stock',
-                                  ),
-                                  const Divider(height: 1),
-                                ],
+
+                          ..._filteredInventory.map(
+                          (item) => Column(
+                            children: [
+                              GestureDetector(
+                                onTap: () async {
+                                  final updated = await context.push(
+                                    UpdateInventoryScreen(preSelectedItem: item),
+                                  );
+                                  if (updated == true) _loadData(); 
+                                },
+                                child: _InventoryTile(
+                                  icon: _getMaterialIcon(item.name),
+                                  color: Colors.orange,
+                                  title: item.name,
+                                  value: '${item.quantity} ${item.unitType}',
+                                  extra: item.quantity > 10 ? 'In Stock' : 'Low Stock',
+                                ),
                               ),
-                            ),
+                              const Divider(height: 1),
+                            ],
+                          ),
+                        ),
+                          
+                          
                         ],
                       ),
 

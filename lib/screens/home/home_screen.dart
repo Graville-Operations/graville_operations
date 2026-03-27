@@ -12,6 +12,7 @@ import 'package:graville_operations/screens/commons/widgets/section_card.dart';
 import 'package:graville_operations/screens/commons/widgets/status_chip.dart';
 import 'package:graville_operations/screens/commons/widgets/stat_card.dart';
 
+
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -72,7 +73,7 @@ class _HomeScreenState extends State<HomeScreen> {
               message: "Update inventory",
               child: miniFab(
                 Icons.store,
-                () => context.push(const UpdateInventoryScreen()),
+                () => context.push(const UpdateInventoryScreen(preSelectedItem: null,)),
               ),
             ),
             const SizedBox(height: 12),

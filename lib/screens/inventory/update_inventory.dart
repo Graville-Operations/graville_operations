@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:graville_operations/models/inventory/inventory%20_model.dart';
+import 'package:graville_operations/models/inventory/inventory _model.dart';
 import 'package:graville_operations/screens/commons/widgets/custom_button.dart';
 import 'package:graville_operations/screens/commons/widgets/custom_dropdown.dart';
 import 'package:graville_operations/services/inventory_service.dart';
 
-enum InventoryOperation { add, subtract }
-
 class UpdateInventoryScreen extends StatefulWidget {
-  const UpdateInventoryScreen({super.key});
+  const UpdateInventoryScreen({super.key,  InventoryModel? preSelectedItem});
 
   @override
   UpdateInventoryScreenState createState() => UpdateInventoryScreenState();
@@ -28,12 +26,9 @@ class UpdateInventoryScreenState extends State<UpdateInventoryScreen> {
   bool _isSubmitting = false;
   String? _loadError;
 
-  InventoryOperation _operation = InventoryOperation.subtract;
-
   final TextEditingController unitController = TextEditingController();
   final TextEditingController categoryController = TextEditingController();
   final TextEditingController quantityController = TextEditingController();
-  final TextEditingController unitPriceController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
 
   @override
@@ -47,7 +42,6 @@ class UpdateInventoryScreenState extends State<UpdateInventoryScreen> {
     unitController.dispose();
     categoryController.dispose();
     quantityController.dispose();
-    unitPriceController.dispose();
     descriptionController.dispose();
     super.dispose();
   }
@@ -82,7 +76,6 @@ class UpdateInventoryScreenState extends State<UpdateInventoryScreen> {
       unitController.text = item?.unitType ?? '';
       categoryController.text = item?.category ?? '';
       quantityController.text = '';
-      unitPriceController.text = item != null ? item.unitPrice.toString() : '';
       descriptionController.text = item?.description ?? '';
     });
   }
@@ -95,8 +88,18 @@ class UpdateInventoryScreenState extends State<UpdateInventoryScreen> {
 
     final enteredQty = int.tryParse(quantityController.text.trim()) ?? 0;
 
-    if (_operation == InventoryOperation.subtract &&
-        enteredQty > _selectedInventory!.quantity) {
+    if (enteredQty <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Please enter a valid quantity greater than 0.'),
+          backgroundColor: Colors.red.shade600,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+
+    if (enteredQty > _selectedInventory!.quantity) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -120,10 +123,9 @@ class UpdateInventoryScreenState extends State<UpdateInventoryScreen> {
       unitType: unitController.text.trim().isNotEmpty
           ? unitController.text.trim()
           : _selectedInventory!.unitType,
-      unitPrice: double.tryParse(unitPriceController.text.trim()) ??
-          _selectedInventory!.unitPrice,
+      unitPrice: _selectedInventory!.unitPrice,
       description: descriptionController.text.trim(),
-      operation: _operation == InventoryOperation.subtract ? 'subtract' : 'add',
+      operation: 'subtract', // always subtract
     );
 
     try {
@@ -131,7 +133,8 @@ class UpdateInventoryScreenState extends State<UpdateInventoryScreen> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('${_selectedInventory!.name} updated successfully!'),
+          content: Text(
+              '${_selectedInventory!.name} stock subtracted successfully!'),
           backgroundColor: Colors.green.shade600,
           behavior: SnackBarBehavior.floating,
         ),
@@ -150,7 +153,8 @@ class UpdateInventoryScreenState extends State<UpdateInventoryScreen> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('An unexpected error occurred. Please try again.'),
+          content:
+              const Text('An unexpected error occurred. Please try again.'),
           backgroundColor: Colors.red.shade600,
           behavior: SnackBarBehavior.floating,
         ),
@@ -173,6 +177,7 @@ class UpdateInventoryScreenState extends State<UpdateInventoryScreen> {
         ),
         title: const Text(
           'Update Inventory',
+          
           style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
         ),
         iconTheme: const IconThemeData(color: Colors.black),
@@ -200,7 +205,6 @@ class UpdateInventoryScreenState extends State<UpdateInventoryScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-
                       const Text(
                         'Construction Site *',
                         style: TextStyle(fontWeight: FontWeight.bold),
@@ -210,7 +214,8 @@ class UpdateInventoryScreenState extends State<UpdateInventoryScreen> {
                         value: selectedSite,
                         items: allSites,
                         displayMapper: (site) => site,
-                        onChanged: (val) => setState(() => selectedSite = val),
+                        onChanged: (val) =>
+                            setState(() => selectedSite = val),
                         hint: 'Select site',
                         isExpanded: true,
                         isDense: true,
@@ -220,7 +225,6 @@ class UpdateInventoryScreenState extends State<UpdateInventoryScreen> {
                       ),
 
                       const SizedBox(height: 20),
-
                       const Text(
                         'Inventory Item *',
                         style: TextStyle(fontWeight: FontWeight.bold),
@@ -248,7 +252,8 @@ class UpdateInventoryScreenState extends State<UpdateInventoryScreen> {
                           decoration: BoxDecoration(
                             color: Colors.blue.shade50,
                             borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: Colors.blue.shade100),
+                            border:
+                                Border.all(color: Colors.blue.shade100),
                           ),
                           child: Text(
                             'Current stock: ${_selectedInventory!.quantity} ${_selectedInventory!.unitType}',
@@ -262,111 +267,6 @@ class UpdateInventoryScreenState extends State<UpdateInventoryScreen> {
                       ],
 
                       const SizedBox(height: 20),
-
-                    
-                      const Text(
-                        'Operation *',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 8),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                        child: Row(
-                          children: [
-                            // Add option
-                            Expanded(
-                              child: GestureDetector(
-                                onTap: () => setState(
-                                    () => _operation = InventoryOperation.subtract),
-                                child: Container(
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 14),
-                                  decoration: BoxDecoration(
-                                    color: _operation == InventoryOperation.subtract
-                                        ? Colors.red
-                                        : Colors.white,
-                                    borderRadius: const BorderRadius.horizontal(
-                                        left: Radius.circular(14)),
-                                  ),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        Icons.remove_circle_outline,
-                                        size: 18,
-                                        color: _operation ==
-                                                InventoryOperation.subtract
-                                            ? Colors.white
-                                            : Colors.grey,
-                                      ),
-                                      const SizedBox(width: 6),
-                                      Text(
-                                        'Subtract Stock',
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          color: _operation ==
-                                                  InventoryOperation.subtract
-                                              ? Colors.white
-                                              : Colors.grey,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-
-                            Expanded(
-                              child: GestureDetector(
-                                onTap: () => setState(() =>
-                                    _operation = InventoryOperation.add),
-                                child: Container(
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 14),
-                                  decoration: BoxDecoration(
-                                    color: _operation ==
-                                            InventoryOperation.add
-                                        ? Colors.green
-                                        : Colors.white,
-                                    borderRadius: const BorderRadius.horizontal(
-                                        right: Radius.circular(14)),
-                                  ),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        Icons.add_circle_outline,
-                                        size: 18,
-                                        color: _operation ==
-                                                InventoryOperation.add
-                                            ? Colors.white
-                                            : Colors.grey,
-                                      ),
-                                      const SizedBox(width: 6),
-                                      Text(
-                                        'Add Stock',
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          color: _operation ==
-                                                  InventoryOperation.add
-                                              ? Colors.white
-                                              : Colors.grey,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      const SizedBox(height: 20),
-
                       const Text(
                         'Unit type',
                         style: TextStyle(fontWeight: FontWeight.bold),
@@ -379,7 +279,6 @@ class UpdateInventoryScreenState extends State<UpdateInventoryScreen> {
                       ),
 
                       const SizedBox(height: 20),
-
                       const Text(
                         'Category',
                         style: TextStyle(
@@ -393,12 +292,9 @@ class UpdateInventoryScreenState extends State<UpdateInventoryScreen> {
                       ),
 
                       const SizedBox(height: 20),
-
-                      Text(
-                        _operation == InventoryOperation.subtract
-                            ? 'Quantity to Subtract *'
-                            : 'Quantity to Add *',
-                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      const Text(
+                        'Quantity to Subtract *',
+                        style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 6),
                       TextField(
@@ -406,27 +302,11 @@ class UpdateInventoryScreenState extends State<UpdateInventoryScreen> {
                         keyboardType: TextInputType.number,
                         onChanged: (_) => setState(() {}),
                         decoration: _inputDecoration(
-                          hintText: _operation == InventoryOperation.subtract
-                              ? 'Enter quantity to subtract'
-                              : 'Enter quantity to add',
+                          hintText: 'Enter quantity to subtract',
                         ),
                       ),
 
-                      // const SizedBox(height: 20),
-
-                      // const Text(
-                      //   'Unit price (Optional)',
-                      //   style: TextStyle(fontWeight: FontWeight.bold),
-                      // ),
-                      // const SizedBox(height: 6),
-                      // TextField(
-                      //   controller: unitPriceController,
-                      //   keyboardType: TextInputType.number,
-                      //   decoration: _inputDecoration(hintText: 'Enter price'),
-                      // ),
-
                       const SizedBox(height: 20),
-
                       const Text(
                         'Description (Optional)',
                         style: TextStyle(fontWeight: FontWeight.bold),
@@ -436,23 +316,17 @@ class UpdateInventoryScreenState extends State<UpdateInventoryScreen> {
                         controller: descriptionController,
                         maxLines: 2,
                         decoration: _inputDecoration(
-                          hintText: 'e.g., Delivered by XYZ supplier',
+                          hintText: 'e.g., Used on Block A foundation',
                         ),
                       ),
 
                       const SizedBox(height: 30),
-
                       Row(
                         children: [
                           Expanded(
                             child: CustomButton(
-                              label: _operation == InventoryOperation.add
-                                  ? 'Add Stock'
-                                  : 'Subtract Stock',
-                              backgroundColor:
-                                  _operation == InventoryOperation.add
-                                      ? Colors.green
-                                      : Colors.red,
+                              label: 'Subtract Stock',
+                              backgroundColor: Colors.red,
                               textColor: Colors.white,
                               height: 55,
                               borderRadius: 14,
@@ -469,9 +343,8 @@ class UpdateInventoryScreenState extends State<UpdateInventoryScreen> {
 
                       Center(
                         child: GestureDetector(
-                          onTap: _isSubmitting
-                              ? null
-                              : () => Navigator.pop(context),
+                          onTap:
+                              _isSubmitting ? null : () => Navigator.pop(context),
                           child: const Text(
                             'Cancel',
                             style: TextStyle(
