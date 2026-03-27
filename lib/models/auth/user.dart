@@ -1,42 +1,9 @@
-import 'package:graville_operations/core/local/entities/group_data.dart';
-import 'package:graville_operations/core/local/entities/user_data.dart';
-import 'package:graville_operations/core/remote/dto/response/group_response.dart';
 
-class AuthLoginResponse {
-  final String accessToken;
-  final String tokenType;
-  final String sessionId;
-  final String accountType;
-  final int expiresIn;
 
-  AuthLoginResponse({
-    required this.accessToken,
-    required this.tokenType,
-    required this.sessionId,
-    required this.accountType,
-    required this.expiresIn,
-  });
 
-  factory AuthLoginResponse.fromJson(Map<String, dynamic> json) {
-    return AuthLoginResponse(
-      accessToken: json["access_token"],
-      tokenType: json["token_type"],
-      sessionId: json["session_id"],
-      accountType: json["account_type"],
-      expiresIn: json["expires_in"],
-    );
-  }
+import 'package:graville_operations/models/auth/groups.dart';
 
-  Map<String, dynamic> toJson() => {
-    "access_token": accessToken,
-    "token_type": tokenType,
-    "session_id": sessionId,
-    "account_type": accountType,
-    "expires_in": expiresIn,
-  };
-}
-
-class MyAccountResponse {
+class User {
   final int id;
   final String refId;
   final String nationalId;
@@ -60,9 +27,8 @@ class MyAccountResponse {
   final String? staffId;
   final String? longitude;
   final String? latitude;
-  final List<GroupResponse> groups;
-
-  MyAccountResponse({
+  final List<Group> groups;
+  User({
     required this.id,
     required this.refId,
     required this.nationalId,
@@ -89,8 +55,8 @@ class MyAccountResponse {
     this.latitude,
   });
 
-  factory MyAccountResponse.fromJson(Map<String, dynamic> json) {
-    return MyAccountResponse(
+  factory User.fromJson(Map<String, dynamic> json) {
+    return User(
       id: json["id"],
       refId: json["ref_id"],
       nationalId: json["national_id"],
@@ -111,7 +77,7 @@ class MyAccountResponse {
       kycComplete: json["kyc_complete"],
       enabled: json["enabled"],
       groups: (json["groups"] as List<dynamic>)
-          .map((group) => GroupResponse.fromJson(group))
+          .map((group) => Group.fromJson(group))
           .toList(),
       company: json["company"],
       staffId: json["staff_id"],
@@ -146,47 +112,6 @@ class MyAccountResponse {
     "longitude": longitude,
     "latitude": latitude,
   };
-
   String get fullName => "$firstName $middleName $lastName";
 
-  UserData toUserData() {
-    return UserData(
-      id: id,
-      refId: refId,
-      nationalId: nationalId,
-      email: email,
-      phoneNo: phoneNo,
-      firstName: firstName,
-      middleName: middleName,
-      lastName: lastName,
-      accountType: accountType,
-      accountStatus: accountStatus,
-      gender: gender,
-      createdBy: createdBy,
-      modifiedBy: modifiedBy,
-      createdAt: createdAt,
-      updatedAt: updatedAt,
-      emailVerified: emailVerified,
-      phoneVerified: phoneVerified,
-      kycComplete: kycComplete,
-      enabled: enabled,
-      company: company,
-      staffId: staffId,
-      longitude: longitude,
-      latitude: latitude,
-      groups: groups
-          .map(
-            (g) => GroupData(
-              id: g.id,
-              description: g.description,
-              createdAt: g.createdAt,
-              title: g.title,
-              refId: g.refId,
-              modifiedBy: g.modifiedBy,
-              updatedAt: g.updatedAt,
-            ),
-          )
-          .toList(),
-    );
-  }
 }
