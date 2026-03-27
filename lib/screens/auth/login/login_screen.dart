@@ -1,14 +1,13 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:graville_operations/core/remote/api/auth_api.dart';
-import 'package:graville_operations/core/remote/dto/requests/login.dart';
-import 'package:graville_operations/core/remote/dto/response/auth_response.dart';
+import 'package:graville_operations/navigation/navigation.dart';
 import 'package:graville_operations/screens/auth/forgot_password/forgot_password.dart';
 import 'package:graville_operations/screens/auth/signup/signup_screen.dart';
 import 'package:graville_operations/screens/commons/widgets/custom_button.dart';
 import 'package:graville_operations/screens/commons/widgets/custom_text_input.dart';
+//import 'package:graville_operations/screens/admin/admin_dashboard.dart';
+import 'package:graville_operations/services/api_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -16,33 +15,24 @@ class LoginScreen extends StatefulWidget {
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }
+
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-
   bool _obscurePassword = true;
 
   Widget _socialIcon(IconData icon, Color color) {
-  return InkWell(
-    borderRadius: BorderRadius.circular(30),
-    onTap: () {},
-    child: CircleAvatar(
-      radius: 22,
-      backgroundColor: Colors.white,
-      child: FaIcon(
-        icon,
-        color: color,
-        size: 20,
+    return InkWell(
+      borderRadius: BorderRadius.circular(30),
+      onTap: () {},
+      child: CircleAvatar(
+        radius: 22,
+        backgroundColor: Colors.white,
+        child: FaIcon(icon, color: color, size: 20),
       ),
-    ),
-  );
-}
-  String? passwordErrorMessage;
-  String? emailErrorMessage;
-  
-  get body => null;
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -60,27 +50,25 @@ class _LoginScreenState extends State<LoginScreen> {
           Positioned.fill(
             child: BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 0, sigmaY: 0),
-              // ignore: deprecated_member_use
               child: Container(color: Colors.black.withOpacity(0)),
             ),
           ),
-
-      SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(24, 0, 24, 40),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SizedBox(height: 20),
+          SafeArea(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(24, 0, 24, 40),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const SizedBox(height: 20),
                     Image.asset(
                       'assets/images/logo.png',
                       height: 100,
                       width: 500,
                     ),
-                    SizedBox(height: 10),
-                    Text(
+                    const SizedBox(height: 10),
+                    const Text(
                       'Welcome to Graville Enterprises Limited!',
                       textAlign: TextAlign.center,
                       style: TextStyle(
@@ -89,214 +77,194 @@ class _LoginScreenState extends State<LoginScreen> {
                         fontSize: 20,
                       ),
                     ),
-                    Text(
+                    const Text(
                       'Please enter your credentials',
                       textAlign: TextAlign.center,
+                      style: TextStyle(color: Colors.blueGrey, fontSize: 18),
+                    ),
+                    const SizedBox(height: 8),
+                    const Text(
+                      "Log in to your account",
                       style: TextStyle(
-                        color: Colors.blueGrey,
-                        fontSize: 18,
+                        fontSize: 23,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue,
                       ),
                     ),
-                const SizedBox(height: 8),
-                const Text(
-                  "Log in to your account",
-                  style: TextStyle(
-                    fontSize: 23,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.blue,
-                  ),
-                ),
-                const SizedBox(height: 10),
-
-                CustomTextInput(
-                  controller: emailController,
-                  labelText: "Email",
-                  hintText: "example@gmail.com",
-                  prefixIcon: Icons.email,
-                  onSuffixIconPressed: () {},
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your email';
-                    }
-                    if (!value.contains('@')) {
-                      return 'Please enter a valid email';
-                    }
-                      return null;
-                  },
-                ),
-                CustomTextInput(
-                  controller: passwordController,
-                  labelText: "Password",
-                  hintText: "at least 8 characters",
-                  prefixIcon: Icons.lock,
-                  suffixIcon: _obscurePassword ? Icons.visibility_off : Icons.visibility,
-                  isObscure: _obscurePassword,
-                  isPassword: _obscurePassword,
-                  onSuffixIconPressed: () {
-                    setState(() {
-                      _obscurePassword = !_obscurePassword;
-                    });
-                  },
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your password';
-                    }
-                    if (value.length < 8) {
-                      return 'Password must be at least 8 characters';
-                    }
-                    return null;
-                  },
-                ),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: TextButton(
-                    onPressed: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                       builder: (context) => ForgotPasswordScreen(),
-                       ),
-                     ),
-                    child: const Text(
-                      " Forgot password?",
-                     style: TextStyle(color: Colors.blue),
+                    const SizedBox(height: 10),
+                    CustomTextInput(
+                      controller: emailController,
+                      labelText: "Email",
+                      hintText: "example@gmail.com",
+                      prefixIcon: Icons.email,
+                      onSuffixIconPressed: () {},
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter your email';
+                        }
+                        if (!value.contains('@')) {
+                          return 'Please enter a valid email';
+                        }
+                        return null;
+                      },
                     ),
-                   ),
-                 ),
-                const SizedBox(height: 8),
-                CustomButton(
-                  label: "log in",
-                  width: double.infinity,
-                  onPressed: () async {
-                    // if (_formKey.currentState!.validate()) {
-                    //   // Show loading indicator
-                    //   showDialog(
-                    //     context: context,
-                    //     barrierDismissible: false,
-                    //     builder: (context) => Center(
-                    //       child: CircularProgressIndicator(),
-                    //     ),
-                    //   );
-                    //
-                    //   final result = await ApiService.login(
-                    //     emailController.text.trim(),
-                    //     passwordController.text.trim(),
-                    //   );
-                    //
-                    //   // Hide loading indicator
-                    //   Navigator.pop(context);
-                    //
-                    //   if (result['success']) {
-                    //     final role = result['data']['role'];
-                    //
-                    //     // Navigate based on role
-                    //   if (role == 'admin' || role == 'field_engineer' || role == 'auditor') {
-                    //    Navigator.pushReplacement(
-                    //      context,
-                    //      MaterialPageRoute(
-                    //        builder: (context) => MainNavigationScreen(),
-                    //      ),
-                    //     );
-                    //   }
-                    //  } else {
-                    //   // Show error message
-                    //   ScaffoldMessenger.of(context).showSnackBar(
-                    //     SnackBar(
-                    //       content: Text(result['message'] ?? 'Login failed'),
-                    //       backgroundColor: Colors.red,
-                    //     ),
-                    //   );
-                    //  }
-                    // }
-                    EasyLoading.show(status: "Logging you in");
-                    LoginRequest loginRequest =  LoginRequest(username: emailController.text, password: passwordController.text);
-                    AuthLoginResponse response = await AuthApi.login(loginRequest);
-                    // await UserStore.to.saveProfile(result.data!);
-                    EasyLoading.dismiss();
-                    if(response.accessToken.isNotEmpty){
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text("Logged in successfully"),
-                            backgroundColor: Colors.green,
+                    const SizedBox(height: 15),
+                    CustomTextInput(
+                      controller: passwordController,
+                      labelText: "Password",
+                      hintText: "at least 8 characters",
+                      prefixIcon: Icons.lock,
+                      suffixIcon: _obscurePassword
+                          ? Icons.visibility_off
+                          : Icons.visibility,
+                      isObscure: _obscurePassword,
+                      isPassword: _obscurePassword,
+                      onSuffixIconPressed: () {
+                        setState(() {
+                          _obscurePassword = !_obscurePassword;
+                        });
+                      },
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter your password';
+                        }
+                        if (value.length < 8) {
+                          return 'Password must be at least 8 characters';
+                        }
+                        return null;
+                      },
+                    ),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: TextButton(
+                        onPressed: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ForgotPasswordScreen(),
                           ),
-                        );
-                    }else{
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('Login failed'),
-                            backgroundColor: Colors.red,
-                          ),
-                        );
-                    }
-                  },
-                ),
-
-                const SizedBox(height: 20),
-                Row(
-                  children: [
-                    Expanded(child: Divider()),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 8),
-                      child: Text(
-                        'OR',
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                      ),
+                        ),
+                        child: const Text(
+                          "Forgot password?",
+                          style: TextStyle(color: Colors.blue),
+                        ),
                       ),
                     ),
-                    Expanded(child: Divider()),
-                  ],
-                ),
-
-                const SizedBox(height: 19),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      "Don't have an account? ",
-                      style: TextStyle(
-                          color: Colors.blue,
-                      ),
-                    ),
-
-                    InkWell(
-                        onTap: () {
-                           Navigator.of(context).push(
-                                MaterialPageRoute(builder: (context) => Signup()),
-                            );
-                            },
-                             child: const Text(
-                                     "Sign Up",
-                               style: TextStyle(
-                               color: Colors.blue,
-                                 fontWeight: FontWeight.bold,
-                               ),
+                    const SizedBox(height: 8),
+                    CustomButton(
+                      label: "log in",
+                      width: double.infinity,
+                      onPressed: () async {
+                        if (_formKey.currentState!.validate()) {
+                          showDialog(
+                            context: context,
+                            barrierDismissible: false,
+                            builder: (context) => const Center(
+                              child: CircularProgressIndicator(),
                             ),
-                         ),
+                          );
+
+                          final result = await ApiService.login(
+                            emailController.text.trim(),
+                            passwordController.text.trim(),
+                          );
+
+                          Navigator.pop(context);
+
+                          if (result['success']) {
+                            //final role = result['data']['role'];
+                            //if (role == 'admin') {
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const MainNavigationScreen(),
+                                ),
+                              );
+                            // } else {
+                            //   Navigator.pushReplacement(
+                            //     context,
+                            //     MaterialPageRoute(
+                            //       builder: (context) =>
+                            //           const MainNavigationScreen(),
+                            //     ),
+                            //   );
+                            // }
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                    result['message'] ?? 'Login failed'),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                          }
+                        }
+                      },
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      children: [
+                        const Expanded(child: Divider()),
+                        const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 8),
+                          child: Text(
+                            'OR',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        const Expanded(child: Divider()),
+                      ],
+                    ),
+                    const SizedBox(height: 19),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text(
+                          "Don't have an account? ",
+                          style: TextStyle(color: Colors.blue),
+                        ),
+                        InkWell(
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                  builder: (context) => const Signup()),
+                            );
+                          },
+                          child: const Text(
+                            "Sign Up",
+                            style: TextStyle(
+                              color: Colors.blue,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 19),
+                    Center(
+                      child: Wrap(
+                        alignment: WrapAlignment.center,
+                        spacing: 15,
+                        children: [
+                          _socialIcon(FontAwesomeIcons.google, Colors.red),
+                          _socialIcon(
+                              FontAwesomeIcons.linkedinIn, Colors.blueAccent),
+                          _socialIcon(FontAwesomeIcons.facebookF, Colors.blue),
+                          _socialIcon(
+                              FontAwesomeIcons.instagram, Colors.purple),
+                          _socialIcon(FontAwesomeIcons.xTwitter, Colors.black),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
-                
-                const SizedBox(height: 19),
-                   Center(
-                     child: Wrap(
-                       alignment: WrapAlignment.center,
-                         spacing: 15,
-                           children: [
-                             _socialIcon(FontAwesomeIcons.google, Colors.red),
-                             _socialIcon(FontAwesomeIcons.linkedinIn, Colors.blueAccent),
-                             _socialIcon(FontAwesomeIcons.facebookF, Colors.blue),
-                             _socialIcon(FontAwesomeIcons.instagram, Colors.purple),
-                             _socialIcon(FontAwesomeIcons.xTwitter, Colors.black),
-                         ],
-                       ),
-                     ),
-              ],
+              ),
             ),
           ),
-        ),
-      ),
         ],
-    )
+      ),
     );
   }
 }
