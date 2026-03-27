@@ -5,7 +5,7 @@ import 'package:graville_operations/models/inventory/inventory%20_model.dart';
 import 'package:http/http.dart' as http;
 
 class MaterialService {
-  static const String _baseUrl = 'http://localhost:8000/api/v1/materials';
+  static const String _baseUrl = 'http://hello.graville.co.ke/api/v1/materials';
 
   static const Map<String, String> _headers = {
     'Content-Type': 'application/json',

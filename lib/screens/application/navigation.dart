@@ -1,32 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
+import 'package:get/get_state_manager/src/simple/get_view.dart';
 
 
-//import 'package:graville_operations/screens/Inventory_Screen/inventory_screen.dart';
 
 import 'package:graville_operations/screens/account_screen/account_screen.dart';
+import 'package:graville_operations/screens/application/controller.dart';
 import 'package:graville_operations/screens/home/home_screen.dart';
 import 'package:graville_operations/screens/inventory/inventory_screen.dart';
 import 'package:graville_operations/screens/workers/workers_screen.dart';
 
-class MainNavigationScreen extends StatefulWidget {
-  const MainNavigationScreen({super.key});
+class ApplicationScreen extends GetView<ApplicationController> {
+  const ApplicationScreen({super.key});
 
-  @override
-  State<MainNavigationScreen> createState() => _MainNavigationScreenState();
-}
-
-class _MainNavigationScreenState extends State<MainNavigationScreen> {
-  int _currentIndex = 0;
-  final List<Widget> _screens = [
-    const HomeScreen(),
-    const WorkersScreen(),
-    const InventoryScreen(),
-    const AccountScreen(),
-  ];
   @override
   Widget build(BuildContext context) {
+    final List<Widget> screens = [
+      const HomeScreen(),
+      const WorkersScreen(),
+      const InventoryScreen(),
+      const AccountScreen(),
+    ];
+
     Color activeColor = Colors.blue.shade900;
     Color inActiveColor = Colors.blue.shade100;
+
     List<BottomNavigationBarItem> bottomItems = [
       BottomNavigationBarItem(
         icon: Icon(Icons.home_outlined, color: inActiveColor),
@@ -49,18 +47,15 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         label: "Account",
       ),
     ];
-    return Scaffold(
-      body: _screens[_currentIndex],
+
+    return Obx(() => Scaffold(
+      body: screens[controller.state.currentIndex.value],
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
+        currentIndex: controller.state.currentIndex.value,
         items: bottomItems,
         type: BottomNavigationBarType.fixed,
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
+        onTap: controller.changeIndex,
       ),
-    );
+    ));
   }
 }
