@@ -1,50 +1,35 @@
 import 'dart:ui';
+
 import 'package:flutter/material.dart';
-import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:graville_operations/core/remote/api/auth_api.dart';
-import 'package:graville_operations/core/remote/dto/requests/login.dart';
-import 'package:graville_operations/core/remote/dto/response/auth_response.dart';
-import 'package:graville_operations/navigation/navigation.dart';
+import 'package:get/get.dart';
 import 'package:graville_operations/screens/auth/forgot_password/forgot_password.dart';
 import 'package:graville_operations/screens/auth/signup/signup_screen.dart';
 import 'package:graville_operations/screens/commons/widgets/custom_button.dart';
 import 'package:graville_operations/screens/commons/widgets/custom_text_input.dart';
-import 'package:graville_operations/services/api_service.dart';
 
-class LoginScreen extends StatefulWidget {
+import 'controller.dart';
+
+class LoginScreen extends GetView<LoginController> {
   const LoginScreen({super.key});
-
-  @override
-  State<LoginScreen> createState() => _LoginScreenState();
-}
-class _LoginScreenState extends State<LoginScreen> {
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
-
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-
-  bool _obscurePassword = true;
-
-  Widget _socialIcon(IconData icon, Color color) {
-  return InkWell(
-    borderRadius: BorderRadius.circular(30),
-    onTap: () {},
-    child: CircleAvatar(
-      radius: 22,
-      backgroundColor: Colors.white,
-      child: FaIcon(
-        icon,
-        color: color,
-        size: 20,
-      ),
-    ),
-  );
-}
-  String? passwordErrorMessage;
-  String? emailErrorMessage;
-  
-  get body => null;
+//   Widget socialIcon(IconData icon, Color color) {
+//   return InkWell(
+//     borderRadius: BorderRadius.circular(30),
+//     onTap: () {},
+//     child: CircleAvatar(
+//       radius: 22,
+//       backgroundColor: Colors.white,
+//       child: FaIcon(
+//         icon,
+//         color: color,
+//         size: 20,
+//       ),
+//     ),
+//   );
+// }
+//   String? passwordErrorMessage;
+//   String? emailErrorMessage;
+//
+//   get body => null;
 
   @override
   Widget build(BuildContext context) {
@@ -71,7 +56,6 @@ class _LoginScreenState extends State<LoginScreen> {
         child: SingleChildScrollView(
           padding: const EdgeInsets.fromLTRB(24, 0, 24, 40),
           child: Form(
-            key: _formKey,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -111,7 +95,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 10),
 
                 CustomTextInput(
-                  controller: emailController,
+                  controller: controller.state.email,
                   labelText: "Email",
                   hintText: "example@gmail.com",
                   prefixIcon: Icons.email,
@@ -130,18 +114,14 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 15),
                 
                 CustomTextInput(
-                  controller: passwordController,
+                  controller: controller.state.psw,
                   labelText: "Password",
                   hintText: "at least 8 characters",
                   prefixIcon: Icons.lock,
-                  suffixIcon: _obscurePassword ? Icons.visibility_off : Icons.visibility,
-                  isObscure: _obscurePassword,
-                  isPassword: _obscurePassword,
-                  onSuffixIconPressed: () {
-                    setState(() {
-                      _obscurePassword = !_obscurePassword;
-                    });
-                  },
+                  suffixIcon: controller.state.obscurePassword.value ? Icons.visibility_off : Icons.visibility,
+                  isObscure: controller.state.obscurePassword.value,
+                  isPassword: controller.state.obscurePassword.value,
+                  onSuffixIconPressed: ()=>controller.togglePasswordVisibility(),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter your password';
@@ -171,70 +151,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 CustomButton(
                   label: "log in",
                   width: double.infinity,
-                  onPressed: () async {
-                    if (_formKey.currentState!.validate()) {
-                      // Show loading indicator
-                      showDialog(
-                        context: context,
-                        barrierDismissible: false,
-                        builder: (context) => Center(
-                          child: CircularProgressIndicator(),
-                        ),
-                      );
-                    
-                      final result = await ApiService.login(
-                        emailController.text.trim(),
-                        passwordController.text.trim(),
-                      );
-                    
-                      // Hide loading indicator
-                      Navigator.pop(context);
-                    
-                      if (result['success']) {
-                        final role = result['data']['role'];
-                    
-                        // Navigate based on role
-                      if (role == 'admin' || role == 'field_engineer' || role == 'auditor') {
-                       Navigator.pushReplacement(
-                         context,
-                         MaterialPageRoute(
-                           builder: (context) => MainNavigationScreen(),
-                         ),
-                        );
-                      }
-                     } else {
-                      // Show error message
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(result['message'] ?? 'Login failed'),
-                          backgroundColor: Colors.red,
-                        ),
-                      );
-                     }
-                    }
-                    EasyLoading.show(status: "Logging you in");
-                    LoginRequest loginRequest =  LoginRequest(username: emailController.text, password: passwordController.text);
-                    AuthLoginResponse response = await AuthApi.login(loginRequest);
-                    // await UserStore.to.saveProfile(result.data!);
-                    EasyLoading.dismiss();
-                    if(response.accessToken.isNotEmpty){
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text("Logged in successfully"),
-                            backgroundColor: Colors.green,
-                          ),
-                        );
-                    }else{
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('Login failed'),
-                            backgroundColor: Colors.red,
-                          ),
-                        );
-                    }
-                  },
+                  onPressed: controller.login
                 ),
-
                 const SizedBox(height: 20),
                 Row(
                   children: [
@@ -281,20 +199,20 @@ class _LoginScreenState extends State<LoginScreen> {
                   ],
                 ),
                 
-                const SizedBox(height: 19),
-                   Center(
-                     child: Wrap(
-                       alignment: WrapAlignment.center,
-                         spacing: 15,
-                           children: [
-                             _socialIcon(FontAwesomeIcons.google, Colors.red),
-                             _socialIcon(FontAwesomeIcons.linkedinIn, Colors.blueAccent),
-                             _socialIcon(FontAwesomeIcons.facebookF, Colors.blue),
-                             _socialIcon(FontAwesomeIcons.instagram, Colors.purple),
-                             _socialIcon(FontAwesomeIcons.xTwitter, Colors.black),
-                         ],
-                       ),
-                     ),
+                // const SizedBox(height: 19),
+                //    Center(
+                //      child: Wrap(
+                //        alignment: WrapAlignment.center,
+                //          spacing: 15,
+                //            children: [
+                //              _socialIcon(FontAwesomeIcons.google, Colors.red),
+                //              _socialIcon(FontAwesomeIcons.linkedinIn, Colors.blueAccent),
+                //              _socialIcon(FontAwesomeIcons.facebookF, Colors.blue),
+                //              _socialIcon(FontAwesomeIcons.instagram, Colors.purple),
+                //              _socialIcon(FontAwesomeIcons.xTwitter, Colors.black),
+                //          ],
+                //        ),
+                //      ),
               ],
             ),
           ),

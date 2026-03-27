@@ -1,8 +1,8 @@
-import 'package:graville_operations/core/commons/http.dart';
 import 'package:graville_operations/core/remote/dto/requests/create_tasks.dart';
 import 'package:graville_operations/core/remote/dto/response/create_task.dart';
 import 'package:graville_operations/core/remote/routes/task_route.dart';
 import 'package:graville_operations/core/remote/dto/response/base_response.dart';
+import 'package:graville_operations/core/utils/http.dart';
 
 class TaskApi {
 
