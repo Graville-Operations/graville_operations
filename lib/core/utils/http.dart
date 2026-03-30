@@ -4,6 +4,8 @@ import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:get/get.dart' hide FormData;
+import 'package:graville_operations/core/local/store/user_store.dart';
 import 'package:graville_operations/core/utils/utils.dart';
 import 'package:flutter/foundation.dart';
 
@@ -65,6 +67,10 @@ class HttpUtil {
     dio.interceptors.add(InterceptorsWrapper(
       onRequest: (options, handler) {
         // Do something before request is sent
+        if (Get.isRegistered<UserStore>() && UserStore.to.hasToken) {
+          final token = UserStore.to.token;
+            options.headers['Authorization'] = 'Bearer $token';
+        }
         return handler.next(options); //continue
         // If you want to complete the request and return some custom data, you can resolve a Response object `handler.resolve(response)`.
         // In this way, the request will be terminated, the upper-level then will be called, and the data returned in then will be your custom response.
@@ -188,15 +194,6 @@ class HttpUtil {
     token.cancel("cancelled");
   }
 
-  /// Read local configuration
-  Map<String, dynamic>? getAuthorizationHeader() {
-    var headers = <String, dynamic>{};
-    // if (Get.isRegistered<UserStore>() && UserStore.to.hasToken == true) {
-    //   headers['Authorization'] = 'Bearer ${UserStore.to.token}';
-    // }
-    return headers;
-  }
-
   /// restful get operation
   /// refresh whether to pull down to refresh, default false
   /// noCache Whether not to cache, default true
@@ -225,11 +222,6 @@ class HttpUtil {
       "cacheDisk": cacheDisk,
     });
     requestOptions.headers = requestOptions.headers ?? {};
-    Map<String, dynamic>? authorization = getAuthorizationHeader();
-    if (authorization != null) {
-      requestOptions.headers!.addAll(authorization);
-    }
-
     var response = await dio.get(
       path,
       queryParameters: queryParameters,
@@ -248,10 +240,6 @@ class HttpUtil {
   }) async {
     Options requestOptions = options ?? Options();
     requestOptions.headers = requestOptions.headers ?? {};
-    Map<String, dynamic>? authorization = getAuthorizationHeader();
-    if (authorization != null) {
-      requestOptions.headers!.addAll(authorization);
-    }
     var response = await dio.post(
       path,
       data: data,
@@ -271,10 +259,6 @@ class HttpUtil {
   }) async {
     Options requestOptions = options ?? Options();
     requestOptions.headers = requestOptions.headers ?? {};
-    Map<String, dynamic>? authorization = getAuthorizationHeader();
-    if (authorization != null) {
-      requestOptions.headers!.addAll(authorization);
-    }
     var response = await dio.put(
       path,
       data: data,
@@ -294,10 +278,6 @@ class HttpUtil {
   }) async {
     Options requestOptions = options ?? Options();
     requestOptions.headers = requestOptions.headers ?? {};
-    Map<String, dynamic>? authorization = getAuthorizationHeader();
-    if (authorization != null) {
-      requestOptions.headers!.addAll(authorization);
-    }
     var response = await dio.patch(
       path,
       data: data,
@@ -317,10 +297,6 @@ class HttpUtil {
   }) async {
     Options requestOptions = options ?? Options();
     requestOptions.headers = requestOptions.headers ?? {};
-    Map<String, dynamic>? authorization = getAuthorizationHeader();
-    if (authorization != null) {
-      requestOptions.headers!.addAll(authorization);
-    }
     var response = await dio.delete(
       path,
       data: data,
@@ -340,10 +316,6 @@ class HttpUtil {
   }) async {
     Options requestOptions = options ?? Options();
     requestOptions.headers = requestOptions.headers ?? {};
-    Map<String, dynamic>? authorization = getAuthorizationHeader();
-    if (authorization != null) {
-      requestOptions.headers!.addAll(authorization);
-    }
     var response = await dio.post(
       path,
       data: FormData.fromMap(data),
@@ -364,10 +336,6 @@ class HttpUtil {
   }) async {
     Options requestOptions = options ?? Options();
     requestOptions.headers = requestOptions.headers ?? {};
-    Map<String, dynamic>? authorization = getAuthorizationHeader();
-    if (authorization != null) {
-      requestOptions.headers!.addAll(authorization);
-    }
     requestOptions.headers!.addAll({
       Headers.contentLengthHeader: dataLength.toString(),
     });
