@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:graville_operations/screens/auth/login/login_screen.dart';
+//import 'package:graville_operations/screens/auth/login/login_screen.dart';
+import 'package:graville_operations/screens/auth/login/view.dart';
 import 'package:graville_operations/screens/settings/settings_screen.dart';
 import 'package:graville_operations/screens/support/support_screen.dart';
 import 'package:graville_operations/services/api_service.dart';
@@ -74,7 +75,7 @@ class _AccountScreenState extends State<AccountScreen> {
       await ApiService.clearSession();
       Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: (_) => const LoginScreen()),
+        MaterialPageRoute(builder: (_) => LoginScreen()),
         (route) => false,
       );
     }

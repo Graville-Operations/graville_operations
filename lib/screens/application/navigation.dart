@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:graville_operations/screens/account_screen/account_screen.dart';
-import 'package:graville_operations/screens/admin/admin_dashboard.dart';
 import 'package:graville_operations/screens/home/home_screen.dart';
 import 'package:graville_operations/screens/inventory/inventory_screen.dart';
 import 'package:graville_operations/screens/workers/workers_screen.dart';
+import 'package:graville_operations/screens/admin/admin_dashboard.dart';
 import 'package:graville_operations/services/api_service.dart';
 
-class MainNavigationScreen extends StatefulWidget {
-  const MainNavigationScreen({super.key});
+class ApplicationScreen extends StatefulWidget {
+  const ApplicationScreen({super.key});
 
   @override
-  State<MainNavigationScreen> createState() => _MainNavigationScreenState();
+  State<ApplicationScreen> createState() => _ApplicationScreenState();
 }
 
-class _MainNavigationScreenState extends State<MainNavigationScreen> {
+class _ApplicationScreenState extends State<ApplicationScreen> {
   int _currentIndex = 0;
   String _role = '';
   bool _isLoading = true;
@@ -54,7 +54,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     final base = [
       BottomNavigationBarItem(
         icon: Icon(Icons.home_outlined, color: inActiveColor),
-        activeIcon: Icon(Icons.home_filled, color: activeColor),
+        activeIcon: Icon(Icons.home, color: activeColor),
         label: "Home",
       ),
       BottomNavigationBarItem(
@@ -68,7 +68,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         label: "Inventory",
       ),
       BottomNavigationBarItem(
-        icon: Icon(Icons.person_2_outlined, color: inActiveColor),
+        icon: Icon(Icons.person_outline, color: inActiveColor),
         activeIcon: Icon(Icons.person, color: activeColor),
         label: "Account",
       ),

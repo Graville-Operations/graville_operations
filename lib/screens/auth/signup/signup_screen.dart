@@ -1,6 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:graville_operations/screens/auth/login/login_screen.dart';
+import 'package:graville_operations/screens/auth/login/view.dart';
 import 'package:graville_operations/screens/commons/assets/images.dart';
 import 'package:graville_operations/screens/commons/widgets/custom_button.dart';
 import 'package:graville_operations/screens/commons/widgets/custom_text_input.dart';
@@ -24,7 +24,7 @@ class _SignupState extends State<Signup> {
   bool _isPasswordVisible = false;
   bool _isConfirmpasswordVisible = false;
 
-  Widget _socialIcon(IconData icon, Color color) {
+  Widget _socialIcon(FaIconData icon, Color color) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10),
       child: InkWell(
