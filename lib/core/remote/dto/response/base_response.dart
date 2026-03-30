@@ -1,6 +1,6 @@
 class BaseResponse<T> {
-  final String message;
-  final int code;
+  final String message; //can be an error message if status code is not 201,200,204(success)
+  final int code; // status code
   final T? data;
 
   BaseResponse({
