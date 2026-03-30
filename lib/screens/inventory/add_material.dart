@@ -46,7 +46,7 @@ class AddMaterialScreenState extends State<AddMaterialScreen> {
     final material = InventoryModel(
       name: nameController.text.trim(),
       category: selectedCategory!,
-      unitType: selectedUnit!,
+      unit: selectedUnit!,
       quantity: 0,
       unitPrice: 0.0,
       description: '',
@@ -109,7 +109,6 @@ class AddMaterialScreenState extends State<AddMaterialScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Material name — free text input
             const Text(
               'Material Name *',
               style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
@@ -122,7 +121,6 @@ class AddMaterialScreenState extends State<AddMaterialScreen> {
             ),
 
             const SizedBox(height: 20),
-
             // Category dropdown
             const Text(
               'Category *',
@@ -143,7 +141,6 @@ class AddMaterialScreenState extends State<AddMaterialScreen> {
             ),
 
             const SizedBox(height: 20),
-
             // Unit dropdown
             const Text(
               'Unit *',

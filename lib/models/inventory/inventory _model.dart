@@ -3,7 +3,7 @@ class InventoryModel {
   final String name;
   final int quantity;
   final String category;
-  final String unitType;
+  final String unit;
   final double unitPrice;
   final String description;
   
@@ -14,7 +14,7 @@ class InventoryModel {
     required this.name,
     required this.quantity,
     required this.category,
-    required this.unitType,
+    required this.unit,
     required this.unitPrice,
     required this.description,
     
@@ -26,7 +26,7 @@ class InventoryModel {
       'name': name,
       'quantity': quantity,
       'category': category,
-      'unit_type': unitType,
+      'unit_type': unit,
       'unit_price': unitPrice,
       'description': description,
       
@@ -40,7 +40,7 @@ class InventoryModel {
       name: json['name'] ?? '',
       quantity: json['quantity'] ?? 0,
       category: json['category'] ?? '',
-      unitType: json['unit_type'] ?? '',
+      unit: json['unit_type'] ?? json['unit'] ??'',
       unitPrice: (json['unit_price'] != null)
           ? (json['unit_price'] as num).toDouble()
           : 0.0,
@@ -50,5 +50,5 @@ class InventoryModel {
     );
   }
 
-  String? get unit => null;
+  //String? get unit => null;
 }

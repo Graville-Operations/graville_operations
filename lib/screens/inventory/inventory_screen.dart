@@ -56,7 +56,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
           : _inventory
               .where((item) =>
                   item.name.toLowerCase().contains(query) ||
-                  item.unitType.toLowerCase().contains(query))
+                  item.unit.toLowerCase().contains(query))
               .toList();
     });
   }
@@ -173,7 +173,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
                       const SizedBox(height: 16),
                       const Text(
                         'Construction Site',
-                        style: TextStyle(color: Colors.grey, fontSize: 12),
+                        style: TextStyle(color: Colors.black, fontSize: 12),
                       ),
                       const SizedBox(height: 6),
                       Container(
@@ -272,7 +272,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
                                   icon: _getMaterialIcon(item.name),
                                   color: Colors.orange,
                                   title: item.name,
-                                  value: '${item.quantity} ${item.unitType}',
+                                  value: '${item.quantity} ${item.unit}',
                                   extra: item.quantity > 10 ? 'In Stock' : 'Low Stock',
                                 ),
                               ),

@@ -20,7 +20,25 @@ class LoginScreen extends GetView<LoginController> {
 //       backgroundColor: Colors.white,
 //       child: FaIcon(
 //         icon,
+//         color: color,//   Widget socialIcon(IconData icon, Color color) {
+//   return InkWell(
+//     borderRadius: BorderRadius.circular(30),
+//     onTap: () {},
+//     child: CircleAvatar(
+//       radius: 22,
+//       backgroundColor: Colors.white,
+//       child: FaIcon(
+//         icon,
 //         color: color,
+//         size: 20,
+//       ),
+//     ),
+//   );
+// }
+//   String? passwordErrFessage;
+//
+//   get body => null;
+
 //         size: 20,
 //       ),
 //     ),

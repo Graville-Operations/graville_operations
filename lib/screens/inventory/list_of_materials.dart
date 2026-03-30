@@ -41,7 +41,7 @@ class _MaterialsListScreenState extends State<MaterialsListScreen> {
           : _materials
               .where((m) =>
                   m.name.toLowerCase().contains(query) ||
-                  m.unitType.toLowerCase().contains(query) ||
+                  m.unit.toLowerCase().contains(query) ||
                   m.category.toLowerCase().contains(query))
               .toList();
     });
@@ -179,7 +179,7 @@ class _MaterialsListScreenState extends State<MaterialsListScreen> {
                                     _MaterialTile(
                                       icon: _getMaterialIcon(m.name),
                                       title: m.name,
-                                      value: m.unitType,
+                                      value: m.unit,
                                       extra: m.category,
                                     ),
                                     const Divider(height: 1),
