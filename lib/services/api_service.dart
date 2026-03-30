@@ -3,10 +3,8 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
-  // Use 10.0.2.2 for Android emulator, your PC IP for physical device
   static const String baseUrl = 'http://localhost:8000/api/v1';
-
-  // Token Management 
+  // Token Management
   static Future<void> saveToken(String token) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('token', token);
@@ -53,7 +51,7 @@ class ApiService {
     }
   }
 
-  // Forgot Password 
+  // Forgot Password
   static Future<Map<String, dynamic>> forgotPassword(String email) async {
     final response = await http.post(
       Uri.parse('$baseUrl/auth/forgot-password'),
@@ -62,13 +60,10 @@ class ApiService {
     );
 
     final data = jsonDecode(response.body);
-    return {
-      'success': response.statusCode == 200,
-      'message': data['message']
-    };
+    return {'success': response.statusCode == 200, 'message': data['message']};
   }
 
-  // Verify OTP 
+  // Verify OTP
   static Future<Map<String, dynamic>> verifyOtp(
       String email, String code) async {
     final response = await http.post(
@@ -78,13 +73,10 @@ class ApiService {
     );
 
     final data = jsonDecode(response.body);
-    return {
-      'success': response.statusCode == 200,
-      'message': data['message']
-    };
+    return {'success': response.statusCode == 200, 'message': data['message']};
   }
 
-  //  Reset Password 
+  // Reset Password
   static Future<Map<String, dynamic>> resetPassword(
       String email, String code, String newPassword) async {
     final response = await http.post(
@@ -98,41 +90,78 @@ class ApiService {
     );
 
     final data = jsonDecode(response.body);
-    return {
-      'success': response.statusCode == 200,
-      'message': data['message']
-    };
+    return {'success': response.statusCode == 200, 'message': data['message']};
   }
 
-  //Authenticated Requests
-  static Future<Map<String, dynamic>> authenticatedGet(
-      String endpoint) async {
+  // Authenticated Requests - GET
+  static Future<Map<String, dynamic>> authenticatedGet(String endpoint) async {
     final token = await getToken();
-    final response = await http.get(
-      Uri.parse('$baseUrl$endpoint'),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
-    );
 
-    final data = jsonDecode(response.body);
-    return {'success': response.statusCode == 200, 'data': data};
+    if (token == null) {
+      return {'success': false, 'data': 'No token found'};
+    }
+
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl$endpoint'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      final data = jsonDecode(response.body);
+
+      if (response.statusCode == 200) {
+        return {'success': true, 'data': data};
+      } else if (response.statusCode == 401) {
+        await clearSession();
+        return {
+          'success': false,
+          'data': 'Session expired. Please login again.'
+        };
+      } else {
+        return {'success': false, 'data': data};
+      }
+    } catch (e) {
+      return {'success': false, 'data': e.toString()};
+    }
   }
 
+  // Authenticated Requests - POST
   static Future<Map<String, dynamic>> authenticatedPost(
       String endpoint, Map<String, dynamic> body) async {
     final token = await getToken();
-    final response = await http.post(
-      Uri.parse('$baseUrl$endpoint'),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
-      body: jsonEncode(body),
-    );
 
-    final data = jsonDecode(response.body);
-    return {'success': response.statusCode == 200, 'data': data};
+    if (token == null) {
+      return {'success': false, 'data': 'No token found'};
+    }
+
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl$endpoint'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode(body),
+      );
+
+      final data = jsonDecode(response.body);
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return {'success': true, 'data': data};
+      } else if (response.statusCode == 401) {
+        await clearSession();
+        return {
+          'success': false,
+          'data': 'Session expired. Please login again.'
+        };
+      } else {
+        return {'success': false, 'data': data};
+      }
+    } catch (e) {
+      return {'success': false, 'data': e.toString()};
+    }
   }
 }
