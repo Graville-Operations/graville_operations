@@ -20,7 +20,7 @@ class MaterialService {
 
   static Future<List<InventoryModel>> getMaterials() async {
     final data =  await _http.get('$_path/materials');
-    debugPrint('getMaterial raw: ${(data as List).first}');
+    //debugPrint('getMaterial raw: ${(data as List).first}');
     return (data as List).map((json) => InventoryModel.fromJson(json)).toList();
 
   }

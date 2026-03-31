@@ -19,6 +19,7 @@ class _InventoryEntry {
     quantityController.text = '';
     descriptionController.text = item.description;
   }
+
   bool get isValid =>
       selectedInventory != null && quantityController.text.isNotEmpty;
 
@@ -31,7 +32,12 @@ class _InventoryEntry {
 }
 
 class UpdateInventoryScreen extends StatefulWidget {
-  const UpdateInventoryScreen({super.key, InventoryModel? preSelectedItem});
+  final InventoryModel? preSelectedItem;
+
+  const UpdateInventoryScreen({
+    super.key,
+    this.preSelectedItem,
+  });
 
   @override
   UpdateInventoryScreenState createState() => UpdateInventoryScreenState();
@@ -43,6 +49,12 @@ class UpdateInventoryScreenState extends State<UpdateInventoryScreen> {
     'Kimnojun',
     'DCC Kibra',
     'Huruma',
+    'Ngei',
+    'Timbwani',
+    'Wanga',
+    'Mabatini',
+    'Iremele',
+    'Shinyalu'
   ];
   String? selectedSite;
 
@@ -51,13 +63,16 @@ class UpdateInventoryScreenState extends State<UpdateInventoryScreen> {
   bool _isSubmitting = false;
   String? _loadError;
 
-  // List of entries  starts with one
   final List<_InventoryEntry> _entries = [_InventoryEntry()];
+  bool get _isPreSelected => widget.preSelectedItem != null;
 
   @override
   void initState() {
     super.initState();
     _loadInventoryItems();
+    if (widget.preSelectedItem != null) {
+      _entries.first.fillFrom(widget.preSelectedItem!);
+    }
   }
 
   @override
@@ -78,6 +93,12 @@ class UpdateInventoryScreenState extends State<UpdateInventoryScreen> {
       setState(() {
         _inventoryItems = items;
         _isLoadingItems = false;
+        if (widget.preSelectedItem != null) {
+          final match = items.where((i) => i.id == widget.preSelectedItem!.id);
+          if (match.isNotEmpty) {
+            _entries.first.fillFrom(match.first);
+          }
+        }
       });
     } on MaterialServiceException catch (e) {
       setState(() {
@@ -104,12 +125,12 @@ class UpdateInventoryScreenState extends State<UpdateInventoryScreen> {
   }
 
   bool get _isFormValid =>
-      selectedSite != null && _entries.every((e) => e.isValid);
+      (_isPreSelected || selectedSite != null) &&
+      _entries.every((e) => e.isValid);
 
   Future<void> _submit() async {
     if (!_isFormValid) return;
 
-    // Validate quantities
     for (final entry in _entries) {
       final enteredQty =
           int.tryParse(entry.quantityController.text.trim()) ?? 0;
@@ -120,7 +141,8 @@ class UpdateInventoryScreenState extends State<UpdateInventoryScreen> {
       }
       if (enteredQty > entry.selectedInventory!.quantity) {
         _showError(
-            'Cannot subtract $enteredQty from ${entry.selectedInventory!.name}. Current stock is ${entry.selectedInventory!.quantity}.');
+            'Cannot subtract $enteredQty from ${entry.selectedInventory!.name}. '
+            'Current stock is ${entry.selectedInventory!.quantity} ${entry.selectedInventory!.unit}.');
         return;
       }
     }
@@ -128,7 +150,6 @@ class UpdateInventoryScreenState extends State<UpdateInventoryScreen> {
     setState(() => _isSubmitting = true);
 
     try {
-      // Submit all entries
       for (final entry in _entries) {
         final updated = InventoryModel(
           name: entry.selectedInventory!.name,
@@ -150,8 +171,7 @@ class UpdateInventoryScreenState extends State<UpdateInventoryScreen> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-              '${_entries.length} item(s) updated successfully!'),
+          content: Text('${_entries.length} item(s) updated successfully!'),
           backgroundColor: Colors.green.shade600,
           behavior: SnackBarBehavior.floating,
         ),
@@ -162,12 +182,11 @@ class UpdateInventoryScreenState extends State<UpdateInventoryScreen> {
       _showError(e.message);
     } catch (e) {
       debugPrint('Submit error: $e');
-      if(e is DioException){
+      if (e is DioException) {
         debugPrint('Backend says: ${e.response?.data}');
       }
       if (!mounted) return;
       _showError('An unexpected error occurred. Please try again.');
-      _showError(e.toString());
     } finally {
       if (mounted) setState(() => _isSubmitting = false);
     }
@@ -186,18 +205,28 @@ class UpdateInventoryScreenState extends State<UpdateInventoryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey.shade200,
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.white,
         elevation: 0,
+        backgroundColor: Colors.white,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
-          'Update Inventory',
-          style:
-              TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+        title: Row(
+          children: [
+            const Icon(Icons.remove_circle_outline, color: Colors.red),
+            const SizedBox(width: 8),
+            Text(
+              _isPreSelected
+                  ? 'Subtract — ${widget.preSelectedItem!.name}'
+                  : 'Subtract Stock',
+              style: const TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
         ),
         iconTheme: const IconThemeData(color: Colors.black),
       ),
@@ -220,31 +249,42 @@ class UpdateInventoryScreenState extends State<UpdateInventoryScreen> {
                   ),
                 )
               : SingleChildScrollView(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // ── Construction Site (once at top) ──
-                      const Text('Construction Site *',
-                          style: TextStyle(fontWeight: FontWeight.bold)),
-                      const SizedBox(height: 6),
-                      CustomDropdown<String>(
-                        value: selectedSite,
-                        items: allSites,
-                        displayMapper: (site) => site,
-                        onChanged: (val) =>
-                            setState(() => selectedSite = val),
-                        hint: 'Select site',
-                        isExpanded: true,
-                        isDense: true,
-                        border: InputBorder.none,
-                        fillColor: Colors.white,
-                        borderRadius: BorderRadius.circular(14),
-                      ),
+                      const SizedBox(height: 16),
+                      if (!_isPreSelected) ...[
+                        const Text(
+                          'Construction Site',
+                          style: TextStyle(color: Colors.black, fontSize: 12),
+                        ),
+                        const SizedBox(height: 6),
+                        Container(
+                          padding:
+                              const EdgeInsets.symmetric(horizontal: 12),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF5F7F9),
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: Colors.grey.shade200),
+                          ),
+                          child: CustomDropdown<String>(
+                            value: selectedSite,
+                            items: allSites,
+                            displayMapper: (site) => site,
+                            onChanged: (val) =>
+                                setState(() => selectedSite = val),
+                            hint: 'Select site',
+                            isExpanded: true,
+                            isDense: true,
+                            border: InputBorder.none,
+                            fillColor: Colors.transparent,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                      ],
 
-                      const SizedBox(height: 20),
-
-                      // ── Dynamic entries ──
                       ..._entries.asMap().entries.map((mapEntry) {
                         final index = mapEntry.key;
                         final entry = mapEntry.value;
@@ -252,28 +292,26 @@ class UpdateInventoryScreenState extends State<UpdateInventoryScreen> {
                       }),
 
                       const SizedBox(height: 12),
-
-                      // ── Add Another Item button ──
-                      OutlinedButton.icon(
-                        onPressed: _addEntry,
-                        icon: const Icon(Icons.add, color: Colors.blue),
-                        label: const Text(
-                          ' Add Another Item',
-                          style: TextStyle(color: Colors.blue),
-                        ),
-                        style: OutlinedButton.styleFrom(
-                          minimumSize: const Size(double.infinity, 50),
-                          side: const BorderSide(color: Colors.blue),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14),
+                      if (!_isPreSelected)
+                        OutlinedButton.icon(
+                          onPressed: _addEntry,
+                          icon: const Icon(Icons.add, color: Colors.blue),
+                          label: const Text(
+                            'Add Another Item',
+                            style: TextStyle(color: Colors.blue),
+                          ),
+                          style: OutlinedButton.styleFrom(
+                            minimumSize: const Size(double.infinity, 50),
+                            side: const BorderSide(color: Colors.blue),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
+                            ),
                           ),
                         ),
-                      ),
 
                       const SizedBox(height: 24),
-
-                      // ── Submit ──
-                      Center(
+                      SizedBox(
+                        width: double.infinity,
                         child: CustomButton(
                           label: _entries.length > 1
                               ? 'Subtract ${_entries.length} Items'
@@ -316,138 +354,234 @@ class UpdateInventoryScreenState extends State<UpdateInventoryScreen> {
   Widget _buildEntryCard(int index, _InventoryEntry entry) {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.grey.shade200),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.shade100),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.03),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Item ${index + 1}',
-                style: const TextStyle(
-                    fontWeight: FontWeight.bold, fontSize: 15),
-              ),
-              if (_entries.length > 1)
-                IconButton(
-                  icon: const Icon(Icons.close, color: Colors.red),
-                  onPressed: () => _removeEntry(index),
-                  tooltip: 'Remove item',
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
-                ),
-            ],
-          ),
-
-          const SizedBox(height: 10),
-
-          const Text('Inventory Item *',
-              style: TextStyle(fontWeight: FontWeight.bold)),
-          const SizedBox(height: 6),
-          CustomDropdown<InventoryModel>(
-            value: entry.selectedInventory,
-            items: _inventoryItems,
-            displayMapper: (item) => item.name,
-            onChanged: (item) {
-              if (item != null) {
-                setState(() => entry.fillFrom(item));
-              }
-            },
-            hint: 'Select inventory item',
-            isExpanded: true,
-            isDense: true,
-            border: InputBorder.none,
-            fillColor: Colors.grey.shade100,
-            borderRadius: BorderRadius.circular(14),
-          ),
-
-          if (entry.selectedInventory != null) ...[
-            const SizedBox(height: 8),
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-              decoration: BoxDecoration(
-                color: Colors.blue.shade50,
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: Colors.blue.shade100),
-              ),
-              child: Text(
-                'Current stock: ${entry.selectedInventory!.quantity} ${entry.selectedInventory!.unit}',
-                style: TextStyle(
-                  color: Colors.blue.shade700,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 13,
-                ),
-              ),
+          Container(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF5F7F9),
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(12)),
+              border: Border(
+                  bottom: BorderSide(color: Colors.grey.shade200)),
             ),
-          ],
-
-          const SizedBox(height: 14),
-          const Text('Unit type',
-              style: TextStyle(fontWeight: FontWeight.bold)),
-          const SizedBox(height: 6),
-          TextField(
-              controller: entry.unitController,
-              readOnly: true,
-              decoration: _inputDecoration()),
-
-          const SizedBox(height: 14),
-
-          // Category
-          const Text('Category',
-              style: TextStyle(fontWeight: FontWeight.bold)),
-          const SizedBox(height: 6),
-          TextField(
-              controller: entry.categoryController,
-              readOnly: true,
-              decoration: _inputDecoration()),
-
-          const SizedBox(height: 14),
-
-          // Quantity
-          const Text('Quantity to Subtract *',
-              style: TextStyle(fontWeight: FontWeight.bold)),
-          const SizedBox(height: 6),
-          TextField(
-            controller: entry.quantityController,
-            keyboardType: TextInputType.number,
-            onChanged: (_) => setState(() {}),
-            decoration:
-                _inputDecoration(hintText: 'Enter quantity to subtract'),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  _isPreSelected
+                      ? entry.selectedInventory?.name ?? 'Item'
+                      : 'Item ${index + 1}',
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                      color: Color(0xFF34495E)),
+                ),
+                if (_entries.length > 1 && !_isPreSelected)
+                  GestureDetector(
+                    onTap: () => _removeEntry(index),
+                    child: const Icon(Icons.close,
+                        color: Colors.red, size: 20),
+                  ),
+              ],
+            ),
           ),
 
-          const SizedBox(height: 14),
+          Padding(
+            padding: const EdgeInsets.all(14),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (!_isPreSelected) ...[
+                  const Text(
+                    'Inventory Item',
+                    style: TextStyle(color: Colors.black, fontSize: 12),
+                  ),
+                  const SizedBox(height: 6),
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF5F7F9),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: Colors.grey.shade200),
+                    ),
+                    child: CustomDropdown<InventoryModel>(
+                      value: entry.selectedInventory,
+                      items: _inventoryItems,
+                      displayMapper: (item) => item.name,
+                      onChanged: (item) {
+                        if (item != null) {
+                          setState(() => entry.fillFrom(item));
+                        }
+                      },
+                      hint: 'Select inventory item',
+                      isExpanded: true,
+                      isDense: true,
+                      border: InputBorder.none,
+                      fillColor: Colors.transparent,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                ],
 
-          // Description
-          const Text('Description (Optional)',
-              style: TextStyle(fontWeight: FontWeight.bold)),
-          const SizedBox(height: 6),
-          TextField(
-            controller: entry.descriptionController,
-            maxLines: 2,
-            decoration: _inputDecoration(
-                hintText: 'e.g., Used on Block A foundation'),
+                if (entry.selectedInventory != null) ...[
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 14, vertical: 10),
+                    decoration: BoxDecoration(
+                      color: Colors.blue.shade50,
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: Colors.blue.shade100),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(Icons.inventory_2_outlined,
+                            color: Colors.blue.shade600, size: 16),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Current stock: ${entry.selectedInventory!.quantity} ${entry.selectedInventory!.unit}',
+                          style: TextStyle(
+                            color: Colors.blue.shade700,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                ],
+
+                const Text(
+                  'Unit type',
+                  style: TextStyle(color: Colors.black, fontSize: 12),
+                ),
+                const SizedBox(height: 6),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 14, vertical: 14),
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF5F7F9),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: Colors.grey.shade200),
+                  ),
+                  child: Text(
+                    entry.unitController.text.isNotEmpty
+                        ? entry.unitController.text
+                        : '—',
+                    style: const TextStyle(fontSize: 15),
+                  ),
+                ),
+
+                const SizedBox(height: 14),
+                const Text(
+                  'Category',
+                  style: TextStyle(color: Colors.black, fontSize: 12),
+                ),
+                const SizedBox(height: 6),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 14, vertical: 14),
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF5F7F9),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: Colors.grey.shade200),
+                  ),
+                  child: Text(
+                    entry.categoryController.text.isNotEmpty
+                        ? entry.categoryController.text
+                        : '—',
+                    style: const TextStyle(fontSize: 15),
+                  ),
+                ),
+
+                const SizedBox(height: 14),
+
+                const Text(
+                  'Quantity to Subtract *',
+                  style: TextStyle(color: Colors.black, fontSize: 12),
+                ),
+                const SizedBox(height: 6),
+                Container(
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF5F7F9),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: Colors.grey.shade200),
+                  ),
+                  child: TextField(
+                    controller: entry.quantityController,
+                    keyboardType: TextInputType.number,
+                    onChanged: (_) => setState(() {}),
+                    decoration: InputDecoration(
+                      hintText: 'Enter quantity used today',
+                      hintStyle: const TextStyle(
+                          fontSize: 13, color: Colors.grey),
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 14, vertical: 14),
+                      filled: true,
+                      fillColor: Colors.transparent,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 14),
+
+                const Text(
+                  'Description (Optional)',
+                  style: TextStyle(color: Colors.black, fontSize: 12),
+                ),
+                const SizedBox(height: 6),
+                Container(
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF5F7F9),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: Colors.grey.shade200),
+                  ),
+                  child: TextField(
+                    controller: entry.descriptionController,
+                    maxLines: 2,
+                    decoration: InputDecoration(
+                      hintText: 'e.g., Used on Block A foundation',
+                      hintStyle: const TextStyle(
+                          fontSize: 13, color: Colors.grey),
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 14, vertical: 14),
+                      filled: true,
+                      fillColor: Colors.transparent,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
-      ),
-    );
-  }
-
-  InputDecoration _inputDecoration({String? hintText}) {
-    return InputDecoration(
-      hintText: hintText,
-      filled: true,
-      fillColor: Colors.grey.shade100,
-      contentPadding:
-          const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(14),
-        borderSide: BorderSide.none,
       ),
     );
   }
