@@ -14,13 +14,10 @@ class AddMaterialScreen extends StatefulWidget {
 class AddMaterialScreenState extends State<AddMaterialScreen> {
  
   final List<String> allCategories = [
-    'Electrical',
-    'Plumbing',
-    'Masonry',
-    'Carpentry',
+    'Structure and Foundation', 'Wall Assembly and Openings', 'Roof Finish and Support Layers', 'Interior Build-Out and Finishes', 'Service Rough-In Materials(e.g pipe,wiring,vents)', 'Exterior Works and Drainage(e.g. gutters, downspouts)', 'Tools and Equipment', 'Safety and Protective Gear', 'Other'
   ];
 
-  final List<String> allUnits = ['kg', 'pcs', 'liters', 'meters', 'bags', 'tons'];
+  final List<String> allUnits = ['pieces', 'meters', 'Bags', 'Tons' ,'m²', 'm³', 'ft²', 'unit count', 'rolls', 'sheets', 'yd³', 'gallons', 'pounds', 'kilograms', 'liters', 'meters', 'feet', 'inches', 'boxes', 'bundles', 'pallets'];
 
   String? selectedCategory;
   String? selectedUnit;
@@ -46,10 +43,13 @@ class AddMaterialScreenState extends State<AddMaterialScreen> {
 
     setState(() => _isLoading = true);
 
-    final material = MaterialModel(
+    final material = InventoryModel(
       name: nameController.text.trim(),
       category: selectedCategory!,
       unit: selectedUnit!,
+      quantity: 0,
+      unitPrice: 0.0,
+      description: '',
     );
 
     try {
@@ -109,7 +109,6 @@ class AddMaterialScreenState extends State<AddMaterialScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Material name — free text input
             const Text(
               'Material Name *',
               style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
@@ -122,7 +121,6 @@ class AddMaterialScreenState extends State<AddMaterialScreen> {
             ),
 
             const SizedBox(height: 20),
-
             // Category dropdown
             const Text(
               'Category *',
@@ -143,7 +141,6 @@ class AddMaterialScreenState extends State<AddMaterialScreen> {
             ),
 
             const SizedBox(height: 20),
-
             // Unit dropdown
             const Text(
               'Unit *',

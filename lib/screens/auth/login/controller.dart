@@ -12,8 +12,9 @@ import 'package:graville_operations/core/remote/dto/requests/login.dart';
 import 'package:graville_operations/core/routes/routes.dart';
 import 'package:graville_operations/screens/auth/login/state.dart';
 
-class LoginController extends GetxController{
+class LoginController extends GetxController {
   var state = LoginState();
+
   void goToSignUp() {
     Get.toNamed(AppRoutes.signup);
   }
@@ -29,21 +30,32 @@ class LoginController extends GetxController{
   Future<String> login() async {
     String res = "Unexpected Error Occurred";
     EasyLoading.show(status: "Logging you in....");
+
     try {
-      LoginRequest request = LoginRequest(username: state.email.text, password: state.psw.text);
-      var result = await AuthApi.login(request); // hitting api_service
+      LoginRequest request = LoginRequest(
+        username: state.email.text,
+        password: state.psw.text,
+      );
+
+      var result = await AuthApi.login(request);
+
       EasyLoading.show(status: 'Updating profile info .....');
+
       await UserStore.to.setToken(result.accessToken);
+
       var me = await AuthApi.me();
       await UserStore.to.saveProfile(me.toUserData());
-      await getPersonalMenus();
       EasyLoading.showSuccess('Logged in Successfully');
-      debugPrint('...to home screen');
+
       Get.offAllNamed(AppRoutes.application);
+
       return "Success";
     } catch (e) {
       res = "...error in login ${e.toString()}";
       debugPrint(res);
+
+      EasyLoading.showError("Login failed"); // ✅ better UX
+
       return res;
     }
   }
