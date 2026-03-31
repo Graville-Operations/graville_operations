@@ -11,25 +11,6 @@ import 'controller.dart';
 
 class LoginScreen extends GetView<LoginController> {
   const LoginScreen({super.key});
-//   Widget socialIcon(IconData icon, Color color) {
-//   return InkWell(
-//     borderRadius: BorderRadius.circular(30),
-//     onTap: () {},
-//     child: CircleAvatar(
-//       radius: 22,
-//       backgroundColor: Colors.white,
-//       child: FaIcon(
-//         icon,
-//         color: color,
-//         size: 20,
-//       ),
-//     ),
-//   );
-// }
-//   String? passwordErrorMessage;
-//   String? emailErrorMessage;
-//
-//   get body => null;
 
   @override
   Widget build(BuildContext context) {
@@ -110,15 +91,17 @@ class LoginScreen extends GetView<LoginController> {
                       return null;
                   },
                 ),
-                CustomTextInput(
+                Obx(() => CustomTextInput(
                   controller: controller.state.psw,
                   labelText: "Password",
                   hintText: "at least 8 characters",
                   prefixIcon: Icons.lock,
-                  suffixIcon: controller.state.obscurePassword.value ? Icons.visibility_off : Icons.visibility,
+                  suffixIcon: controller.state.obscurePassword.value
+                      ? Icons.visibility_off
+                      : Icons.visibility,
                   isObscure: controller.state.obscurePassword.value,
                   isPassword: controller.state.obscurePassword.value,
-                  onSuffixIconPressed: ()=>controller.togglePasswordVisibility(),
+                  onSuffixIconPressed: () => controller.togglePasswordVisibility(),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter your password';
@@ -128,7 +111,7 @@ class LoginScreen extends GetView<LoginController> {
                     }
                     return null;
                   },
-                ),
+                )),
                 Align(
                   alignment: Alignment.centerRight,
                   child: TextButton(

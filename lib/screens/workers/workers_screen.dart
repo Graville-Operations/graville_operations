@@ -1,7 +1,7 @@
 
 import 'package:flutter/material.dart';
+import 'package:graville_operations/application/custom_navigator.dart';
 import 'package:graville_operations/models/worker_model.dart';
-import 'package:graville_operations/navigation/custom_navigator.dart';
 import 'package:graville_operations/screens/commons/widgets/custom_button.dart';
 import 'package:graville_operations/screens/workers/add_worker_screen.dart';
 import 'package:graville_operations/screens/workers/worker_profile_screen.dart';

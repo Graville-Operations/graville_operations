@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:graville_operations/core/local/entities/user_data.dart';
 import 'package:graville_operations/core/local/store/storage_service.dart';
@@ -35,7 +36,7 @@ class UserStore extends GetxController {
       _isLogin.value = true;
       _profile(UserData.fromJson(jsonDecode(profileOffline)));
     }
-    print("... userstore is$_isLogin");
+    debugPrint("... UserStore is login $_isLogin");
   }
 
   // saving token

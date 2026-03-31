@@ -2,8 +2,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
+import 'package:graville_operations/core/local/store/menu_store.dart';
+import 'package:graville_operations/core/local/store/storage_service.dart';
 import 'package:graville_operations/core/local/store/user_store.dart';
+import 'package:graville_operations/core/local/store/values.dart';
 import 'package:graville_operations/core/remote/api/auth_api.dart';
+import 'package:graville_operations/core/remote/api/menus.dart';
 import 'package:graville_operations/core/remote/dto/requests/login.dart';
 import 'package:graville_operations/core/routes/routes.dart';
 import 'package:graville_operations/screens/auth/login/state.dart';
@@ -32,6 +36,7 @@ class LoginController extends GetxController{
       await UserStore.to.setToken(result.accessToken);
       var me = await AuthApi.me();
       await UserStore.to.saveProfile(me.toUserData());
+      await getPersonalMenus();
       EasyLoading.showSuccess('Logged in Successfully');
       debugPrint('...to home screen');
       Get.offAllNamed(AppRoutes.application);
@@ -40,6 +45,24 @@ class LoginController extends GetxController{
       res = "...error in login ${e.toString()}";
       debugPrint(res);
       return res;
+    }
+  }
+  Future<void> getPersonalMenus()async{
+    try {
+      final currentToken = UserStore.to.token;
+      // TODO() changing this to MenuStore.to.menuToken
+      final menuToken = StorageService.to.getString(menuTokenKey);
+      final cached = MenuStore.getMenus();
+
+      if (cached.isNotEmpty && currentToken == menuToken) {
+        debugPrint("...... using cached menus");
+        return;
+      }
+      var menus = await MenuApi.getMyMenu();
+      await MenuStore.saveMenus(menus, currentToken);
+      debugPrint("...... menus fetched and saved ${menus.length}");
+    } catch (e) {
+      debugPrint("...... error getting menus ${e.toString()}");
     }
   }
 }

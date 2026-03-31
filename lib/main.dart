@@ -3,6 +3,7 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:graville_operations/core/local/store/storage_service.dart';
 import 'package:graville_operations/core/local/store/user_store.dart';
+import 'package:graville_operations/global.dart';
 
 import 'core/routes/routes.dart';
 import 'core/style/theme.dart';
@@ -10,11 +11,7 @@ import 'core/style/theme.dart';
 
 
 void main() async{
-  WidgetsFlutterBinding.ensureInitialized();
-  await Get.putAsync<StorageService>(() async {
-    return await StorageService().init();
-  });
-  Get.put(UserStore());
+  Global.init();
   runApp(const MyApp());
 }
 
@@ -34,7 +31,6 @@ class _MyAppState extends State<MyApp> {
         initialRoute: AppRoutes.initial,
         getPages: AppPages.routes,
         builder: EasyLoading.init(),
-
     );
   }
 }

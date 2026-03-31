@@ -67,10 +67,12 @@ class CustomTextInput extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(color: Colors.black),
             ),
-            suffixIcon: IconButton(
+            suffixIcon: suffixIcon != null
+                ? IconButton(
               icon: Icon(suffixIcon, color: Colors.grey),
               onPressed: onSuffixIconPressed,
-            ),
+            )
+                : null,
           ),
     );
   }
