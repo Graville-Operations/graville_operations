@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:graville_operations/navigation/custom_navigator.dart';
 import 'package:graville_operations/screens/commons/widgets/section_card.dart';
+import 'package:graville_operations/screens/commons/widgets/custom_button.dart';
+import 'package:graville_operations/screens/commons/widgets/custom_text_input.dart';
+import 'package:graville_operations/screens/commons/widgets/custom_dropdown.dart';
 
 enum ProjectStatus { onGoing, completed, delayed }
 
@@ -29,6 +32,30 @@ extension ProjectStatusExt on ProjectStatus {
         ProjectStatus.delayed: Icons.pause_circle_outline,
       }[this]!;
 }
+const _availableTags = [
+  'Civil Works',
+  'Electrical',
+  'Plumbing',
+  'Structural',
+  'Roofing',
+  'Interior Fit-Out',
+  'Roads',
+  'Water & Sanitation',
+  'Government',
+  'Private Sector',
+  'Residential',
+  'Commercial',
+];
+
+const _tenderCompanies = [
+  'Graville Enterprises Limited',
+  'Flex(K) Limited',
+  'Mejams Investment Limited',
+  'Stanmore Enterprise Limited',
+  'Alicewood Investment Limited',
+  'RealDiamond(K) Limited',
+  'Primeville Enterprises',
+];
 
 class CreateSitesScreen extends StatefulWidget {
   const CreateSitesScreen({super.key});
@@ -44,26 +71,20 @@ class _CreateSitesScreenState extends State<CreateSitesScreen> {
   final _latCtrl = TextEditingController();
   final _lngCtrl = TextEditingController();
   final _descCtrl = TextEditingController();
-  final _tagCtrl = TextEditingController();
+  final _inquiringEntityCtrl = TextEditingController();
 
   ProjectStatus _status = ProjectStatus.onGoing;
   DateTime? _completionDate;
-  final List<String> _tags = [];
+  final Set<String> _selectedTags = {};
+  String? _selectedCompany;
   bool _isSubmitting = false;
 
   @override
   void dispose() {
-    for (final c in [_nameCtrl, _locationCtrl, _latCtrl, _lngCtrl, _descCtrl, _tagCtrl]) {
+    for (final c in [_nameCtrl, _locationCtrl, _latCtrl, _lngCtrl, _descCtrl, _inquiringEntityCtrl]) {
       c.dispose();
     }
     super.dispose();
-  }
-
-  void _addTag() {
-    final tag = _tagCtrl.text.trim();
-    if (tag.isNotEmpty && !_tags.contains(tag)) {
-      setState(() { _tags.add(tag); _tagCtrl.clear(); });
-    }
   }
 
   Future<void> _pickDate() async {
@@ -86,18 +107,6 @@ class _CreateSitesScreenState extends State<CreateSitesScreen> {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _isSubmitting = true);
 
-    // TODO: wire to your API client
-    // final payload = {
-    //   'name': _nameCtrl.text.trim(),
-    //   'project_status': _status.apiValue,
-    //   'location': _locationCtrl.text.trim(),
-    //   'completion_date': _completionDate?.toIso8601String(),
-    //   'latitude': double.tryParse(_latCtrl.text),
-    //   'longitude': double.tryParse(_lngCtrl.text),
-    //   'description': _descCtrl.text.trim(),
-    //   'tags': _tags,
-    // };
-
     await Future.delayed(const Duration(seconds: 1));
     setState(() => _isSubmitting = false);
 
@@ -113,23 +122,6 @@ class _CreateSitesScreenState extends State<CreateSitesScreen> {
     }
   }
 
-  InputDecoration _inputDec(String hint, {Widget? prefixIcon}) => InputDecoration(
-        hintText: hint,
-        prefixIcon: prefixIcon,
-        hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
-        filled: true,
-        fillColor: Colors.grey.shade50,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10),
-            borderSide: BorderSide(color: Colors.grey.shade200)),
-        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10),
-            borderSide: BorderSide(color: Colors.grey.shade200)),
-        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10),
-            borderSide: const BorderSide(color: Colors.black, width: 1.5)),
-        errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10),
-            borderSide: const BorderSide(color: Color(0xffe53935))),
-      );
-
   Widget _label(IconData icon, String text) => Row(children: [
         Icon(icon, size: 16, color: Colors.black87),
         const SizedBox(width: 8),
@@ -140,33 +132,10 @@ class _CreateSitesScreenState extends State<CreateSitesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xfff5f5f7),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24),
-        child: SizedBox(
-          width: double.infinity,
-          height: 52,
-          child: FloatingActionButton.extended(
-            heroTag: 'submit_project',
-            onPressed: _isSubmitting ? null : _submit,
-            backgroundColor: Colors.black,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-            label: _isSubmitting
-                ? const SizedBox(width: 20, height: 20,
-                    child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                : const Row(mainAxisSize: MainAxisSize.min, children: [
-                    Icon(Icons.check_circle_outline, color: Colors.white, size: 20),
-                    SizedBox(width: 10),
-                    Text('Create Project',
-                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold,
-                            fontSize: 15, letterSpacing: 0.3)),
-                  ]),
-          ),
-        ),
-      ),
       body: Form(
         key: _formKey,
         child: CustomScrollView(slivers: [
+          // App Bar
           SliverAppBar(
             backgroundColor: Colors.white,
             elevation: 0,
@@ -182,26 +151,51 @@ class _CreateSitesScreenState extends State<CreateSitesScreen> {
           ),
 
           SliverPadding(
-            padding: const EdgeInsets.fromLTRB(16, 20, 16, 120),
+            padding: const EdgeInsets.fromLTRB(16, 20, 16, 32),
             sliver: SliverList(
               delegate: SliverChildListDelegate([
-
-                // Project Name
                 SectionCard(
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     _label(Icons.folder_open, 'Project Name'),
                     const SizedBox(height: 12),
-                    TextFormField(
+                    CustomTextInput(
                       controller: _nameCtrl,
-                      decoration: _inputDec('e.g. Sunrise Apartments Phase 2'),
+                      hintText: 'e.g. Sunrise Apartments Phase 2',
+                      prefixIcon: Icons.folder_open,
                       validator: (v) => (v == null || v.trim().isEmpty) ? 'Name is required' : null,
                     ),
                   ]),
                 ),
 
                 const SizedBox(height: 14),
+                SectionCard(
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    _label(Icons.business_center_outlined, 'Tender Details'),
+                    const SizedBox(height: 12),
 
-                // Status
+                    // Tender company dropdown
+                    CustomDropdown<String>(
+                      value: _selectedCompany,
+                      items: _tenderCompanies,
+                      displayMapper: (c) => c,
+                      hint: 'Tenderer Name',
+                      prefixIcon: const Icon(Icons.business, color: Colors.grey),
+                      onChanged: (v) => setState(() => _selectedCompany = v),
+                    ),
+
+                    const SizedBox(height: 10),
+
+                    // Inquiring entity
+                    CustomTextInput(
+                      controller: _inquiringEntityCtrl,
+                      hintText: 'Inquiring entity (org. that issued the tender)',
+                      prefixIcon: Icons.account_balance_outlined,
+                      validator: (v) => (v == null || v.trim().isEmpty) ? 'Required' : null,
+                    ),
+                  ]),
+                ),
+
+                const SizedBox(height: 14),
                 SectionCard(
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     _label(Icons.flag_outlined, 'Project Status'),
@@ -241,39 +235,36 @@ class _CreateSitesScreenState extends State<CreateSitesScreen> {
                 ),
 
                 const SizedBox(height: 14),
-
-                // Location
                 SectionCard(
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     _label(Icons.location_on_outlined, 'Location'),
                     const SizedBox(height: 12),
-                    TextFormField(
+                    CustomTextInput(
                       controller: _locationCtrl,
-                      decoration: _inputDec('e.g. Nairobi, Kenya'),
+                      hintText: 'e.g. Nairobi, Kenya',
+                      prefixIcon: Icons.location_on_outlined,
                       validator: (v) => (v == null || v.trim().isEmpty) ? 'Location is required' : null,
                     ),
                     const SizedBox(height: 10),
                     Row(children: [
-                      Expanded(child: TextFormField(
+                      Expanded(child: CustomTextInput(
                         controller: _latCtrl,
+                        hintText: 'Latitude',
+                        prefixIcon: Icons.swap_vert,
                         keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true),
-                        decoration: _inputDec('Latitude',
-                            prefixIcon: Icon(Icons.swap_vert, size: 14, color: Colors.grey.shade500)),
                       )),
                       const SizedBox(width: 10),
-                      Expanded(child: TextFormField(
+                      Expanded(child: CustomTextInput(
                         controller: _lngCtrl,
+                        hintText: 'Longitude',
+                        prefixIcon: Icons.swap_horiz,
                         keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true),
-                        decoration: _inputDec('Longitude',
-                            prefixIcon: Icon(Icons.swap_horiz, size: 14, color: Colors.grey.shade500)),
                       )),
                     ]),
                   ]),
                 ),
 
                 const SizedBox(height: 14),
-
-                // Completion Date
                 SectionCard(
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     _label(Icons.calendar_today_outlined, 'Completion Date'),
@@ -309,64 +300,70 @@ class _CreateSitesScreenState extends State<CreateSitesScreen> {
                 ),
 
                 const SizedBox(height: 14),
-
-                // Description
                 SectionCard(
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     _label(Icons.notes_outlined, 'Description'),
                     const SizedBox(height: 12),
-                    TextFormField(
+                    CustomTextInput(
                       controller: _descCtrl,
+                      hintText: 'Brief project overview...',
+                      prefixIcon: Icons.notes_outlined,
                       maxLines: 4,
-                      decoration: _inputDec('Brief project overview...'),
                     ),
                   ]),
                 ),
 
                 const SizedBox(height: 14),
-
-                // Tags
                 SectionCard(
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     _label(Icons.label_outline, 'Tags'),
+                    const SizedBox(height: 4),
+                    Text('Select all that apply',
+                        style: TextStyle(fontSize: 12, color: Colors.grey.shade500)),
                     const SizedBox(height: 12),
-                    Row(children: [
-                      Expanded(child: TextFormField(
-                        controller: _tagCtrl,
-                        decoration: _inputDec('Add a tag...'),
-                        onFieldSubmitted: (_) => _addTag(),
-                      )),
-                      const SizedBox(width: 8),
-                      GestureDetector(
-                        onTap: _addTag,
-                        child: Container(
-                          width: 42, height: 42,
-                          decoration: const BoxDecoration(color: Colors.black, shape: BoxShape.circle),
-                          child: const Icon(Icons.add, color: Colors.white, size: 20),
-                        ),
-                      ),
-                    ]),
-                    if (_tags.isNotEmpty) ...[
-                      const SizedBox(height: 12),
-                      Wrap(
-                        spacing: 8, runSpacing: 6,
-                        children: _tags.map((t) => Chip(
-                          label: Text(t, style: const TextStyle(fontSize: 12, color: Colors.black87)),
-                          deleteIcon: const Icon(Icons.close, size: 14, color: Colors.black54),
-                          onDeleted: () => setState(() => _tags.remove(t)),
-                          backgroundColor: Colors.grey.shade100,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
-                            side: BorderSide(color: Colors.grey.shade200),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: _availableTags.map((tag) {
+                        final selected = _selectedTags.contains(tag);
+                        return GestureDetector(
+                          onTap: () => setState(() =>
+                              selected ? _selectedTags.remove(tag) : _selectedTags.add(tag)),
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 150),
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+                            decoration: BoxDecoration(
+                              color: selected ? Colors.black : Colors.grey.shade100,
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
+                                  color: selected ? Colors.black : Colors.grey.shade300),
+                            ),
+                            child: Text(tag,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
+                                  color: selected ? Colors.white : Colors.black87,
+                                )),
                           ),
-                          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                          padding: const EdgeInsets.symmetric(horizontal: 4),
-                        )).toList(),
-                      ),
-                    ],
+                        );
+                      }).toList(),
+                    ),
                   ]),
                 ),
 
+                const SizedBox(height: 24),
+                CustomButton(
+                  label: 'Create Project',
+                  onPressed: _submit,
+                  isLoading: _isSubmitting,
+                  backgroundColor: Colors.black,
+                  width: double.infinity,
+                  height: 52,
+                  borderRadius: 16,
+                  icon: const Icon(Icons.check_circle_outline, color: Colors.white, size: 20),
+                ),
+
+                const SizedBox(height: 32),
               ]),
             ),
           ),

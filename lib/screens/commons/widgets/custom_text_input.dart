@@ -34,44 +34,46 @@ class CustomTextInput extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    final bool isMultiline = maxLines != null && maxLines! > 1;
-    return TextFormField(
-      controller: controller,
-      obscureText: isPassword,
-      validator: validator,
-      readOnly: readOnly,
-      style: TextStyle(color: Colors.black54),
+  @override
+Widget build(BuildContext context) {
+  final bool isMultiline = maxLines != null && maxLines! > 1;
+  return TextFormField(
+    controller: controller,
+    obscureText: isPassword,
+    validator: validator,
+    readOnly: readOnly,
+    style: const TextStyle(color: Colors.black), // ← typed text is solid black
 
-      keyboardType: isMultiline ? TextInputType.multiline : keyboardType,
-      minLines: isMultiline ? 4 : 1,
-      maxLines: isMultiline ? null : 1,
-      decoration:
-          decoration ??
-          InputDecoration(
-            filled: true,
-            fillColor: Colors.grey[100],
-            prefixIcon: Icon(prefixIcon, color: Colors.grey),
-            labelText: labelText,
-            floatingLabelStyle: TextStyle(
-              color: Colors.black,
-              fontWeight: FontWeight.bold,
-            ),
-            hintText: hintText,
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-            errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: Colors.red),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: Colors.black),
-            ),
-            suffixIcon: IconButton(
-              icon: Icon(suffixIcon, color: Colors.grey),
-              onPressed: onSuffixIconPressed,
-            ),
+    keyboardType: isMultiline ? TextInputType.multiline : keyboardType,
+    minLines: isMultiline ? 4 : 1,
+    maxLines: isMultiline ? null : 1,
+    decoration:
+        decoration ??
+        InputDecoration(
+          filled: true,
+          fillColor: Colors.grey[100],
+          prefixIcon: Icon(prefixIcon, color: Colors.grey),
+          labelText: labelText,
+          floatingLabelStyle: const TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
           ),
-    );
-  }
+          hintText: hintText,
+          hintStyle: const TextStyle(color: Colors.grey), // ← hint is greyed out
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+          errorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(color: Colors.red),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(color: Colors.black),
+          ),
+          suffixIcon: IconButton(
+            icon: Icon(suffixIcon, color: Colors.grey),
+            onPressed: onSuffixIconPressed,
+          ),
+        ),
+  );
+}
 }
