@@ -89,12 +89,11 @@ class ApplicationScreen extends GetView<ApplicationController> {
       ))
           .toList();
 
-      if (bottomMenus.isEmpty) return const NoAccessScreen();
+      if (bottomMenus.isEmpty || screens.isEmpty) return const NoAccessScreen();
 
       final safeIndex = controller.state.currentIndex.value.clamp(0, screens.length - 1);
 
       return Scaffold(
-        // Show drawer icon only if there are drawer menus
         drawer: drawerMenus.isNotEmpty
             ? AppDrawer(drawerMenus: drawerMenus)
             : null,
