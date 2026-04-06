@@ -42,7 +42,7 @@ Widget build(BuildContext context) {
     obscureText: isPassword,
     validator: validator,
     readOnly: readOnly,
-    style: const TextStyle(color: Colors.black), // ← typed text is solid black
+    style: const TextStyle(color: Colors.black), 
 
     keyboardType: isMultiline ? TextInputType.multiline : keyboardType,
     minLines: isMultiline ? 4 : 1,
@@ -59,7 +59,7 @@ Widget build(BuildContext context) {
             fontWeight: FontWeight.bold,
           ),
           hintText: hintText,
-          hintStyle: const TextStyle(color: Colors.grey), // ← hint is greyed out
+          hintStyle: const TextStyle(color: Colors.grey), 
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
           errorBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
@@ -67,7 +67,7 @@ Widget build(BuildContext context) {
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: Colors.black),
+            borderSide: const BorderSide(color: Colors.grey),
           ),
           suffixIcon: IconButton(
             icon: Icon(suffixIcon, color: Colors.grey),

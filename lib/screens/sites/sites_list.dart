@@ -280,7 +280,6 @@ class _SiteCard extends StatelessWidget {
                 maxLines: 1, overflow: TextOverflow.ellipsis)),
           ]),
         ],
-
         if (site.tenderName != null) ...[
           const SizedBox(height: 4),
           Row(children: [
@@ -291,7 +290,6 @@ class _SiteCard extends StatelessWidget {
                 maxLines: 1, overflow: TextOverflow.ellipsis)),
           ]),
         ],
-
         if (site.tags.isNotEmpty) ...[
           const SizedBox(height: 8),
           Wrap(spacing: 6, runSpacing: 4,
