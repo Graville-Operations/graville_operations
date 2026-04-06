@@ -7,6 +7,7 @@ import 'package:graville_operations/screens/inventory/update_inventory.dart';
 import 'package:graville_operations/screens/material/receive_material.dart';
 import 'package:graville_operations/screens/material/transfer_material.dart';
 import 'package:graville_operations/screens/sites/create_sites.dart';
+import 'package:graville_operations/screens/sites/sites_list.dart';
 import 'package:graville_operations/screens/workers/add_worker_screen.dart';
 import 'package:graville_operations/screens/commons/assets/images.dart';
 import 'package:graville_operations/screens/commons/widgets/section_card.dart';
@@ -62,6 +63,16 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             const SizedBox(height: 12),
+            Tooltip(
+            message: "View sites",
+            child: miniFab(
+              Icons.map_outlined,
+              () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const SitesListScreen()),
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
             Tooltip(
               message: "Hired equipment",
               child: miniFab(

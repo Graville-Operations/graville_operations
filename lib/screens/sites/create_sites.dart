@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:graville_operations/navigation/custom_navigator.dart';
+import 'package:graville_operations/core/local/store/user_store.dart';
+//import 'package:graville_operations/navigation/custom_navigator.dart';
 import 'package:graville_operations/screens/commons/widgets/section_card.dart';
 import 'package:graville_operations/screens/commons/widgets/custom_button.dart';
 import 'package:graville_operations/screens/commons/widgets/custom_text_input.dart';
 import 'package:graville_operations/screens/commons/widgets/custom_dropdown.dart';
+import 'package:graville_operations/models/site/site_model.dart';
+import 'package:graville_operations/services/site_service.dart';
 
 enum ProjectStatus { onGoing, completed, delayed }
 
@@ -104,23 +107,51 @@ class _CreateSitesScreenState extends State<CreateSitesScreen> {
   }
 
   Future<void> _submit() async {
-    if (!_formKey.currentState!.validate()) return;
-    setState(() => _isSubmitting = true);
-
-    await Future.delayed(const Duration(seconds: 1));
-    setState(() => _isSubmitting = false);
-
+  if (!_formKey.currentState!.validate()) return;
+  setState(() => _isSubmitting = true);
+ 
+  try {
+    final site = SiteModel(
+      name             : _nameCtrl.text.trim(),
+      projectStatus    : _status.apiValue,
+      location         : _locationCtrl.text.trim(),
+      completionDate   : _completionDate?.toIso8601String(),
+      latitude         : double.tryParse(_latCtrl.text),
+      longitude        : double.tryParse(_lngCtrl.text),
+      description      : _descCtrl.text.trim(),
+      tags             : _selectedTags.toList(),
+      tenderName       : _selectedCompany,
+      inquiringEntity  : _inquiringEntityCtrl.text.trim(),
+      createdBy        : UserStore.to.profile.id,
+    );
+ 
+    await SiteService.createSite(site);
+ 
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        backgroundColor: Colors.black,
+        backgroundColor: Colors.green,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         content: Text('Project "${_nameCtrl.text.trim()}" created!',
             style: const TextStyle(color: Colors.white)),
       ));
-      Navigator.of(context).pop();
+      Navigator.of(context).pop(true); // true signals caller to refresh list
     }
+  } on SiteServiceException catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(e.toString()),
+      backgroundColor: Colors.red,
+    ));
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+      content: Text('Something went wrong. Please try again.'),
+      backgroundColor: Colors.red,
+    ));
+  } finally {
+    if (mounted) setState(() => _isSubmitting = false);
   }
+}
+ 
 
   Widget _label(IconData icon, String text) => Row(children: [
         Icon(icon, size: 16, color: Colors.black87),
@@ -356,7 +387,7 @@ class _CreateSitesScreenState extends State<CreateSitesScreen> {
                   label: 'Create Project',
                   onPressed: _submit,
                   isLoading: _isSubmitting,
-                  backgroundColor: Colors.black,
+                  backgroundColor: Colors.green,
                   width: double.infinity,
                   height: 52,
                   borderRadius: 16,
