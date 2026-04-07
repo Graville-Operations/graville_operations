@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:graville_operations/core/local/store/user_store.dart';
-import 'package:graville_operations/models/auth/user.dart';
 import 'package:graville_operations/models/personal_settings.dart';
-import 'package:graville_operations/screens/commons/widgets/custom_dropdown.dart';
-import 'package:graville_operations/screens/settings/edit_profile_screen.dart';
+//import 'package:graville_operations/screens/auth/login/login_screen.dart';
+import 'package:graville_operations/screens/auth/login/view.dart';
+// import 'package:graville_operations/screens/settings/settings_screen.dart';
 import 'package:graville_operations/screens/support/support_screen.dart';
+import 'package:graville_operations/services/api_service.dart';
 import 'package:graville_operations/services/profile_api_service.dart';
 
 class AccountScreen extends StatefulWidget {
@@ -24,6 +24,11 @@ class _AccountScreenState extends State<AccountScreen> {
 
   String _selectedLanguage = 'en';
   String _selectedTheme = 'system';
+  String firstName = '';
+  String lastName = '';
+  String email = '';
+  String role = '';
+  bool _isLoading = true;
 
   @override
   void initState() {
@@ -31,45 +36,59 @@ class _AccountScreenState extends State<AccountScreen> {
     _loadProfile();
   }
 
-  Future<void> _loadProfile() async {
-    try {
-      final userId = UserStore.to.userId;
-
-      final User user =
-          await _service.getProfile(userId); // ✅ FIXED (uncommented)
-
-      setState(() {
-        _user = user; // ✅ assign correctly
-        _selectedLanguage = _settings?.language ?? 'en';
-        _selectedTheme = _settings?.theme ?? 'system';
-        _loading = false;
-      });
-    } catch (e) {
-      setState(() {
-        _error = 'Failed to load profile';
-        _loading = false;
-      });
+  void _loadProfile() async {
+    final userId = await ApiService.getUserId();
+    if (userId != null) {
+      final result = await ApiService.getProfile(userId);
+      if (result['success']) {
+        setState(() {
+          firstName = result['data']['first_name'] ?? '';
+          lastName = result['data']['last_name'] ?? '';
+          email = result['data']['email'] ?? '';
+          _isLoading = false;
+        });
+      } else {
+        setState(() => _isLoading = false);
+      }
+    } else {
+      setState(() => _isLoading = false);
     }
+
+    final savedRole = await ApiService.getRole();
+    setState(() {
+      role = savedRole ?? '';
+    });
   }
 
-  Future<void> _saveSettings() async {
-    try {
-      final userId = UserStore.to.userId;
-      await _service.updatePersonalSettings(userId, {
-        'language': _selectedLanguage,
-        'theme': _selectedTheme,
-      });
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Settings saved')),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to save settings')),
-        );
-      }
+  void _logout() async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Logout'),
+        content: const Text('Are you sure you want to logout?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text(
+              'Logout',
+              style: TextStyle(color: Colors.red),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true) {
+      await ApiService.clearSession();
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (_) => LoginScreen()),
+        (route) => false,
+      );
     }
   }
 
@@ -87,302 +106,164 @@ class _AccountScreenState extends State<AccountScreen> {
         elevation: 0,
         backgroundColor: const Color(0xFFF5F5F7),
       ),
-      body: _loading
+      body: _isLoading
           ? const Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
+          : Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
                 children: [
-                  _ProfileCard(user: _user, error: _error),
-                  const SizedBox(height: 24),
-                  _SectionCard(
-                    title: 'Account',
-                    items: [
-                      _AccountItem(
-                        icon: Icons.edit,
-                        title: 'Edit Profile',
-                        onTap: _navigateToEditProfile,
-                      ),
-                      _AccountItem(icon: Icons.security, title: 'Security'),
-                      _AccountItem(
-                          icon: Icons.notifications_none,
-                          title: 'Notifications'),
-                      _AccountItem(icon: Icons.lock_outline, title: 'Privacy'),
-                    ],
+                  // Profile Card
+                  _ProfileCard(
+                    firstName: firstName,
+                    lastName: lastName,
+                    email: email,
+                    role: role,
+                    onTap: () async {
+                      final userId = await ApiService.getUserId();
+                      if (userId != null) {
+                        // Navigate to edit profile when ready
+                        debugPrint('Edit profile tapped for user $userId');
+                      }
+                    },
                   ),
                   const SizedBox(height: 16),
-                  _SectionCard(
-                    title: 'Preferences',
-                    items: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 8),
-                        child: CustomDropdown<String>(
-                          label: 'Language',
-                          items: const ['en', 'sw'],
-                          value: _selectedLanguage,
-                          displayMapper: (v) =>
-                              v == 'sw' ? 'Swahili' : 'English',
-                          prefixIcon: const Icon(Icons.language),
-                          onChanged: (v) {
-                            setState(() => _selectedLanguage = v ?? 'en');
-                            _saveSettings();
-                          },
+
+                  // Account Items
+                  Card(
+                    child: Column(
+                      children: List.generate(
+                        _accountItems.length,
+                        (index) => _AccountItemTile(
+                          item: _accountItems[index],
+                          showDivider: index != _accountItems.length - 1,
                         ),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 8),
-                        child: CustomDropdown<String>(
-                          label: 'Theme',
-                          items: const ['light', 'dark', 'system'],
-                          value: _selectedTheme,
-                          displayMapper: (v) => v,
-                          prefixIcon: const Icon(Icons.dark_mode_outlined),
-                          onChanged: (v) {
-                            setState(() => _selectedTheme = v ?? 'system');
-                            _saveSettings();
-                          },
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Logout Button
+                  Card(
+                    child: ListTile(
+                      leading: const Icon(Icons.logout, color: Colors.red),
+                      title: const Text(
+                        'Logout',
+                        style: TextStyle(
+                          color: Colors.red,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  _SectionCard(
-                    title: 'Support & About',
-                    items: [
-                      _AccountItem(
-                        icon: Icons.support_agent,
-                        title: 'Help & Support',
-                        onTap: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (_) => const SupportScreen())),
-                      ),
-                      _AccountItem(
-                          icon: Icons.description, title: 'Terms & Policies'),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  _SectionCard(
-                    title: 'Actions',
-                    items: [
-                      _AccountItem(
-                          icon: Icons.flag_outlined, title: 'Report a problem'),
-                      _AccountItem(
-                          icon: Icons.person_add_alt_1, title: 'Add account'),
-                      _AccountItem(
-                          icon: Icons.language, title: 'Visit our website'),
-                      _AccountItem(
-                        icon: Icons.logout,
-                        title: 'Log out',
-                        onTap: _showLogoutDialog,
-                      ),
-                    ],
+                      onTap: _logout,
+                    ),
                   ),
                 ],
               ),
             ),
     );
   }
-
-  void _navigateToEditProfile() async {
-    if (_user == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Unable to edit profile. User data not loaded yet.'),
-          backgroundColor: Colors.orange,
-        ),
-      );
-      return;
-    }
-
-    try {
-      final updated = await Navigator.push<User>(
-        context,
-        MaterialPageRoute(
-          builder: (_) => EditProfileScreen(user: _user!),
-        ),
-      );
-
-      if (updated != null && mounted) {
-        setState(() => _user = updated);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Profile updated successfully'),
-            backgroundColor: Colors.green,
-          ),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error opening edit profile: ${e.toString()}'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    }
-  }
-
-  void _showLogoutDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Logout'),
-        content: const Text('Are you sure you want to logout?'),
-        actions: [
-          TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel')),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              // UserStore.to.onLogout();
-            },
-            child: const Text('Logout', style: TextStyle(color: Colors.red)),
-          ),
-        ],
-      ),
-    );
-  }
 }
+
+final List<_AccountItem> _accountItems = [
+  _AccountItem(
+    icon: Icons.settings,
+    title: 'Settings',
+    destination: SettingsScreen(),
+  ),
+  _AccountItem(
+    icon: Icons.support_agent,
+    title: 'Contact Support',
+    destination: SupportScreen(),
+  ),
+  _AccountItem(icon: Icons.description, title: 'Terms & Policies'),
+  _AccountItem(icon: Icons.language, title: 'Visit Our Website'),
+];
 
 class _ProfileCard extends StatelessWidget {
-  final User? user;
-  final String? error;
+  final String firstName;
+  final String lastName;
+  final String email;
+  final String role;
+  final VoidCallback onTap;
 
-  const _ProfileCard({this.user, this.error});
+  const _ProfileCard({
+    required this.firstName,
+    required this.lastName,
+    required this.email,
+    required this.role,
+    required this.onTap,
+  });
+
+  Color get _roleColor {
+    switch (role) {
+      case 'field_engineer':
+        return Colors.blue;
+      case 'auditor':
+        return Colors.green;
+      default:
+        return Colors.grey;
+    }
+  }
+
+  String get _roleLabel {
+    return role.replaceAll('_', ' ').toUpperCase();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    if (error != null) {
-      return Card(
+    return Card(
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(16),
           child: Row(
             children: [
-              Icon(Icons.error_outline, color: Colors.orange[700]),
-              const SizedBox(width: 12),
-              Expanded(child: Text(error!, style: theme.textTheme.bodyMedium)),
-            ],
-          ),
-        ),
-      );
-    }
-
-    if (user == null) {
-      return const SizedBox(); // nothing if no data
-    }
-
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Row(
-          children: [
-            /// PROFILE IMAGE
-            CircleAvatar(
-              radius: 35,
-              backgroundColor: theme.colorScheme.surfaceContainerHighest,
-              backgroundImage: user!.profilePicture != null
-                  ? NetworkImage(user!.profilePicture!)
-                  : null,
-              child: user!.profilePicture == null
-                  ? Text(
-                      (user?.initials ?? '?'),
-                      style: TextStyle(
-                        fontSize: 26,
+              CircleAvatar(
+                radius: 32,
+                backgroundColor: theme.colorScheme.surfaceContainerHighest,
+                child: Icon(
+                  Icons.person,
+                  size: 32,
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '$firstName $lastName',
+                      style: theme.textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
-                        color: theme.colorScheme.onSurfaceVariant,
                       ),
-                    )
-                  : null,
-            ),
-
-            const SizedBox(width: 16),
-
-            /// USER DETAILS
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    user!.fullName,
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
                     ),
-                  ),
-                  const SizedBox(height: 6),
-
-                  /// EMAIL
-                  Row(
-                    children: [
-                      const Icon(Icons.email_outlined, size: 16),
-                      const SizedBox(width: 6),
-                      Expanded(
+                    const SizedBox(height: 4),
+                    Text(email, style: theme.textTheme.bodySmall),
+                    const SizedBox(height: 6),
+                    if (role.isNotEmpty)
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: _roleColor.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
                         child: Text(
-                          user!.email,
-                          style: theme.textTheme.bodyMedium,
-                          overflow: TextOverflow.ellipsis,
+                          _roleLabel,
+                          style: TextStyle(
+                            color: _roleColor,
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 4),
-
-                  /// PHONE
-                  //if (user!.phoneNo != null)
-                  Row(
-                    children: [
-                      const Icon(Icons.phone_outlined, size: 16),
-                      const SizedBox(width: 6),
-                      Text(
-                        user!.phoneNo!,
-                        style: theme.textTheme.bodySmall,
-                      ),
-                    ],
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _SectionCard extends StatelessWidget {
-  final String title;
-  final List<Widget> items;
-
-  const _SectionCard({required this.title, required this.items});
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(8),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Text(
-                title,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-              ),
-            ),
-            ...items,
-          ],
+              const Icon(Icons.edit, size: 18, color: Colors.grey),
+            ],
+          ),
         ),
       ),
     );
@@ -392,7 +273,7 @@ class _SectionCard extends StatelessWidget {
 class _AccountItem extends StatelessWidget {
   final IconData icon;
   final String title;
-  final VoidCallback? onTap;
+  final Widget? destination;
 
   const _AccountItem({
     required this.icon,
@@ -403,27 +284,40 @@ class _AccountItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        child: Row(
-          children: [
-            Icon(icon, size: 22, color: theme.colorScheme.onSurfaceVariant),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Text(
-                title,
-                style: theme.textTheme.bodyLarge?.copyWith(
-                  fontWeight: FontWeight.w500,
+
+    return Column(
+      children: [
+        InkWell(
+          onTap: () {
+            if (item.destination != null) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => item.destination!),
+              );
+            }
+          },
+          child: Padding(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            child: Row(
+              children: [
+                Icon(item.icon, size: 22),
+                const SizedBox(width: 16),
+                Text(
+                  item.title,
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
             ),
             const Icon(Icons.chevron_right, size: 20),
           ],
         ),
-      ),
+        if (showDivider)
+          const Divider(height: 1, indent: 16, endIndent: 16),
+        ]
+      ],
     );
   }
 }

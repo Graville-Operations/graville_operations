@@ -3,11 +3,12 @@ import 'dart:async';
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart' hide FormData;
 import 'package:graville_operations/core/local/store/user_store.dart';
 import 'package:graville_operations/core/utils/utils.dart';
-import 'package:flutter/foundation.dart';
+import 'package:graville_operations/core/utils/constants.dart';
 
 /*
   * http operation class
@@ -69,7 +70,7 @@ class HttpUtil {
         // Do something before request is sent
         if (Get.isRegistered<UserStore>() && UserStore.to.hasToken) {
           final token = UserStore.to.token;
-            options.headers['Authorization'] = 'Bearer $token';
+          options.headers['Authorization'] = 'Bearer $token';
         }
         return handler.next(options); //continue
         // If you want to complete the request and return some custom data, you can resolve a Response object `handler.resolve(response)`.
@@ -85,6 +86,7 @@ class HttpUtil {
         // In this way, the request will be aborted and an exception will be triggered, and the upper layer catchError will be called.
       },
       onError: (DioException e, handler) {
+        //debugPrint('Error response body: ${e.response?.data}');
         // Do something with response error
         // Loading.dismiss();
         ErrorEntity eInfo = createErrorEntity(e);
