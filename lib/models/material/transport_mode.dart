@@ -1,5 +1,4 @@
 
-
 class TransportMode {
   final String id;
   final String name;

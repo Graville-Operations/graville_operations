@@ -25,7 +25,19 @@ class WorkerService {
     return Worker.fromJson(data);
 
   }
-}
+
+
+    static Future<List<Worker>> fetchWorkersFiltered({String? skill, required String sortBy, required String order, required int limit, required int offset}) async {
+      final data = await _http.get('$_path/list', queryParameters: {
+        if (skill != null) 'skill': skill,
+        'sortBy': sortBy,
+        'order': order,
+        'limit': limit.toString(),
+        'offset': offset.toString(),
+      });
+      return (data as List).map((json) => Worker.fromJson(json)).toList();
+    }
+  }
 
 class WorkerServiceException implements Exception {
   final String message;
