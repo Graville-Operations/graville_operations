@@ -3,6 +3,7 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:graville_operations/core/local/store/storage_service.dart';
 import 'package:graville_operations/core/local/store/user_store.dart';
+//import 'package:graville_operations/screens/account_screen/account_screen.dart';
 
 import 'core/routes/routes.dart';
 import 'core/style/theme.dart';
@@ -32,6 +33,7 @@ class _MyAppState extends State<MyApp> {
       initialRoute: AppRoutes.initial,
       getPages: AppPages.routes,
       builder: EasyLoading.init(),
+      // home: const AccountScreen(),
     );
   }
 }

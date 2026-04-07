@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:graville_operations/models/profile_model.dart';
+import 'package:graville_operations/core/local/store/user_store.dart';
+import 'package:graville_operations/models/auth/user.dart';
+import 'package:graville_operations/services/profile_api_service.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
 class EditProfileScreen extends StatefulWidget {
-  const EditProfileScreen({super.key});
+  final User user;
+
+  const EditProfileScreen({super.key, required this.user});
 
   @override
   State<EditProfileScreen> createState() => _EditProfileScreenState();
@@ -12,6 +16,7 @@ class EditProfileScreen extends StatefulWidget {
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
   final _formKey = GlobalKey<FormState>();
+  final _service = ProfileApiService();
 
   late TextEditingController _firstNameController;
   late TextEditingController _lastNameController;
@@ -21,40 +26,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   bool _isSaving = false;
   File? _selectedImage;
 
-  UserProfile? _user;
-  UserProfile? _originalUser;
-
   @override
   void initState() {
     super.initState();
-
-    _firstNameController = TextEditingController();
-    _lastNameController = TextEditingController();
-    _emailController = TextEditingController();
-    _phoneController = TextEditingController();
-
-    _initializeUser();
-  }
-
-  void _initializeUser() {
-    setState(() {
-      _user = UserProfile(
-        id: 1,
-        email: "john@example.com",
-        firstName: "John",
-        lastName: "Doe",
-        phoneNumber: "0712345678",
-        role: "user",
-        isActive: true,
-      );
-
-      _originalUser = _user;
-
-      _firstNameController.text = _user!.firstName ?? '';
-      _lastNameController.text = _user!.lastName ?? '';
-      _emailController.text = _user!.email;
-      _phoneController.text = _user!.phoneNumber ?? '';
-    });
+    final u = widget.user;
+    _firstNameController = TextEditingController(text: u.firstName ?? '');
+    _lastNameController = TextEditingController(text: u.lastName ?? '');
+    _emailController = TextEditingController(text: u.email);
+    _phoneController = TextEditingController(text: u.phoneNo ?? '');
   }
 
   @override
@@ -68,54 +47,46 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   Future<void> _pickImage() async {
     final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-
-    if (pickedFile != null) {
-      setState(() {
-        _selectedImage = File(pickedFile.path);
-      });
-    }
+    final picked = await picker.pickImage(source: ImageSource.gallery);
+    if (picked != null) setState(() => _selectedImage = File(picked.path));
   }
 
   Future<void> _saveProfile() async {
-    if (_formKey.currentState!.validate()) {
-      setState(() => _isSaving = true);
+    if (!_formKey.currentState!.validate()) return;
+    setState(() => _isSaving = true);
 
-      await Future.delayed(const Duration(seconds: 1));
-
-      setState(() {
-        _user = UserProfile(
-          id: _user!.id,
-          email: _emailController.text,
-          firstName: _firstNameController.text,
-          lastName: _lastNameController.text,
-          phoneNumber: _phoneController.text,
-          role: _user!.role,
-          isActive: _user!.isActive,
-        );
-
-        _isSaving = false;
+    try {
+      final userId = UserStore.to.userId;
+      final updated = await _service.updateProfile(userId, {
+        'first_name': _firstNameController.text,
+        'last_name': _lastNameController.text,
+        'email': _emailController.text,
+        'phone_number': _phoneController.text,
       });
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Profile updated successfully!')),
         );
-        Navigator.pop(context);
+        Navigator.pop(context, updated);
       }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to update: $e')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isSaving = false);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final user = _user;
-
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Edit Profile',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
+        title: const Text('Edit Profile',
+            style: TextStyle(fontWeight: FontWeight.bold)),
         centerTitle: true,
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
@@ -143,16 +114,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             backgroundColor: Colors.grey[200],
                             backgroundImage: _selectedImage != null
                                 ? FileImage(_selectedImage!)
-                                : (user?.profilePicture != null
-                                    ? NetworkImage(user!.profilePicture!)
+                                : (widget.user.profilePicture != null
+                                    ? NetworkImage(widget.user.profilePicture!)
                                     : null) as ImageProvider?,
                             child: (_selectedImage == null &&
-                                    user?.profilePicture == null)
-                                ? const Icon(
-                                    Icons.person,
-                                    size: 50,
-                                    color: Colors.grey,
-                                  )
+                                    widget.user.profilePicture == null)
+                                ? const Icon(Icons.person,
+                                    size: 50, color: Colors.grey)
                                 : null,
                           ),
                           Positioned(
@@ -167,11 +135,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                               ),
                               child: const Padding(
                                 padding: EdgeInsets.all(8),
-                                child: Icon(
-                                  Icons.camera_alt,
-                                  size: 22,
-                                  color: Colors.white,
-                                ),
+                                child: Icon(Icons.camera_alt,
+                                    size: 22, color: Colors.white),
                               ),
                             ),
                           ),
@@ -239,8 +204,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         ? const SizedBox(
                             height: 20,
                             width: 20,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
+                            child: CircularProgressIndicator(strokeWidth: 2))
                         : const Text('Save'),
                   ),
                 ),

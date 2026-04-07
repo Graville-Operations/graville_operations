@@ -20,7 +20,25 @@ class LoginScreen extends GetView<LoginController> {
 //       backgroundColor: Colors.white,
 //       child: FaIcon(
 //         icon,
+//         color: color,//   Widget socialIcon(IconData icon, Color color) {
+//   return InkWell(
+//     borderRadius: BorderRadius.circular(30),
+//     onTap: () {},
+//     child: CircleAvatar(
+//       radius: 22,
+//       backgroundColor: Colors.white,
+//       child: FaIcon(
+//         icon,
 //         color: color,
+//         size: 20,
+//       ),
+//     ),
+//   );
+// }
+//   String? passwordErrFessage;
+//
+//   get body => null;
+
 //         size: 20,
 //       ),
 //     ),
@@ -55,7 +73,6 @@ class LoginScreen extends GetView<LoginController> {
               child: SingleChildScrollView(
                 padding: const EdgeInsets.fromLTRB(24, 0, 24, 40),
                 child: Form(
-                  key: _formKey,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -93,8 +110,9 @@ class LoginScreen extends GetView<LoginController> {
                         ),
                       ),
                       const SizedBox(height: 10),
+
                       CustomTextInput(
-                        controller: emailController,
+                        controller: controller.state.email,
                         labelText: "Email",
                         hintText: "example@gmail.com",
                         prefixIcon: Icons.email,
@@ -109,21 +127,19 @@ class LoginScreen extends GetView<LoginController> {
                           return null;
                         },
                       ),
+                      const SizedBox(height: 16),
                       CustomTextInput(
-                        controller: passwordController,
+                        controller: controller.state.psw,
                         labelText: "Password",
                         hintText: "at least 8 characters",
                         prefixIcon: Icons.lock,
-                        suffixIcon: _obscurePassword
+                        suffixIcon: controller.state.obscurePassword.value
                             ? Icons.visibility_off
                             : Icons.visibility,
-                        isObscure: _obscurePassword,
-                        isPassword: _obscurePassword,
-                        onSuffixIconPressed: () {
-                          setState(() {
-                            _obscurePassword = !_obscurePassword;
-                          });
-                        },
+                        isObscure: controller.state.obscurePassword.value,
+                        isPassword: controller.state.obscurePassword.value,
+                        onSuffixIconPressed: () =>
+                            controller.togglePasswordVisibility(),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Please enter your password';
@@ -151,102 +167,9 @@ class LoginScreen extends GetView<LoginController> {
                       ),
                       const SizedBox(height: 8),
                       CustomButton(
-                        label: "log in",
-                        width: double.infinity,
-                        onPressed: () async {
-                          if (_formKey.currentState!.validate()) {
-                            // Show loading indicator
-                            showDialog(
-                              context: context,
-                              barrierDismissible: false,
-                              builder: (context) => Center(
-                                child: CircularProgressIndicator(),
-                              ),
-                            );
-
-<<<<<<< HEAD:lib/screens/auth/login/login_screen.dart
-                            final result = await ApiService.login(
-                              emailController.text.trim(),
-                              passwordController.text.trim(),
-                            );
-
-                            // Hide loading indicator
-                            Navigator.pop(context);
-
-                            if (result['success']) {
-                              final role = result['data']['role'];
-
-                              // Navigate based on role
-                              if (role == 'admin' ||
-                                  role == 'field_engineer' ||
-                                  role == 'auditor') {
-                                Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        MainNavigationScreen(),
-                                  ),
-                                );
-                              }
-                            } else {
-                              // Show error message
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content:
-                                      Text(result['message'] ?? 'Login failed'),
-                                  backgroundColor: Colors.red,
-                                ),
-                              );
-                            }
-                          }
-                          EasyLoading.show(status: "Logging you in");
-                          LoginRequest loginRequest = LoginRequest(
-                              username: emailController.text,
-                              password: passwordController.text);
-                          AuthLoginResponse response =
-                              await AuthApi.login(loginRequest);
-                          // await UserStore.to.saveProfile(result.data!);
-                          EasyLoading.dismiss();
-                          if (response.accessToken.isNotEmpty) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text("Logged in successfully"),
-                                backgroundColor: Colors.green,
-                              ),
-                            );
-                          } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('Login failed'),
-                                backgroundColor: Colors.red,
-                              ),
-                            );
-                          }
-                        },
-=======
-      SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(24, 0, 24, 40),
-          child: Form(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SizedBox(height: 20),
-                    Image.asset(
-                      'assets/images/logo.png',
-                      height: 100,
-                      width: 500,
-                    ),
-                    SizedBox(height: 10),
-                    Text(
-                      'Welcome to Graville Enterprises Limited!',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20,
->>>>>>> main:lib/screens/auth/login/view.dart
-                      ),
+                          label: "log in",
+                          width: double.infinity,
+                          onPressed: controller.login),
                       const SizedBox(height: 20),
                       Row(
                         children: [
@@ -264,6 +187,7 @@ class LoginScreen extends GetView<LoginController> {
                           Expanded(child: Divider()),
                         ],
                       ),
+
                       const SizedBox(height: 19),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -291,150 +215,25 @@ class LoginScreen extends GetView<LoginController> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 19),
-                      Center(
-                        child: Wrap(
-                          alignment: WrapAlignment.center,
-                          spacing: 15,
-                          children: [
-                            _socialIcon(FontAwesomeIcons.google, Colors.red),
-                            _socialIcon(
-                                FontAwesomeIcons.linkedinIn, Colors.blueAccent),
-                            _socialIcon(
-                                FontAwesomeIcons.facebookF, Colors.blue),
-                            _socialIcon(
-                                FontAwesomeIcons.instagram, Colors.purple),
-                            _socialIcon(
-                                FontAwesomeIcons.xTwitter, Colors.black),
-                          ],
-                        ),
-                      ),
+
+                      // const SizedBox(height: 19),
+                      //    Center(
+                      //      child: Wrap(
+                      //        alignment: WrapAlignment.center,
+                      //          spacing: 15,
+                      //            children: [
+                      //              _socialIcon(FontAwesomeIcons.google, Colors.red),
+                      //              _socialIcon(FontAwesomeIcons.linkedinIn, Colors.blueAccent),
+                      //              _socialIcon(FontAwesomeIcons.facebookF, Colors.blue),
+                      //              _socialIcon(FontAwesomeIcons.instagram, Colors.purple),
+                      //              _socialIcon(FontAwesomeIcons.xTwitter, Colors.black),
+                      //          ],
+                      //        ),
+                      //      ),
                     ],
                   ),
                 ),
-<<<<<<< HEAD:lib/screens/auth/login/login_screen.dart
               ),
-=======
-                const SizedBox(height: 10),
-
-                CustomTextInput(
-                  controller: controller.state.email,
-                  labelText: "Email",
-                  hintText: "example@gmail.com",
-                  prefixIcon: Icons.email,
-                  onSuffixIconPressed: () {},
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your email';
-                    }
-                    if (!value.contains('@')) {
-                      return 'Please enter a valid email';
-                    }
-                      return null;
-                  },
-                ),
-                CustomTextInput(
-                  controller: controller.state.psw,
-                  labelText: "Password",
-                  hintText: "at least 8 characters",
-                  prefixIcon: Icons.lock,
-                  suffixIcon: controller.state.obscurePassword.value ? Icons.visibility_off : Icons.visibility,
-                  isObscure: controller.state.obscurePassword.value,
-                  isPassword: controller.state.obscurePassword.value,
-                  onSuffixIconPressed: ()=>controller.togglePasswordVisibility(),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your password';
-                    }
-                    if (value.length < 8) {
-                      return 'Password must be at least 8 characters';
-                    }
-                    return null;
-                  },
-                ),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: TextButton(
-                    onPressed: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                       builder: (context) => ForgotPasswordScreen(),
-                       ),
-                     ),
-                    child: const Text(
-                      " Forgot password?",
-                     style: TextStyle(color: Colors.blue),
-                    ),
-                   ),
-                 ),
-                const SizedBox(height: 8),
-                CustomButton(
-                  label: "log in",
-                  width: double.infinity,
-                  onPressed: controller.login
-                ),
-                const SizedBox(height: 20),
-                Row(
-                  children: [
-                    Expanded(child: Divider()),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 8),
-                      child: Text(
-                        'OR',
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                      ),
-                      ),
-                    ),
-                    Expanded(child: Divider()),
-                  ],
-                ),
-
-                const SizedBox(height: 19),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      "Don't have an account? ",
-                      style: TextStyle(
-                          color: Colors.blue,
-                      ),
-                    ),
-
-                    InkWell(
-                        onTap: () {
-                           Navigator.of(context).push(
-                                MaterialPageRoute(builder: (context) => Signup()),
-                            );
-                            },
-                             child: const Text(
-                                     "Sign Up",
-                               style: TextStyle(
-                               color: Colors.blue,
-                                 fontWeight: FontWeight.bold,
-                               ),
-                            ),
-                         ),
-                  ],
-                ),
-                
-                // const SizedBox(height: 19),
-                //    Center(
-                //      child: Wrap(
-                //        alignment: WrapAlignment.center,
-                //          spacing: 15,
-                //            children: [
-                //              _socialIcon(FontAwesomeIcons.google, Colors.red),
-                //              _socialIcon(FontAwesomeIcons.linkedinIn, Colors.blueAccent),
-                //              _socialIcon(FontAwesomeIcons.facebookF, Colors.blue),
-                //              _socialIcon(FontAwesomeIcons.instagram, Colors.purple),
-                //              _socialIcon(FontAwesomeIcons.xTwitter, Colors.black),
-                //          ],
-                //        ),
-                //      ),
-              ],
->>>>>>> main:lib/screens/auth/login/view.dart
             ),
           ],
         ));
