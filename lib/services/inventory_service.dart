@@ -4,7 +4,6 @@ import 'dart:convert';
 import 'package:flutter/widgets.dart';
 import 'package:graville_operations/core/utils/http.dart';
 import 'package:graville_operations/models/inventory/inventory%20_model.dart';
-import 'package:http/http.dart' as http;
 
 class MaterialService {
   static const String _path = '/materials';

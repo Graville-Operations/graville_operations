@@ -7,6 +7,7 @@ import 'package:graville_operations/screens/inventory/update_inventory.dart';
 import 'package:graville_operations/screens/material/receive_material.dart';
 import 'package:graville_operations/screens/material/transfer_material.dart';
 import 'package:graville_operations/screens/sites/create_sites.dart';
+import 'package:graville_operations/screens/task_screen/task_screen.dart';
 import 'package:graville_operations/screens/workers/add_worker_screen.dart';
 import 'package:graville_operations/screens/commons/assets/images.dart';
 import 'package:graville_operations/screens/commons/widgets/section_card.dart';
@@ -91,6 +92,14 @@ class _HomeScreenState extends State<HomeScreen> {
               child: miniFab(
                 Icons.local_shipping,
                 () => context.push(const TransferMaterialScreen()),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Tooltip(
+              message: "create task",
+              child: miniFab(
+                Icons.add,
+                () => context.push(const CreateTaskScreen()),
               ),
             ),
             const SizedBox(height: 12),
