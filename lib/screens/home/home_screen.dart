@@ -12,6 +12,7 @@ import 'package:graville_operations/screens/commons/widgets/section_card.dart';
 import 'package:graville_operations/screens/commons/widgets/status_chip.dart';
 import 'package:graville_operations/screens/commons/widgets/stat_card.dart';
 
+
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -72,7 +73,7 @@ class _HomeScreenState extends State<HomeScreen> {
               message: "Update inventory",
               child: miniFab(
                 Icons.store,
-                () => context.push(const UpdateInventoryScreen()),
+                () => context.push(const UpdateInventoryScreen(preSelectedItem: null,)),
               ),
             ),
             const SizedBox(height: 12),
@@ -101,23 +102,33 @@ class _HomeScreenState extends State<HomeScreen> {
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
-            backgroundColor: Colors.white,
-            elevation: 0,
-            floating: true,
-            snap: true,
-            automaticallyImplyLeading: false,
-            title: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Image.asset(CommonImages.logo, height: 28),
-                const SizedBox(width: 10),
-                const Text(
-                  "Graville Operations",
-                  style: TextStyle(fontWeight: FontWeight.bold),
+              backgroundColor: Colors.white,
+              elevation: 0,
+              floating: true,
+              snap: true, 
+              automaticallyImplyLeading: false,
+              toolbarHeight: 80,
+              flexibleSpace: SafeArea(
+                child: Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Image.asset(CommonImages.logo, height: 40),
+                      const SizedBox(height: 4),
+                      const Text(
+                        "Graville Operations",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ],
+              ),
             ),
-          ),
+          
 
           SliverPadding(
             padding: const EdgeInsets.all(15),
