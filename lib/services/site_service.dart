@@ -7,7 +7,11 @@ class SiteService {
   static final _http = HttpUtil();
 
   static Future<SiteModel> createSite(SiteModel site) async {
-    final data = await _http.post('$_path/create-site', data: site.toJson());
+    final jsonData = site.toJson();
+    // debugPrint(' Sending to API: $jsonData');
+    // debugPrint(' URL: $_path/create-site');
+    
+    final data = await _http.post('$_path/create-site', data: jsonData);
     return SiteModel.fromJson(data);
   }
 

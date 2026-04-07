@@ -127,7 +127,7 @@ class _EditSiteScreenState extends State<EditSiteScreen> {
       );
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          backgroundColor: Colors.black,
+          backgroundColor: Colors.green,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           content: Text('"${_nameCtrl.text.trim()}" updated!',
@@ -335,7 +335,7 @@ class _EditSiteScreenState extends State<EditSiteScreen> {
 
               CustomButton(
                 label: 'Save Changes', onPressed: _submit, isLoading: _isSubmitting,
-                backgroundColor: Colors.black, width: double.infinity, height: 52, borderRadius: 16,
+                backgroundColor: Colors.green, width: double.infinity, height: 52, borderRadius: 16,
                 icon: const Icon(Icons.save_outlined, color: Colors.white, size: 20),
               ),
 

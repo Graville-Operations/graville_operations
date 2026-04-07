@@ -22,7 +22,7 @@ class SiteModel {
     required this.name,
     required this.location,
     required this.projectStatus,
-    this.siteStatus,
+    this.siteStatus = 'Active', 
     this.completionDate,
     this.description,
     this.tenderName,
@@ -61,7 +61,7 @@ class SiteModel {
         'name'             : name,
         'location'         : location,
         'project_status'   : projectStatus,
-        'site_status'      : siteStatus,
+        'site_status'      : siteStatus ?? 'Active', 
         'completion_date'  : completionDate,
         'description'      : description,
         'tender_name'      : tenderName,
@@ -72,7 +72,6 @@ class SiteModel {
         'created_by'       : createdBy,
       };
 
-  /// For PATCH — only sends fields that are non-null
   Map<String, dynamic> toUpdateJson() {
     final map = <String, dynamic>{};
     if (name.isNotEmpty)          map['name']              = name;
