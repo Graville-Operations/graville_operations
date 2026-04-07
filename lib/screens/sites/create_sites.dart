@@ -168,18 +168,31 @@ class _CreateSitesScreenState extends State<CreateSitesScreen> {
         child: CustomScrollView(slivers: [
           // App Bar
           SliverAppBar(
-            backgroundColor: Colors.white,
-            elevation: 0,
-            floating: true,
-            snap: true,
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back, color: Colors.black),
-              onPressed: () => Navigator.of(context).pop(),
-            ),
-            title: const Text('New Project',
-                style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 17)),
-            centerTitle: true,
+          backgroundColor: Colors.white,
+          elevation: 0,
+          floating: true,
+          snap: true,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back, color: Colors.black),
+            onPressed: () => Navigator.of(context).pop(),
           ),
+          title: Row(
+            children: const [
+              Icon(Icons.create_sharp, color: Colors.black, size: 20),
+              SizedBox(width: 8),
+              Text(
+                'New Project',
+                style: TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 17,
+                ),
+              ),
+            ],
+          ),
+          centerTitle: false, // ← key change
+          titleSpacing: 0,    // ← pulls title flush to leading
+        ),
 
           SliverPadding(
             padding: const EdgeInsets.fromLTRB(16, 20, 16, 32),
