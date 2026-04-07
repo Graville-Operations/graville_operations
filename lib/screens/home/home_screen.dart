@@ -6,6 +6,7 @@ import 'package:graville_operations/screens/inventory/add_material.dart';
 import 'package:graville_operations/screens/inventory/update_inventory.dart';
 import 'package:graville_operations/screens/material/receive_material.dart';
 import 'package:graville_operations/screens/material/transfer_material.dart';
+import 'package:graville_operations/screens/sites/create_sites.dart';
 import 'package:graville_operations/screens/task_screen/task_screen.dart';
 import 'package:graville_operations/screens/workers/add_worker_screen.dart';
 import 'package:graville_operations/screens/commons/assets/images.dart';
@@ -51,6 +52,14 @@ class _HomeScreenState extends State<HomeScreen> {
               child: miniFab(
                 Icons.person_add,
                 () => context.push(const AddWorkerScreen()),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Tooltip(
+              message: "New Site",
+              child: miniFab(
+                Icons.apartment,
+                () => context.push(const CreateSitesScreen()),
               ),
             ),
             const SizedBox(height: 12),
@@ -146,23 +155,23 @@ class _HomeScreenState extends State<HomeScreen> {
                 SectionCard(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
-                      Text(
+                    children: [
+                      const Text(
                         "Current Project",
                         style: TextStyle(color: Colors.grey),
                       ),
-                      SizedBox(height: 5),
+                      const SizedBox(height: 5),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
+                          const Text(
                             "Sunrise Apartments",
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          ProjectStatusChip(status: ProjectStatus.onSchedule),
+                          //ProjectStatusChip(status: ProjectStatus.onSchedule),
                         ],
                       ),
                     ],

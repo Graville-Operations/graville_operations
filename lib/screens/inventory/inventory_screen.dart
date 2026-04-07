@@ -6,6 +6,7 @@ import 'package:graville_operations/screens/inventory/list_of_materials.dart';
 import 'package:graville_operations/screens/inventory/update_inventory.dart';
 import 'package:graville_operations/screens/material/hired_materials.dart';
 import 'package:graville_operations/services/inventory_service.dart';
+import 'package:graville_operations/screens/inventory/inventory_details_screen.dart';
 
 
 
@@ -264,7 +265,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
                               GestureDetector(
                                 onTap: () async {
                                   final updated = await context.push(
-                                    UpdateInventoryScreen(preSelectedItem: item),
+                                    InventoryDetailScreen(item: item),
                                   );
                                   if (updated == true) _loadData(); 
                                 },
