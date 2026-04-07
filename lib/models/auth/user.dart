@@ -1,6 +1,3 @@
-
-
-
 import 'package:graville_operations/models/auth/groups.dart';
 
 class User {
@@ -87,31 +84,34 @@ class User {
   }
 
   Map<String, dynamic> toJson() => {
-    "id": id,
-    "ref_id": refId,
-    "national_id": nationalId,
-    "email": email,
-    "phone_no": phoneNo,
-    "first_name": firstName,
-    "middle_name": middleName,
-    "last_name": lastName,
-    "account_type": accountType,
-    "account_status": accountStatus,
-    "gender": gender,
-    "created_by": createdBy,
-    "modified_by": modifiedBy,
-    "created_at": createdAt,
-    "updated_at": updatedAt,
-    "email_verified": emailVerified,
-    "phone_verified": phoneVerified,
-    "kyc_complete": kycComplete,
-    "enabled": enabled,
-    "groups": groups.map((g) => g.toJson()).toList(),
-    "company": company,
-    "staff_id": staffId,
-    "longitude": longitude,
-    "latitude": latitude,
-  };
+        "id": id,
+        "ref_id": refId,
+        "national_id": nationalId,
+        "email": email,
+        "phone_no": phoneNo,
+        "first_name": firstName,
+        "middle_name": middleName,
+        "last_name": lastName,
+        "account_type": accountType,
+        "account_status": accountStatus,
+        "gender": gender,
+        "created_by": createdBy,
+        "modified_by": modifiedBy,
+        "created_at": createdAt,
+        "updated_at": updatedAt,
+        "email_verified": emailVerified,
+        "phone_verified": phoneVerified,
+        "kyc_complete": kycComplete,
+        "enabled": enabled,
+        "groups": groups.map((g) => g.toJson()).toList(),
+        "company": company,
+        "staff_id": staffId,
+        "longitude": longitude,
+        "latitude": latitude,
+      };
   String get fullName => "$firstName $middleName $lastName";
 
+  get profilePicture => null;
+
+  String? get initials => null;
 }

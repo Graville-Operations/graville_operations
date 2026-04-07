@@ -8,6 +8,12 @@ class AuthLoginResponse {
   final String sessionId;
   final String accountType;
   final int expiresIn;
+  final int? userId;
+  final String? firstName;
+  final String? lastName;
+  final String? email;
+  final String? phoneNo;
+  final String? role;
 
   AuthLoginResponse({
     required this.accessToken,
@@ -15,25 +21,38 @@ class AuthLoginResponse {
     required this.sessionId,
     required this.accountType,
     required this.expiresIn,
+    this.userId,
+    this.firstName,
+    this.lastName,
+    this.email,
+    this.phoneNo,
+    this.role,
   });
 
   factory AuthLoginResponse.fromJson(Map<String, dynamic> json) {
+    final user = json["user"] as Map<String, dynamic>?; // ← this was missing
     return AuthLoginResponse(
       accessToken: json["access_token"],
       tokenType: json["token_type"],
-      sessionId: json["session_id"],
-      accountType: json["account_type"],
-      expiresIn: json["expires_in"],
+      sessionId: json["session_id"] ?? '',
+      accountType: json["account_type"] ?? '',
+      expiresIn: json["expires_in"] ?? 0,
+      userId: user?["id"],
+      firstName: user?["first_name"],
+      lastName: user?["last_name"],
+      email: user?["email"],
+      phoneNo: user?["phone_no"],
+      role: user?["role"] ?? json["role"],
     );
   }
 
   Map<String, dynamic> toJson() => {
-    "access_token": accessToken,
-    "token_type": tokenType,
-    "session_id": sessionId,
-    "account_type": accountType,
-    "expires_in": expiresIn,
-  };
+        "access_token": accessToken,
+        "token_type": tokenType,
+        "session_id": sessionId,
+        "account_type": accountType,
+        "expires_in": expiresIn,
+      };
 }
 
 class MyAccountResponse {
@@ -121,31 +140,31 @@ class MyAccountResponse {
   }
 
   Map<String, dynamic> toJson() => {
-    "id": id,
-    "ref_id": refId,
-    "national_id": nationalId,
-    "email": email,
-    "phone_no": phoneNo,
-    "first_name": firstName,
-    "middle_name": middleName,
-    "last_name": lastName,
-    "account_type": accountType,
-    "account_status": accountStatus,
-    "gender": gender,
-    "created_by": createdBy,
-    "modified_by": modifiedBy,
-    "created_at": createdAt,
-    "updated_at": updatedAt,
-    "email_verified": emailVerified,
-    "phone_verified": phoneVerified,
-    "kyc_complete": kycComplete,
-    "enabled": enabled,
-    "groups": groups.map((g) => g.toJson()).toList(),
-    "company": company,
-    "staff_id": staffId,
-    "longitude": longitude,
-    "latitude": latitude,
-  };
+        "id": id,
+        "ref_id": refId,
+        "national_id": nationalId,
+        "email": email,
+        "phone_no": phoneNo,
+        "first_name": firstName,
+        "middle_name": middleName,
+        "last_name": lastName,
+        "account_type": accountType,
+        "account_status": accountStatus,
+        "gender": gender,
+        "created_by": createdBy,
+        "modified_by": modifiedBy,
+        "created_at": createdAt,
+        "updated_at": updatedAt,
+        "email_verified": emailVerified,
+        "phone_verified": phoneVerified,
+        "kyc_complete": kycComplete,
+        "enabled": enabled,
+        "groups": groups.map((g) => g.toJson()).toList(),
+        "company": company,
+        "staff_id": staffId,
+        "longitude": longitude,
+        "latitude": latitude,
+      };
 
   String get fullName => "$firstName $middleName $lastName";
 

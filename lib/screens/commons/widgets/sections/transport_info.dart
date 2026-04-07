@@ -9,16 +9,16 @@ class TransportInfo extends StatelessWidget {
   const TransportInfo({
     super.key,
     required this.onChanged,
-    required this.selectedMode
+    required this.selectedMode,
   });
 
   @override
   Widget build(BuildContext context) {
     final List<TransportMode> mode = const [
-     TransportMode(id: "1", name: "Truck"),
-     TransportMode(id: "2", name: "Tipper"),
-     TransportMode(id: "3", name: "Pickup"),
-     TransportMode(id: "4", name: "Lorry"),
+      TransportMode(id: "1", name: "Truck"),
+      TransportMode(id: "2", name: "Tipper"),
+      TransportMode(id: "3", name: "Pickup"),
+      TransportMode(id: "4", name: "Lorry"),
     ];
 
     return Column(

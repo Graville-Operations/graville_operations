@@ -1,10 +1,10 @@
 name: graville_operations
-description: "A new Flutter project."
+description: A new Flutter project.
 publish_to: 'none'
 version: 1.0.0+1
 
 environment:
-  sdk: ^3.8.1
+  sdk: ">=3.0.0 <4.0.0"
 
 dependencies:
   flutter:
@@ -15,10 +15,11 @@ dependencies:
   cupertino_icons: ^1.0.8
   image_picker: ^1.0.7
   cookie_jar: ^4.0.9
-  dio: ^5.9.2
+  dio: ^5.3.2
   dio_cookie_manager: ^3.4.0
   flutter_easyloading: ^3.0.5
   shared_preferences: ^2.2.2
+  json_annotation: ^4.8.1
   get: ^4.7.3
   flutter_screenutil: ^5.9.3
   shimmer: ^3.0.0
@@ -44,6 +45,3 @@ flutter:
   #       - asset: fonts/TrajanPro.ttf
   #       - asset: fonts/TrajanPro_Bold.ttf
   #         weight: 700
-
-    # 
-

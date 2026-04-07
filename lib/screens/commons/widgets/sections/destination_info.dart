@@ -15,11 +15,11 @@ class DestinationInfo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final List<DestinationSite> destination = const [
-     DestinationSite(id: "1", name: "Mishi Mboko"),
-     DestinationSite(id: "2", name: "Iruka Police Station"),
-     DestinationSite(id: "3", name: "Mabatini Primary"),
-     DestinationSite(id: "4", name: "Kwa Njenga"),
-     DestinationSite(id: "5", name: "Wanga TTI")
+      DestinationSite(id: "1", name: "Mishi Mboko"),
+      DestinationSite(id: "2", name: "Iruka Police Station"),
+      DestinationSite(id: "3", name: "Mabatini Primary"),
+      DestinationSite(id: "4", name: "Kwa Njenga"),
+      DestinationSite(id: "5", name: "Wanga TTI"),
     ];
 
     return Column(

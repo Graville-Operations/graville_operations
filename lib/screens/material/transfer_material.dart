@@ -18,7 +18,6 @@ class TransferMaterialScreen extends StatefulWidget {
 }
 
 class _TransferMaterialScreenState extends State<TransferMaterialScreen> {
-
   TextEditingController destinationController = TextEditingController();
   TextEditingController notesController = TextEditingController();
   TextEditingController quantityController = TextEditingController();
@@ -72,25 +71,25 @@ class _TransferMaterialScreenState extends State<TransferMaterialScreen> {
                   },
                 ),
                 FormSection(
-                    title: "Quantity",
-                    icon: Icons.numbers,
-                    required: true,
-                    child: CustomTextInput(
-                      controller: quantityController,
-                      hintText: "Enter Quantity",
-                      keyboardType: TextInputType.number,
-                    ),
+                  title: "Quantity",
+                  icon: Icons.numbers,
+                  required: true,
+                  child: CustomTextInput(
+                    controller: quantityController,
+                    hintText: "Enter Quantity",
+                    keyboardType: TextInputType.number,
                   ),
-                  FormSection(
-                      title: "Price per unit",
-                      icon: Icons.numbers,
-                      required: true,
-                      child: CustomTextInput(
-                        controller: unitController,
-                        hintText: "0",
-                        keyboardType: TextInputType.number,
-                      ),
-                    ),
+                ),
+                FormSection(
+                  title: "Price per unit",
+                  icon: Icons.numbers,
+                  required: true,
+                  child: CustomTextInput(
+                    controller: unitController,
+                    hintText: "0",
+                    keyboardType: TextInputType.number,
+                  ),
+                ),
                 //SizedBox(height: 16),
 
                 // Quantity Section
@@ -98,33 +97,50 @@ class _TransferMaterialScreenState extends State<TransferMaterialScreen> {
                 //SizedBox(height: 16),
 
                 // Price per Unit and Destination
-                DestinationInfo(selectedDestination: selectedDestination, onChanged: (destination){setState(() {
-                  selectedDestination = destination;
-                });}),
+                DestinationInfo(
+                  selectedDestination: selectedDestination,
+                  onChanged: (destination) {
+                    setState(() {
+                      selectedDestination = destination;
+                    });
+                  },
+                ),
                 //SizedBox(height: 16),
 
                 // Mode of Transport
-                TransportInfo(selectedMode: selectedMode, onChanged: (mode){setState(() {
-                  selectedMode = mode;
-                });}),
+                TransportInfo(
+                  selectedMode: selectedMode,
+                  onChanged: (mode) {
+                    setState(() {
+                      selectedMode = mode;
+                    });
+                  },
+                ),
                 //SizedBox(height: 16),
 
                 // Driver Name / Transport Details
-                FormSection(title: "Driver's Name/Transport Details",required: false, child: CustomTextInput(controller: TextEditingController(), hintText: "Enter Driver's name or transport details")),
+                FormSection(
+                  title: "Driver's Name/Transport Details",
+                  required: false,
+                  child: CustomTextInput(
+                    controller: TextEditingController(),
+                    hintText: "Enter Driver's name or transport details",
+                  ),
+                ),
                 //SizedBox(height: 16),
 
                 // Notes Section
                 FormSection(
-                    title: "Notes",
-                    icon: Icons.comment,
-                    required: false,
-                    child: CustomTextInput(
-                      controller: notesController,
-                      hintText: "Add any additional notes or remarks...",
-                      //prefixIcon: Icons.notes_outlined,
-                      maxLines: 5,
-                    ),
+                  title: "Notes",
+                  icon: Icons.comment,
+                  required: false,
+                  child: CustomTextInput(
+                    controller: notesController,
+                    hintText: "Add any additional notes or remarks...",
+                    //prefixIcon: Icons.notes_outlined,
+                    maxLines: 5,
                   ),
+                ),
                 SizedBox(height: 15),
 
                 // Confirm Transfer Button

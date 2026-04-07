@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:graville_operations/models/worker_model.dart';
+<<<<<<< HEAD
+=======
 
+>>>>>>> main
 
 class WorkerProfileScreen extends StatelessWidget {
   final Worker worker;
@@ -17,7 +20,6 @@ class WorkerProfileScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              
               ClipRRect(
                 borderRadius: BorderRadius.circular(24),
                 child: worker.imageUrl != null
@@ -49,7 +51,9 @@ class WorkerProfileScreen extends StatelessWidget {
                     _buildInfoRow(
                       icon: Icons.phone,
                       label: "Phone Number",
-                      value: worker.phoneNumber.isNotEmpty ? worker.phoneNumber : '—',
+                      value: worker.phoneNumber.isNotEmpty
+                          ? worker.phoneNumber
+                          : '—',
                     ),
                     const SizedBox(height: 16),
                     _buildInfoRow(
@@ -78,8 +82,6 @@ class WorkerProfileScreen extends StatelessWidget {
                           : '—',
                     ),
                     const SizedBox(height: 20),
-
-                 
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -100,10 +102,10 @@ class WorkerProfileScreen extends StatelessWidget {
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 14, vertical: 6),
                               decoration: BoxDecoration(
-                                color: worker.skillType.toLowerCase() ==
-                                        'skilled'
-                                    ? Colors.blue
-                                    : Colors.grey.shade500,
+                                color:
+                                    worker.skillType.toLowerCase() == 'skilled'
+                                        ? Colors.blue
+                                        : Colors.grey.shade500,
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               child: Text(
@@ -120,9 +122,7 @@ class WorkerProfileScreen extends StatelessWidget {
                         ),
                       ],
                     ),
-
                     const SizedBox(height: 20),
-
                     _buildInfoRow(
                       icon: Icons.calendar_month,
                       label: "Joined Date",
