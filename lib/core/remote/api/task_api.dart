@@ -15,17 +15,17 @@ class TaskApi {
   }
 
   //create task
-  static Future<BaseResponse> createTask(CreateTaskRequest request, {required String description}) async {
-    var response = await HttpUtil().post(
-      TaskRoute.createTask,
-      data: request.toJson(),
-    );
+static Future<void> createTask(CreateTaskRequest request) async {
+  await HttpUtil().post(
+    TaskRoute.createTask,
+    data: request.toJson(),
+  );
+}
 
-    return BaseResponse.fromJson(response, null);
   }
 
   //update task
-  static Future<BaseResponse> updateTask(
+  Future<BaseResponse> updateTask(
       int id,
       CreateTaskRequest request,
       ) async {
@@ -38,11 +38,10 @@ class TaskApi {
   }
 
   //delete task
-  static Future<BaseResponse> deleteTask(int id) async {
+  Future<BaseResponse> deleteTask(int id) async {
     var response = await HttpUtil().delete(
       "${TaskRoute.deleteTask}/$id",
     );
 
     return BaseResponse.fromJson(response, null);
   }
-}
