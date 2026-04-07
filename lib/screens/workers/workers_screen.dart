@@ -1,8 +1,7 @@
-
 import 'package:flutter/material.dart';
 import 'package:graville_operations/models/worker_model.dart';
 import 'package:graville_operations/navigation/custom_navigator.dart';
-import 'package:graville_operations/screens/commons/widgets/custom_button.dart';
+import 'package:graville_operations/screens/commons/widgets/custom_dropdown.dart';
 import 'package:graville_operations/screens/workers/add_worker_screen.dart';
 import 'package:graville_operations/screens/workers/worker_profile_screen.dart';
 import 'package:graville_operations/services/worker_service.dart';
@@ -41,7 +40,6 @@ class _WorkersScreenState extends State<WorkersScreen> {
     _loadWorkers();
   }
 
-  
   Future<void> _loadWorkers() async {
     setState(() {
       _isLoading = true;
@@ -157,7 +155,6 @@ class _WorkersScreenState extends State<WorkersScreen> {
           ],
         ),
         actions: [
-          // Refresh button
           IconButton(
             icon: const Icon(Icons.refresh, color: Colors.blue),
             onPressed: _loadWorkers,
@@ -171,48 +168,39 @@ class _WorkersScreenState extends State<WorkersScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Site dropdown
-            const Text(
-              "Construction Site",
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                color: Colors.black87,
-              ),
-            ),
-            const SizedBox(height: 6),
-            Card(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                child: DropdownButtonFormField<String>(
-                  value: selectedSite,
-                  hint: const Text("Select Site"),
-                  isDense: true,
-                  items: sites
-                      .map((site) =>
-                          DropdownMenuItem(value: site, child: Text(site)))
-                      .toList(),
-                  onChanged: (value) => setState(() => selectedSite = value),
-                  decoration: InputDecoration(
-                    isDense: true,
-                    filled: true,
-                    fillColor: Colors.grey.shade100,
-                    contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 8),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide.none,
-                    ),
-                  ),
+              const Text(
+                "Construction Site",
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black87,
                 ),
               ),
-            ),
+              const SizedBox(height: 6),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF5F7F9),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: Colors.grey.shade200),
+                ),
+                child: CustomDropdown<String>(
+                  value: selectedSite,
+                  items: sites,
+                  displayMapper: (site) => site,
+                  onChanged: (value) => setState(() => selectedSite = value),
+                  hint: 'Select Site',
+                  isExpanded: true,
+                  isDense: true,
+                  border: InputBorder.none,
+                  fillColor: Colors.transparent,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
 
             const SizedBox(height: 16),
 
-          
+            // Stat cards
             Row(
               children: [
                 Expanded(
@@ -242,49 +230,66 @@ class _WorkersScreenState extends State<WorkersScreen> {
             // Actions row
             Row(
               children: [
-                CustomButton(
-                  label: "Add Worker",
-                  onPressed: () async {
-                    final result =
-                        await context.push(const AddWorkerScreen());
-                    if (result != null) _loadWorkers(); // refresh after adding
-                  },
-                  backgroundColor: const Color(0xFF3366FF),
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () async {
+                      final result =
+                          await context.push(const AddWorkerScreen());
+                      if (result != null) _loadWorkers();
+                    },
+                    child: Container(
+                      height: 48,
+                      decoration: BoxDecoration(
+                        color: Colors.blue.shade100,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.person_add, color: Colors.blue, size: 18),
+                          SizedBox(width: 8),
+                          Text(
+                            "Add Worker",
+                            style: TextStyle(
+                              color: Colors.blue,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: SizedBox(
-                    width: 240,
-                    child: CompositedTransformTarget(
-                      link: _layerLink,
-                      child: TextField(
-                        controller: searchController,
-                        onChanged: (value) {
-                          if (value.isEmpty) {
-                            _removeOverlay();
-                          } else {
-                            _showOverlay();
-                          }
-                        },
-                        decoration: InputDecoration(
-                          isDense: true,
-                          filled: true,
-                          fillColor: Colors.white,
-                          prefixIcon: const Icon(Icons.search),
-                          hintText: "Search",
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide:
-                                BorderSide(color: Colors.grey.shade400),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide:
-                                const BorderSide(color: Colors.blue),
-                          ),
+                  child: CompositedTransformTarget(
+                    link: _layerLink,
+                    child: TextField(
+                      controller: searchController,
+                      onChanged: (value) {
+                        if (value.isEmpty) {
+                          _removeOverlay();
+                        } else {
+                          _showOverlay();
+                        }
+                      },
+                      decoration: InputDecoration(
+                        isDense: true,
+                        filled: true,
+                        fillColor: Colors.white,
+                        prefixIcon: const Icon(Icons.search),
+                        hintText: "Search",
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide:
+                              BorderSide(color: Colors.grey.shade400),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: const BorderSide(color: Colors.blue),
                         ),
                       ),
                     ),
@@ -301,7 +306,7 @@ class _WorkersScreenState extends State<WorkersScreen> {
             ),
             const SizedBox(height: 10),
 
-            
+            // Workers table
             if (_isLoading)
               const Center(
                 child: Padding(
@@ -344,26 +349,42 @@ class _WorkersScreenState extends State<WorkersScreen> {
                 ),
               )
             else
-              Card(
-                shape: RoundedRectangleBorder(
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
                   borderRadius: BorderRadius.circular(12),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: DataTable(
-                      showCheckboxColumn: false,
-                      headingRowColor: MaterialStatePropertyAll(
-                        Colors.grey.shade200,
-                      ),
-                      columnSpacing: 30,
-                      columns: _buildHeaderColumns(),
-                      rows: _buildWorkerRows(),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.04),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
                     ),
+                  ],
+                ),
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: DataTable(
+                    showCheckboxColumn: false,
+                    headingRowColor: WidgetStatePropertyAll(
+                      Colors.grey.shade100,
+                    ),
+                    columnSpacing: 24,
+                    headingRowHeight: 44,
+                    dataRowMinHeight: 52,
+                    dataRowMaxHeight: 52,
+                    border: TableBorder(
+                      horizontalInside:
+                          BorderSide(color: Colors.grey.shade200),
+                      bottom: BorderSide(color: Colors.grey.shade200),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    columns: _buildHeaderColumns(),
+                    rows: _buildWorkerRows(),
                   ),
                 ),
               ),
+
+            const SizedBox(height: 30),
           ],
         ),
       ),
@@ -377,7 +398,12 @@ class _WorkersScreenState extends State<WorkersScreen> {
           (title) => DataColumn(
             label: Text(
               title,
-              style: const TextStyle(fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 13,
+                color: Colors.black,
+                letterSpacing: 0.5,
+              ),
             ),
           ),
         )
@@ -393,7 +419,12 @@ class _WorkersScreenState extends State<WorkersScreen> {
           }
         },
         cells: [
-          DataCell(Text(worker.fullName)),
+          DataCell(
+            Text(
+              worker.fullName,
+              style: const TextStyle(fontWeight: FontWeight.w500),
+            ),
+          ),
           DataCell(Text(worker.nationalId.toString())),
           DataCell(
             Container(
@@ -419,11 +450,13 @@ class _WorkersScreenState extends State<WorkersScreen> {
           ),
           DataCell(Text(worker.phoneNumber)),
           DataCell(Text(worker.siteId?.toString() ?? '—')),
-          DataCell(Text(
-            worker.createdAt != null
-                ? '${worker.createdAt!.day}/${worker.createdAt!.month}/${worker.createdAt!.year}'
-                : '—',
-          )),
+          DataCell(
+            Text(
+              worker.createdAt != null
+                  ? '${worker.createdAt!.day}/${worker.createdAt!.month}/${worker.createdAt!.year}'
+                  : '—',
+            ),
+          ),
         ],
       );
     }).toList();
