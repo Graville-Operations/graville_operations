@@ -4,6 +4,7 @@ import 'package:graville_operations/screens/application/binding.dart';
 import 'package:graville_operations/screens/application/navigation.dart';
 import 'package:graville_operations/screens/auth/login/binding.dart';
 import 'package:graville_operations/screens/auth/login/view.dart';
+import 'package:graville_operations/screens/dashboard/dashboard_screen.dart';
 
 import 'routes.dart';
 
@@ -24,6 +25,10 @@ class AppPages {
         name: AppPages.application,
         page: ()=>ApplicationScreen(),
       binding: ApplicationBindings()
+    ),
+    GetPage(
+      name: AppRoutes.application,
+      page:()=>DashboardScreen()
     )
    ];
 }

@@ -31,8 +31,7 @@ class _MyAppState extends State<MyApp> {
       theme: AppTheme.light,
       initialRoute: AppRoutes.initial,
       getPages: AppPages.routes,
-      builder: EasyLoading.init(),
-      home: const DashboardScreen(),
+      builder: EasyLoading.init()
     );
   }
 }

@@ -58,9 +58,9 @@ class HttpUtil {
 
     // Cookie management
     CookieJar cookieJar = CookieJar();
-    if (!kIsWeb) {
+    // if (!kIsWeb) {
       dio.interceptors.add(CookieManager(cookieJar));
-    }
+    // }
 
     //Add interceptor
     dio.interceptors.add(InterceptorsWrapper(
