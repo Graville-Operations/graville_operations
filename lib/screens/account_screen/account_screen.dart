@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:graville_operations/models/auth/user.dart';
 import 'package:graville_operations/models/personal_settings.dart';
 //import 'package:graville_operations/screens/auth/login/login_screen.dart';
 import 'package:graville_operations/screens/auth/login/view.dart';
@@ -164,11 +165,11 @@ class _AccountScreenState extends State<AccountScreen> {
 }
 
 final List<_AccountItem> _accountItems = [
-  _AccountItem(
-    icon: Icons.settings,
-    title: 'Settings',
-    destination: SettingsScreen(),
-  ),
+//   _AccountItem(
+//     icon: Icons.settings,
+//     title: 'Settings',
+//     destination: SettingsScreen(),
+//   ),
   _AccountItem(
     icon: Icons.support_agent,
     title: 'Contact Support',
@@ -285,39 +286,34 @@ class _AccountItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Column(
-      children: [
-        InkWell(
-          onTap: () {
-            if (item.destination != null) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => item.destination!),
-              );
-            }
-          },
-          child: Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-            child: Row(
-              children: [
-                Icon(item.icon, size: 22),
-                const SizedBox(width: 16),
-                Text(
-                  item.title,
-                  style: theme.textTheme.bodyLarge?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
+    return Column(children: [
+      InkWell(
+        onTap: () {
+          if (item.destination != null) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => item.destination!),
+            );
+          }
+        },
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          child: Row(children: [
+            Icon(item.icon, size: 22),
+            const SizedBox(width: 16),
+            Text(
+              item.title,
+              style: theme.textTheme.bodyLarge?.copyWith(
+                fontWeight: FontWeight.w600,
               ),
             ),
-            const Icon(Icons.chevron_right, size: 20),
-          ],
+          ]),
+          const Icon(Icons.chevron_right, size: 20),
         ),
-        if (showDivider)
-          const Divider(height: 1, indent: 16, endIndent: 16),
-        ]
-      ],
-    );
+      ),
+    ]);
+
+    if (showDivider) ;
+    const Divider(height: 1, indent: 16, endIndent: 16);
   }
 }
