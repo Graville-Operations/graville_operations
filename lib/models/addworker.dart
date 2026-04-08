@@ -14,4 +14,6 @@ class Worker {
     required this.specialty,
     required this.rate,
   });
+
+  static Object? fromJson(json) {}
 }

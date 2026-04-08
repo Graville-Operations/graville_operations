@@ -21,8 +21,7 @@ class ApiService {
     });
   }
 
-
-  // Token Management 
+  // Token Management
   static Future<void> saveToken(String token) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('token', token);
@@ -60,7 +59,7 @@ class ApiService {
     await prefs.remove('user_id');
   }
 
-  //  Check if admin exists 
+  //  Check if admin exists
   static Future<bool> adminExists() async {
     final response = await HttpUtil().get(
       '/auth/admin/exists',
@@ -108,7 +107,7 @@ class ApiService {
     };
   }
 
-  //  Login 
+  //  Login
   static Future<Map<String, dynamic>> login(
       String email, String password) async {
     final response = await HttpUtil().post(
@@ -137,7 +136,7 @@ class ApiService {
     }
   }
 
-  //  Forgot Password 
+  //  Forgot Password
   static Future<Map<String, dynamic>> forgotPassword(String email) async {
     final response = await HttpUtil().post(
       '/auth/forgot-password',
@@ -152,7 +151,7 @@ class ApiService {
     };
   }
 
-  //  Verify OTP 
+  //  Verify OTP
   static Future<Map<String, dynamic>> verifyOtp(
       String email, String code) async {
     final response = await HttpUtil().post(
@@ -168,7 +167,7 @@ class ApiService {
     };
   }
 
-  //  Reset Password 
+  // Reset Password
   static Future<Map<String, dynamic>> resetPassword(
       String email, String code, String newPassword) async {
     final response = await HttpUtil().post(
@@ -188,7 +187,7 @@ class ApiService {
     };
   }
 
-  //  Create Field Engineer (Admin only) 
+  //  Create Field Engineer (Admin only)
   static Future<Map<String, dynamic>> createFieldEngineer({
     required String firstName,
     required String lastName,
@@ -215,7 +214,7 @@ class ApiService {
     };
   }
 
-  //  Create Auditor (Admin only) 
+  //  Create Auditor (Admin only)
   static Future<Map<String, dynamic>> createAuditor({
     required String firstName,
     required String lastName,
@@ -242,7 +241,7 @@ class ApiService {
     };
   }
 
-  // ─── Get All Users (Admin only) 
+  // ─── Get All Users (Admin only)
   static Future<Map<String, dynamic>> getAllUsers() async {
     final response = await HttpUtil().get(
       '/auth/admin/users',
@@ -253,7 +252,7 @@ class ApiService {
     return {'success': data != null, 'data': data};
   }
 
-  //  Delete User (Admin only) 
+  //  Delete User (Admin only)
   static Future<Map<String, dynamic>> deleteUser(
       int userId, String role) async {
     final response = await HttpUtil().delete(
@@ -269,7 +268,7 @@ class ApiService {
     };
   }
 
-  //  Get Profile 
+  //  Get Profile
   static Future<Map<String, dynamic>> getProfile(int userId) async {
     final response = await HttpUtil().get(
       '/profile/$userId',
@@ -279,7 +278,7 @@ class ApiService {
     return {'success': data != null, 'data': data};
   }
 
-  //  Update Profile 
+  //  Update Profile
   static Future<Map<String, dynamic>> updateProfile(
       int userId, Map<String, dynamic> profileData) async {
     final response = await HttpUtil().put(
@@ -295,7 +294,7 @@ class ApiService {
     };
   }
 
-  //  Update Personal Settings 
+  //  Update Personal Settings
   static Future<Map<String, dynamic>> updatePersonalSettings(
       int userId, Map<String, dynamic> settings) async {
     final response = await HttpUtil().put(
@@ -311,9 +310,8 @@ class ApiService {
     };
   }
 
-  //  Authenticated Requests 
-  static Future<Map<String, dynamic>> authenticatedGet(
-      String endpoint) async {
+  //  Authenticated Requests
+  static Future<Map<String, dynamic>> authenticatedGet(String endpoint) async {
     final response = await HttpUtil().get(
       endpoint,
       options: await _authJsonOptions(),
@@ -323,6 +321,7 @@ class ApiService {
     return {'success': data != null, 'data': data};
   }
 
+  // Authenticated Requests - POST
   static Future<Map<String, dynamic>> authenticatedPost(
       String endpoint, Map<String, dynamic> body) async {
     final response = await HttpUtil().post(

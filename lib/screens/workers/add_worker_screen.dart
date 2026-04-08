@@ -275,7 +275,6 @@ class _AddWorkerScreenState extends State<AddWorkerScreen> {
   }
 }
 
-
 class FormLabel extends StatelessWidget {
   final String label;
   const FormLabel({super.key, required this.label});
@@ -386,8 +385,7 @@ class FormActions extends StatelessWidget {
             child: ElevatedButton(
               onPressed: isEnabled ? onSubmit : null,
               style: ElevatedButton.styleFrom(
-                backgroundColor:
-                    isEnabled ? Colors.blue : Colors.grey.shade300,
+                backgroundColor: isEnabled ? Colors.blue : Colors.grey.shade300,
                 foregroundColor: isEnabled ? Colors.white : Colors.grey,
                 disabledBackgroundColor: Colors.grey.shade300,
                 disabledForegroundColor: Colors.grey,

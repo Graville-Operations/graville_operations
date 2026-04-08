@@ -5,8 +5,8 @@ import 'package:graville_operations/core/local/store/storage_service.dart';
 import 'package:graville_operations/core/local/store/values.dart';
 import 'package:graville_operations/core/routes/names.dart';
 
-
 class UserStore extends GetxController {
+  // int userId = 12;
   static UserStore get to => Get.find();
 
   // checking if user is logged in
@@ -24,13 +24,14 @@ class UserStore extends GetxController {
 
   bool get hasToken => token.isNotEmpty;
 
-
+  int get userId => _profile.value.id ?? 12;
 
   @override
   void onInit() {
     super.onInit();
     token = StorageService.to.getString(storageUserTokenKey);
     var profileOffline = StorageService.to.getString(storageUserProfileKey);
+    print("profileOffline: $profileOffline");
     if (profileOffline.isNotEmpty) {
       _isLogin.value = true;
       _profile(UserData.fromJson(jsonDecode(profileOffline)));
