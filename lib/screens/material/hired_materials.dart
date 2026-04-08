@@ -16,7 +16,7 @@ class CustomTextInput extends StatelessWidget {
   final void Function(String)? onChanged;
 
   const CustomTextInput({
-    Key? key,
+    super.key,
     required this.controller,
     this.hintText,
     this.readOnly = false,
@@ -27,7 +27,7 @@ class CustomTextInput extends StatelessWidget {
     this.keyboardType,
     this.maxLines = 1,
     this.onChanged,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
