@@ -5,6 +5,7 @@ import 'package:graville_operations/screens/inventory/inventory_screen.dart';
 import 'package:graville_operations/screens/workers/workers_screen.dart';
 import 'package:graville_operations/screens/admin/admin_dashboard.dart';
 import 'package:graville_operations/services/api_service.dart';
+import 'package:graville_operations/screens/finance/finance_dashboard_screen.dart';
 
 class ApplicationScreen extends StatefulWidget {
   const ApplicationScreen({super.key});
@@ -42,6 +43,7 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
 
     if (_role == 'admin') {
       base.add(const AdminDashboard());
+      base.add(const FinanceDashboardScreen());
     }
 
     return base;
@@ -82,6 +84,11 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
           label: "Admin",
         ),
       );
+       base.add(BottomNavigationBarItem(
+    icon: Icon(Icons.bar_chart_outlined, color: inActiveColor),
+    activeIcon: Icon(Icons.bar_chart, color: activeColor),
+    label: "Finance",
+  ));
     }
 
     return base;

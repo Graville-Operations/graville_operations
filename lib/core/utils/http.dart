@@ -35,7 +35,7 @@ class HttpUtil {
       connectTimeout: const Duration(milliseconds: 30000),
 
       // The interval between two received data on the response stream, in milliseconds。
-      receiveTimeout: const Duration(milliseconds: 20000),
+      receiveTimeout: const Duration(milliseconds: 60000),
 
       // Http request header.
       headers: {},
