@@ -13,7 +13,7 @@ class Global{
 
     //while using Get.put() you can inject the controller and the controller will be ready to be used
     //this is because it's in the memory
-    Get.put<UserStore>(UserStore());
+    Get.lazyPut<UserStore>(() => UserStore());
     // Get.put<MenuStore>(MenuStore());
   }
 }

@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:graville_operations/core/local/store/user_store.dart';
+import 'package:graville_operations/core/remote/api/auth_api.dart';
+import 'package:graville_operations/core/routes/names.dart';
 //import 'package:graville_operations/screens/auth/login/login_screen.dart';
 import 'package:graville_operations/screens/auth/login/view.dart';
-import 'package:graville_operations/screens/settings/settings_screen.dart';
 import 'package:graville_operations/screens/support/support_screen.dart';
 import 'package:graville_operations/services/api_service.dart';
 
@@ -73,11 +76,8 @@ class _AccountScreenState extends State<AccountScreen> {
 
     if (confirm == true) {
       await ApiService.clearSession();
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (_) => LoginScreen()),
-            (route) => false,
-      );
+      await AuthApi.logout();
+      Get.offNamed(AppRoutes.login);
     }
   }
 
@@ -154,7 +154,7 @@ final List<_AccountItem> _accountItems = [
   _AccountItem(
     icon: Icons.settings,
     title: 'Settings',
-    destination: SettingsScreen(),
+    // destination: SettingsScreen(),
   ),
   _AccountItem(
     icon: Icons.support_agent,

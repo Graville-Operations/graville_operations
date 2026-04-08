@@ -56,13 +56,13 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             const SizedBox(height: 12),
-            Tooltip(
-              message: "New Site",
-              child: miniFab(
-                Icons.apartment,
-                () => context.push(const CreateSitesScreen()),
-              ),
-            ),
+            // Tooltip(
+            //   message: "New Site",
+            //   child: miniFab(
+            //     Icons.apartment,
+            //     () => context.push(const CreateSitesScreen()),
+            //   ),
+            // ),
             const SizedBox(height: 12),
             Tooltip(
             message: "View sites",

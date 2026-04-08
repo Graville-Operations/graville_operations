@@ -12,8 +12,6 @@ import 'controller.dart';
 
 class LoginScreen extends GetView<LoginController> {
   const LoginScreen({super.key});
-
-  // ✅ Social icon (UI only — safe to keep)
   Widget socialIcon(IconData icon, Color color) {
     return InkWell(
       borderRadius: BorderRadius.circular(30),
@@ -54,7 +52,6 @@ class LoginScreen extends GetView<LoginController> {
             child: SingleChildScrollView(
               padding: const EdgeInsets.fromLTRB(24, 0, 24, 40),
               child: Form(
-                key: controller.formKey,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
