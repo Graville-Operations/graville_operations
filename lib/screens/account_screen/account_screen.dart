@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:graville_operations/models/personal_settings.dart';
 //import 'package:graville_operations/screens/auth/login/login_screen.dart';
 import 'package:graville_operations/screens/auth/login/view.dart';
-// import 'package:graville_operations/screens/settings/settings_screen.dart';
+//import 'package:graville_operations/screens/settings/settings_screen.dart';
 import 'package:graville_operations/screens/support/support_screen.dart';
 import 'package:graville_operations/services/api_service.dart';
-import 'package:graville_operations/services/profile_api_service.dart';
 
 class AccountScreen extends StatefulWidget {
   const AccountScreen({super.key});
@@ -15,15 +13,6 @@ class AccountScreen extends StatefulWidget {
 }
 
 class _AccountScreenState extends State<AccountScreen> {
-  final _service = ProfileApiService();
-
-  User? _user;
-  PersonalSettings? _settings;
-  String? _error;
-  bool _loading = true;
-
-  String _selectedLanguage = 'en';
-  String _selectedTheme = 'system';
   String firstName = '';
   String lastName = '';
   String email = '';
@@ -96,15 +85,13 @@ class _AccountScreenState extends State<AccountScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Account',
-            style: TextStyle(fontWeight: FontWeight.bold)),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new),
-          onPressed: () => Navigator.pop(context),
-        ),
-        centerTitle: true,
-        elevation: 0,
-        backgroundColor: const Color(0xFFF5F5F7),
+        title: const Text('Account'),
+        leading: Navigator.canPop(context)
+            ? IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: () => Navigator.pop(context),
+              )
+            : null,
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -167,7 +154,7 @@ final List<_AccountItem> _accountItems = [
   _AccountItem(
     icon: Icons.settings,
     title: 'Settings',
-    destination: SettingsScreen(),
+    //destination: SettingsScreen(),
   ),
   _AccountItem(
     icon: Icons.support_agent,
@@ -210,6 +197,8 @@ class _ProfileCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Card(
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
@@ -270,7 +259,7 @@ class _ProfileCard extends StatelessWidget {
   }
 }
 
-class _AccountItem extends StatelessWidget {
+class _AccountItem {
   final IconData icon;
   final String title;
   final Widget? destination;
@@ -278,8 +267,15 @@ class _AccountItem extends StatelessWidget {
   const _AccountItem({
     required this.icon,
     required this.title,
-    this.onTap,
+    this.destination,
   });
+}
+
+class _AccountItemTile extends StatelessWidget {
+  final _AccountItem item;
+  final bool showDivider;
+
+  const _AccountItemTile({required this.item, required this.showDivider});
 
   @override
   Widget build(BuildContext context) {
@@ -309,14 +305,12 @@ class _AccountItem extends StatelessWidget {
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-              ),
+              ],
             ),
-            const Icon(Icons.chevron_right, size: 20),
-          ],
+          ),
         ),
         if (showDivider)
           const Divider(height: 1, indent: 16, endIndent: 16),
-        ]
       ],
     );
   }

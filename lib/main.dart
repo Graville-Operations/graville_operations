@@ -32,7 +32,7 @@ class _MyAppState extends State<MyApp> {
       initialRoute: AppRoutes.initial,
       getPages: AppPages.routes,
       builder: EasyLoading.init(),
-      home: const DashboardScreen(),
+     // home: const DashboardScreen(),
     );
   }
 }
