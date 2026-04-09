@@ -14,3 +14,6 @@ const String storageIndexNewsCache = 'cache_index_news';
 
 /// multi-language
 const String storageLanguageCode = 'language_code';
+
+const String menuTokenKey = 'user_menu_token';
+const String userMenus = 'user_menus';
