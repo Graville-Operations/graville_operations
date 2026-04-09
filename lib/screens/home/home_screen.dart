@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:graville_operations/application/custom_navigator.dart';
 import 'package:graville_operations/models/project_status.dart';
-import 'package:graville_operations/navigation/custom_navigator.dart';
 import 'package:graville_operations/screens/commons/widgets/progress_bar.dart';
 import 'package:graville_operations/screens/inventory/add_material.dart';
 import 'package:graville_operations/screens/inventory/update_inventory.dart';
@@ -56,13 +56,13 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             const SizedBox(height: 12),
-            Tooltip(
-              message: "New Site",
-              child: miniFab(
-                Icons.apartment,
-                () => context.push(const CreateSitesScreen()),
-              ),
-            ),
+            // Tooltip(
+            //   message: "New Site",
+            //   child: miniFab(
+            //     Icons.apartment,
+            //     () => context.push(const CreateSitesScreen()),
+            //   ),
+            // ),
             const SizedBox(height: 12),
             Tooltip(
             message: "View sites",
