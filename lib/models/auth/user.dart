@@ -111,7 +111,11 @@ class User {
       };
   String get fullName => "$firstName $middleName $lastName";
 
-  get profilePicture => null;
+  String? get profilePicture => null;
 
-  String? get initials => null;
+  String get initials {
+    final f = firstName.isNotEmpty ? firstName[0].toUpperCase() : '';
+    final l = lastName.isNotEmpty ? lastName[0].toUpperCase() : '';
+    return '$f$l';
+  }
 }
