@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:graville_operations/core/local/store/user_store.dart';
+import 'package:graville_operations/core/remote/api/auth_api.dart';
+import 'package:graville_operations/core/routes/names.dart';
 //import 'package:graville_operations/screens/auth/login/login_screen.dart';
 import 'package:graville_operations/screens/auth/login/view.dart';
-//import 'package:graville_operations/screens/settings/settings_screen.dart';
 import 'package:graville_operations/screens/support/support_screen.dart';
 import 'package:graville_operations/services/api_service.dart';
 
@@ -73,11 +76,8 @@ class _AccountScreenState extends State<AccountScreen> {
 
     if (confirm == true) {
       await ApiService.clearSession();
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (_) => LoginScreen()),
-        (route) => false,
-      );
+      await AuthApi.logout();
+      Get.offNamed(AppRoutes.login);
     }
   }
 
@@ -88,64 +88,64 @@ class _AccountScreenState extends State<AccountScreen> {
         title: const Text('Account'),
         leading: Navigator.canPop(context)
             ? IconButton(
-                icon: const Icon(Icons.arrow_back),
-                onPressed: () => Navigator.pop(context),
-              )
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
+        )
             : null,
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : Padding(
-              padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            // Profile Card
+            _ProfileCard(
+              firstName: firstName,
+              lastName: lastName,
+              email: email,
+              role: role,
+              onTap: () async {
+                final userId = await ApiService.getUserId();
+                if (userId != null) {
+                  // Navigate to edit profile when ready
+                  debugPrint('Edit profile tapped for user $userId');
+                }
+              },
+            ),
+            const SizedBox(height: 16),
+
+            // Account Items
+            Card(
               child: Column(
-                children: [
-                  // Profile Card
-                  _ProfileCard(
-                    firstName: firstName,
-                    lastName: lastName,
-                    email: email,
-                    role: role,
-                    onTap: () async {
-                      final userId = await ApiService.getUserId();
-                      if (userId != null) {
-                        // Navigate to edit profile when ready
-                        debugPrint('Edit profile tapped for user $userId');
-                      }
-                    },
+                children: List.generate(
+                  _accountItems.length,
+                      (index) => _AccountItemTile(
+                    item: _accountItems[index],
+                    showDivider: index != _accountItems.length - 1,
                   ),
-                  const SizedBox(height: 16),
-
-                  // Account Items
-                  Card(
-                    child: Column(
-                      children: List.generate(
-                        _accountItems.length,
-                        (index) => _AccountItemTile(
-                          item: _accountItems[index],
-                          showDivider: index != _accountItems.length - 1,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Logout Button
-                  Card(
-                    child: ListTile(
-                      leading: const Icon(Icons.logout, color: Colors.red),
-                      title: const Text(
-                        'Logout',
-                        style: TextStyle(
-                          color: Colors.red,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      onTap: _logout,
-                    ),
-                  ),
-                ],
+                ),
               ),
             ),
+            const SizedBox(height: 16),
+
+            // Logout Button
+            Card(
+              child: ListTile(
+                leading: const Icon(Icons.logout, color: Colors.red),
+                title: const Text(
+                  'Logout',
+                  style: TextStyle(
+                    color: Colors.red,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                onTap: _logout,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -154,7 +154,7 @@ final List<_AccountItem> _accountItems = [
   _AccountItem(
     icon: Icons.settings,
     title: 'Settings',
-    //destination: SettingsScreen(),
+    // destination: SettingsScreen(),
   ),
   _AccountItem(
     icon: Icons.support_agent,
@@ -294,7 +294,7 @@ class _AccountItemTile extends StatelessWidget {
           },
           child: Padding(
             padding:
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             child: Row(
               children: [
                 Icon(item.icon, size: 22),
