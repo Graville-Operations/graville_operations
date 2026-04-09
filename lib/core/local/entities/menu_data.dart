@@ -17,7 +17,7 @@ class MenuItem{
     required this.priority,
     this.subMenus = const [],
   });
-  factory MenuItem.fromJson(Map<String, dynamic> json) {
+  factory MenuItem.fromJson(json) {
     return MenuItem(
       id: json['id'] as int,
       name: json['name'] as String,

@@ -4,6 +4,7 @@ import 'dart:math' as math;
 
 class DashboardDetailsScreen extends StatefulWidget {
   final DashboardModel site;
+
   const DashboardDetailsScreen({super.key, required this.site});
 
   @override
@@ -630,6 +631,7 @@ class _DashboardDetailScreenState extends State<DashboardDetailsScreen> {
 class _SectionHeader extends StatelessWidget {
   final String title;
   final String? sub;
+
   const _SectionHeader({required this.title, this.sub});
 
   @override
@@ -655,6 +657,7 @@ class _SectionHeader extends StatelessWidget {
 class _HeroMeta extends StatelessWidget {
   final IconData icon;
   final String text;
+
   const _HeroMeta({required this.icon, required this.text});
 
   @override
@@ -680,6 +683,7 @@ class _StatCard extends StatelessWidget {
   final String value;
   final String sub;
   final Color valueColor;
+
   const _StatCard(
       {required this.label,
       required this.value,
@@ -689,7 +693,7 @@ class _StatCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
@@ -727,6 +731,7 @@ class _RingCard extends StatelessWidget {
   final String sub;
   final int percent;
   final Color color;
+
   const _RingCard(
       {required this.label,
       required this.sub,
@@ -778,6 +783,7 @@ class _RingCard extends StatelessWidget {
 class _RingPainter extends CustomPainter {
   final double percent;
   final Color color;
+
   const _RingPainter({required this.percent, required this.color});
 
   @override
@@ -817,6 +823,7 @@ class _RingPainter extends CustomPainter {
 
 class _ReportItem extends StatelessWidget {
   final ReportItem report;
+
   const _ReportItem({required this.report});
 
   Color get _typeColor {
