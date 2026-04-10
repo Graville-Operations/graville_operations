@@ -4,13 +4,12 @@ import 'package:get/get.dart';
 import 'package:graville_operations/core/local/entities/user_data.dart';
 import 'package:graville_operations/core/local/store/user_store.dart';
 import 'package:graville_operations/core/remote/api/auth_api.dart';
+import 'package:graville_operations/core/remote/api/menus.dart';
 import 'package:graville_operations/core/remote/dto/requests/login.dart';
 import 'package:graville_operations/core/routes/routes.dart';
 import 'package:graville_operations/screens/auth/login/state.dart';
 
 class LoginController extends GetxController {
-  final formKey = GlobalKey<FormState>(); // ✅ ADD THIS
-
   var state = LoginState();
 
   void goToSignUp() {
@@ -26,11 +25,6 @@ class LoginController extends GetxController {
   }
 
   Future<String> login() async {
-    // ✅ validate BEFORE login
-    if (!formKey.currentState!.validate()) {
-      return "Invalid form";
-    }
-
     String res = "Unexpected Error Occurred";
     EasyLoading.show(status: "Logging you in....");
 
@@ -43,17 +37,23 @@ class LoginController extends GetxController {
       var result = await AuthApi.login(request);
 
       EasyLoading.show(status: 'Updating profile info .....');
+      if(result.accessToken.isNotEmpty){
+        await UserStore.to.setToken(result.accessToken);
 
-      await UserStore.to.setToken(result.accessToken);
+        var me = await AuthApi.me();
+        await UserStore.to.saveProfile(me.toUserData());
+        var menus = await MenuApi.getMyMenu();
+        await UserStore.to.saveMenus(menus, result.accessToken);
 
-      var me = await AuthApi.me();
-      await UserStore.to.saveProfile(me.toUserData());
+        EasyLoading.showSuccess('Logged in Successfully');
 
-      EasyLoading.showSuccess('Logged in Successfully');
+        Get.offAllNamed(AppRoutes.application);
 
-      Get.offAllNamed(AppRoutes.application);
+        return "Success";
+      }else{
+        return "Error logging you in";
+      }
 
-      return "Success";
     } catch (e) {
       res = "...error in login ${e.toString()}";
       debugPrint(res);

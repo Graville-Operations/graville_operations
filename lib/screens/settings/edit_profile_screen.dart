@@ -1,14 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:graville_operations/core/local/store/user_store.dart';
-import 'package:graville_operations/models/auth/user.dart';
-import 'package:graville_operations/services/profile_api_service.dart';
-import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+import 'package:image_picker/image_picker.dart';
 
 class EditProfileScreen extends StatefulWidget {
-  final User user;
-
-  const EditProfileScreen({super.key, required this.user});
+  const EditProfileScreen({super.key});
 
   @override
   State<EditProfileScreen> createState() => _EditProfileScreenState();
@@ -16,24 +11,24 @@ class EditProfileScreen extends StatefulWidget {
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _service = ProfileApiService();
 
+  // ✅ Dummy data pre-filled in controllers
   late TextEditingController _firstNameController;
   late TextEditingController _lastNameController;
   late TextEditingController _emailController;
   late TextEditingController _phoneController;
 
-  bool _isSaving = false;
   File? _selectedImage;
+  bool _isSaving = false;
 
   @override
   void initState() {
     super.initState();
-    final u = widget.user;
-    _firstNameController = TextEditingController(text: u.firstName);
-    _lastNameController = TextEditingController(text: u.lastName);
-    _emailController = TextEditingController(text: u.email);
-    _phoneController = TextEditingController(text: u.phoneNo);
+    // ✅ Pre-filled dummy data
+    _firstNameController = TextEditingController(text: 'John');
+    _lastNameController = TextEditingController(text: 'Doe');
+    _emailController = TextEditingController(text: 'johndoe@gmail.com');
+    _phoneController = TextEditingController(text: '+254 712 345 678');
   }
 
   @override
@@ -45,7 +40,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     super.dispose();
   }
 
-  // ✅ Fixed: opens CAMERA not gallery
+  // ✅ Opens camera when camera icon is tapped
   Future<void> _openCamera() async {
     final picker = ImagePicker();
     final picked = await picker.pickImage(source: ImageSource.camera);
@@ -54,33 +49,18 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     }
   }
 
-  Future<void> _saveProfile() async {
+  void _onSave() async {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _isSaving = true);
 
-    try {
-      final userId = UserStore.to.userId;
-      final updated = await _service.updateProfile(userId, {
-        'first_name': _firstNameController.text.trim(),
-        'last_name': _lastNameController.text.trim(),
-        'email': _emailController.text.trim(),
-        'phone_number': _phoneController.text.trim(),
-      });
+    // Simulate a save delay
+    await Future.delayed(const Duration(seconds: 1));
 
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Profile updated successfully!')),
-        );
-        Navigator.pop(context, updated);
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to update: $e')),
-        );
-      }
-    } finally {
-      if (mounted) setState(() => _isSaving = false);
+    if (mounted) {
+      setState(() => _isSaving = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Profile saved successfully!')),
+      );
     }
   }
 
@@ -89,9 +69,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
+      backgroundColor: const Color(0xFFF5F5F7),
       appBar: AppBar(
-        title: const Text('Edit Profile',
-            style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text(
+          'Edit Profile',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         centerTitle: true,
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
@@ -105,168 +88,254 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         children: [
           Expanded(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.all(24),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
               child: Form(
                 key: _formKey,
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const SizedBox(height: 8),
-
-                    // ✅ Avatar with camera icon — tapping icon opens camera
-                    Stack(
-                      children: [
-                        CircleAvatar(
-                          radius: 60,
-                          backgroundColor: Colors.grey[200],
-                          backgroundImage: _selectedImage != null
-                              ? FileImage(_selectedImage!)
-                              : (widget.user.profilePicture != null
-                                  ? NetworkImage(
-                                      widget.user.profilePicture!)
-                                  : null) as ImageProvider?,
-                          child: (_selectedImage == null &&
-                                  widget.user.profilePicture == null)
-                              ? Text(
-                                  widget.user.initials,
-                                  style: TextStyle(
-                                    fontSize: 32,
-                                    fontWeight: FontWeight.bold,
-                                    color: theme.colorScheme.onSurfaceVariant,
+                    // ✅ Image picker card at the top
+                    // ✅ Image picker card at the top
+                    Center(
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(vertical: 28),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: Colors.grey.shade200),
+                        ),
+                        child: Column(
+                          children: [
+                            Stack(
+                              children: [
+                                // ✅ Plain grey avatar — no initials
+                                CircleAvatar(
+                                  radius: 52,
+                                  backgroundColor: Colors.grey.shade200,
+                                  backgroundImage: _selectedImage != null
+                                      ? FileImage(_selectedImage!)
+                                      : null,
+                                  child: _selectedImage == null
+                                      ? Icon(
+                                          Icons.person,
+                                          size: 52,
+                                          color: Colors.grey.shade400,
+                                        )
+                                      : null,
+                                ),
+                                // ✅ Camera icon — tapping opens camera
+                                Positioned(
+                                  bottom: 0,
+                                  right: 0,
+                                  child: GestureDetector(
+                                    onTap: _openCamera,
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: Colors.blue,
+                                        shape: BoxShape.circle,
+                                        border: Border.all(
+                                            color: Colors.white, width: 2.5),
+                                      ),
+                                      padding: const EdgeInsets.all(7),
+                                      child: const Icon(
+                                        Icons.camera_alt,
+                                        size: 18,
+                                        color: Colors.white,
+                                      ),
+                                    ),
                                   ),
-                                )
-                              : null,
-                        ),
-                        // ✅ Camera icon button — tapping opens camera
-                        Positioned(
-                          bottom: 0,
-                          right: 0,
-                          child: GestureDetector(
-                            onTap: _openCamera, // opens camera
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: Colors.blue,
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                    color: Colors.white, width: 3),
-                              ),
-                              padding: const EdgeInsets.all(8),
-                              child: const Icon(Icons.camera_alt,
-                                  size: 20, color: Colors.white),
+                                ),
+                              ],
                             ),
-                          ),
+                            const SizedBox(height: 12),
+                            const Text(
+                              'Tap the camera to change photo',
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
 
-                    const SizedBox(height: 32),
+                    const SizedBox(height: 24),
 
                     // ✅ First Name
+                    _buildLabel('First Name'),
+                    const SizedBox(height: 6),
                     TextFormField(
                       controller: _firstNameController,
-                      decoration: const InputDecoration(
-                        labelText: 'First Name',
-                        border: OutlineInputBorder(),
-                        prefixIcon: Icon(Icons.person_outline),
+                      decoration: _inputDecoration(
+                        hint: 'Enter first name',
+                        icon: Icons.person_outline,
                       ),
-                      validator: (v) =>
-                          (v == null || v.trim().isEmpty)
-                              ? 'First name is required'
-                              : null,
+                      validator: (v) => (v == null || v.trim().isEmpty)
+                          ? 'First name is required'
+                          : null,
                     ),
+
                     const SizedBox(height: 16),
 
                     // ✅ Last Name
+                    _buildLabel('Last Name'),
+                    const SizedBox(height: 6),
                     TextFormField(
                       controller: _lastNameController,
-                      decoration: const InputDecoration(
-                        labelText: 'Last Name',
-                        border: OutlineInputBorder(),
-                        prefixIcon: Icon(Icons.person_outline),
+                      decoration: _inputDecoration(
+                        hint: 'Enter last name',
+                        icon: Icons.person_outline,
                       ),
-                      validator: (v) =>
-                          (v == null || v.trim().isEmpty)
-                              ? 'Last name is required'
-                              : null,
+                      validator: (v) => (v == null || v.trim().isEmpty)
+                          ? 'Last name is required'
+                          : null,
                     ),
+
                     const SizedBox(height: 16),
 
                     // ✅ Email
+                    _buildLabel('Email'),
+                    const SizedBox(height: 6),
                     TextFormField(
                       controller: _emailController,
-                      decoration: const InputDecoration(
-                        labelText: 'Email',
-                        border: OutlineInputBorder(),
-                        prefixIcon: Icon(Icons.email_outlined),
-                      ),
                       keyboardType: TextInputType.emailAddress,
-                      validator: (v) =>
-                          (v == null || !v.contains('@'))
-                              ? 'Enter a valid email'
-                              : null,
+                      decoration: _inputDecoration(
+                        hint: 'Enter email address',
+                        icon: Icons.email_outlined,
+                      ),
+                      validator: (v) => (v == null || !v.contains('@'))
+                          ? 'Enter a valid email'
+                          : null,
                     ),
+
                     const SizedBox(height: 16),
 
                     // ✅ Phone Number
+                    _buildLabel('Phone Number'),
+                    const SizedBox(height: 6),
                     TextFormField(
                       controller: _phoneController,
-                      decoration: const InputDecoration(
-                        labelText: 'Phone Number',
-                        border: OutlineInputBorder(),
-                        prefixIcon: Icon(Icons.phone_outlined),
-                      ),
                       keyboardType: TextInputType.phone,
-                      validator: (v) =>
-                          (v == null || v.trim().isEmpty)
-                              ? 'Phone number is required'
-                              : null,
+                      decoration: _inputDecoration(
+                        hint: 'Enter phone number',
+                        icon: Icons.phone_outlined,
+                      ),
+                      validator: (v) => (v == null || v.trim().isEmpty)
+                          ? 'Phone number is required'
+                          : null,
                     ),
+
+                    const SizedBox(height: 32),
                   ],
                 ),
               ),
             ),
           ),
 
-          // ✅ Cancel & Save buttons pinned at bottom
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+          // ✅ Cancel & Save buttons pinned at the bottom
+          Container(
+            color: Colors.white,
+            padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
             child: Row(
               children: [
+                // Cancel — left
                 Expanded(
                   child: OutlinedButton(
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 14),
+                      side: const BorderSide(color: Colors.grey),
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10)),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                     ),
-                    onPressed:
-                        _isSaving ? null : () => Navigator.pop(context),
-                    child: const Text('Cancel',
-                        style: TextStyle(fontSize: 16)),
+                    onPressed: _isSaving ? null : () => Navigator.pop(context),
+                    child: const Text(
+                      'Cancel',
+                      style: TextStyle(
+                        fontSize: 15,
+                        color: Colors.black87,
+                      ),
+                    ),
                   ),
                 ),
+
                 const SizedBox(width: 16),
+
+                // Save — right
                 Expanded(
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                      foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10)),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      elevation: 0,
                     ),
-                    onPressed: _isSaving ? null : _saveProfile,
+                    onPressed: _isSaving ? null : _onSave,
                     child: _isSaving
                         ? const SizedBox(
                             height: 20,
                             width: 20,
                             child: CircularProgressIndicator(
-                                strokeWidth: 2))
-                        : const Text('Save',
-                            style: TextStyle(fontSize: 16)),
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                        : const Text(
+                            'Save',
+                            style: TextStyle(fontSize: 15),
+                          ),
                   ),
                 ),
               ],
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  // ✅ Reusable field label
+  Widget _buildLabel(String text) {
+    return Text(
+      text,
+      style: const TextStyle(
+        fontSize: 14,
+        fontWeight: FontWeight.w600,
+        color: Colors.black87,
+      ),
+    );
+  }
+
+  // ✅ Reusable input decoration
+  InputDecoration _inputDecoration(
+      {required String hint, required IconData icon}) {
+    return InputDecoration(
+      hintText: hint,
+      hintStyle: const TextStyle(color: Colors.grey, fontSize: 14),
+      prefixIcon: Icon(icon, size: 20, color: Colors.grey),
+      filled: true,
+      fillColor: Colors.white,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide: BorderSide(color: Colors.grey.shade300),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide: BorderSide(color: Colors.grey.shade300),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide: const BorderSide(color: Colors.blue, width: 1.5),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide: const BorderSide(color: Colors.red),
       ),
     );
   }
