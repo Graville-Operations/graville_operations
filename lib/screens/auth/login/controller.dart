@@ -3,12 +3,13 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:graville_operations/core/local/entities/user_data.dart';
 import 'package:graville_operations/core/local/store/user_store.dart';
+import 'package:graville_operations/core/remote/api/auth_api.dart';
+import 'package:graville_operations/core/remote/dto/requests/login.dart';
 import 'package:graville_operations/core/routes/routes.dart';
 import 'package:graville_operations/screens/auth/login/state.dart';
-import 'package:graville_operations/services/api_service.dart';
 
 class LoginController extends GetxController {
-  final formKey = GlobalKey<FormState>();
+  final formKey = GlobalKey<FormState>(); // ✅ ADD THIS
 
   var state = LoginState();
 
@@ -25,51 +26,41 @@ class LoginController extends GetxController {
   }
 
   Future<String> login() async {
+    // ✅ validate BEFORE login
     if (!formKey.currentState!.validate()) {
       return "Invalid form";
     }
 
+    String res = "Unexpected Error Occurred";
     EasyLoading.show(status: "Logging you in....");
 
     try {
-      final result = await ApiService.login(
-        state.email.text.trim(),
-        state.psw.text.trim(),
+      LoginRequest request = LoginRequest(
+        username: state.email.text,
+        password: state.psw.text,
       );
 
-      if (result['success']) {
-        final data = result['data'];
-        final user = data['user'];
+      var result = await AuthApi.login(request);
 
-        // Save token to UserStore (GetX storage)
-        await UserStore.to.setToken(data['access_token']);
+      EasyLoading.show(status: 'Updating profile info .....');
 
-        // Save profile to UserStore using data from our backend
-        await UserStore.to.saveProfile(UserData(
-          id: user['id'],
-          email: user['email'],
-          firstName: user['first_name'],
-          lastName: user['last_name'],
-          accountType: user['role'],
-          enabled: true,
-          groups: [],
-        ));
+      await UserStore.to.setToken(result.accessToken);
 
-        // Also save to ApiService SharedPreferences for our screens
-        await ApiService.saveRole(data['role']);
-        await ApiService.saveUserId(user['id']);
+      var me = await AuthApi.me();
+      await UserStore.to.saveProfile(me.toUserData());
 
-        EasyLoading.showSuccess('Logged in Successfully');
-        Get.offAllNamed(AppRoutes.application);
-        return "Success";
-      } else {
-        EasyLoading.showError(result['message'] ?? 'Login failed');
-        return result['message'] ?? 'Login failed';
-      }
+      EasyLoading.showSuccess('Logged in Successfully');
+
+      Get.offAllNamed(AppRoutes.application);
+
+      return "Success";
     } catch (e) {
-      debugPrint("...error in login ${e.toString()}");
-      EasyLoading.showError("Login failed");
-      return e.toString();
+      res = "...error in login ${e.toString()}";
+      debugPrint(res);
+
+      EasyLoading.showError("Login failed"); // ✅ better UX
+
+      return res;
     }
   }
 }

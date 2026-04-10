@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:graville_operations/screens/dashboard/dashboard_details_screen.dart';
 import 'package:graville_operations/models/dashboard/dashboard_model.dart';
+import 'package:graville_operations/screens/projects/dashboard/details/dashboard_details_screen.dart';
 
-class DashboardScreen extends StatefulWidget {
-  const DashboardScreen({super.key});
+class ProjectDashboardScreen extends StatefulWidget {
+  const ProjectDashboardScreen({super.key});
 
   @override
-  State<DashboardScreen> createState() => _DashboardScreenState();
+  State<ProjectDashboardScreen> createState() => _ProjectDashboardScreenState();
 }
 
-class _DashboardScreenState extends State<DashboardScreen> {
+class _ProjectDashboardScreenState extends State<ProjectDashboardScreen> {
   String _filter = 'All';
   String _search = '';
   final TextEditingController _searchController = TextEditingController();

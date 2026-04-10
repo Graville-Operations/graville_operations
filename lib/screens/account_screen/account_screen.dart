@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:graville_operations/models/auth/user.dart';
-import 'package:graville_operations/models/personal_settings.dart';
+import 'package:get/get.dart';
+import 'package:graville_operations/core/local/store/user_store.dart';
+import 'package:graville_operations/core/remote/api/auth_api.dart';
+import 'package:graville_operations/core/routes/names.dart';
 //import 'package:graville_operations/screens/auth/login/login_screen.dart';
 import 'package:graville_operations/screens/auth/login/view.dart';
-// import 'package:graville_operations/screens/settings/settings_screen.dart';
 import 'package:graville_operations/screens/support/support_screen.dart';
 import 'package:graville_operations/services/api_service.dart';
-import 'package:graville_operations/services/profile_api_service.dart';
 
 class AccountScreen extends StatefulWidget {
   const AccountScreen({super.key});
@@ -16,15 +16,6 @@ class AccountScreen extends StatefulWidget {
 }
 
 class _AccountScreenState extends State<AccountScreen> {
-  final _service = ProfileApiService();
-
-  User? _user;
-  PersonalSettings? _settings;
-  String? _error;
-  bool _loading = true;
-
-  String _selectedLanguage = 'en';
-  String _selectedTheme = 'system';
   String firstName = '';
   String lastName = '';
   String email = '';
@@ -85,11 +76,8 @@ class _AccountScreenState extends State<AccountScreen> {
 
     if (confirm == true) {
       await ApiService.clearSession();
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (_) => LoginScreen()),
-        (route) => false,
-      );
+      await AuthApi.logout();
+      Get.offNamed(AppRoutes.login);
     }
   }
 
@@ -97,69 +85,67 @@ class _AccountScreenState extends State<AccountScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Account',
-            style: TextStyle(fontWeight: FontWeight.bold)),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new),
+        title: const Text('Account'),
+        leading: Navigator.canPop(context)
+            ? IconButton(
+          icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
-        ),
-        centerTitle: true,
-        elevation: 0,
-        backgroundColor: const Color(0xFFF5F5F7),
+        )
+            : null,
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : Padding(
-              padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            // Profile Card
+            _ProfileCard(
+              firstName: firstName,
+              lastName: lastName,
+              email: email,
+              role: role,
+              onTap: () async {
+                final userId = await ApiService.getUserId();
+                if (userId != null) {
+                  // Navigate to edit profile when ready
+                  debugPrint('Edit profile tapped for user $userId');
+                }
+              },
+            ),
+            const SizedBox(height: 16),
+
+            // Account Items
+            Card(
               child: Column(
-                children: [
-                  // Profile Card
-                  _ProfileCard(
-                    firstName: firstName,
-                    lastName: lastName,
-                    email: email,
-                    role: role,
-                    onTap: () async {
-                      final userId = await ApiService.getUserId();
-                      if (userId != null) {
-                        // Navigate to edit profile when ready
-                        debugPrint('Edit profile tapped for user $userId');
-                      }
-                    },
+                children: List.generate(
+                  _accountItems.length,
+                      (index) => _AccountItemTile(
+                    item: _accountItems[index],
+                    showDivider: index != _accountItems.length - 1,
                   ),
-                  const SizedBox(height: 16),
-
-                  // Account Items
-                  Card(
-                    child: Column(
-                      children: List.generate(
-                        _accountItems.length,
-                        (index) => _AccountItemTile(
-                          item: _accountItems[index],
-                          showDivider: index != _accountItems.length - 1,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Logout Button
-                  Card(
-                    child: ListTile(
-                      leading: const Icon(Icons.logout, color: Colors.red),
-                      title: const Text(
-                        'Logout',
-                        style: TextStyle(
-                          color: Colors.red,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      onTap: _logout,
-                    ),
-                  ),
-                ],
+                ),
               ),
             ),
+            const SizedBox(height: 16),
+
+            // Logout Button
+            Card(
+              child: ListTile(
+                leading: const Icon(Icons.logout, color: Colors.red),
+                title: const Text(
+                  'Logout',
+                  style: TextStyle(
+                    color: Colors.red,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                onTap: _logout,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -168,6 +154,7 @@ final List<_AccountItem> _accountItems = [
   _AccountItem(
     icon: Icons.settings,
     title: 'Settings',
+    // destination: SettingsScreen(),
   ),
   _AccountItem(
     icon: Icons.support_agent,
@@ -211,6 +198,7 @@ class _ProfileCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+
     return Card(
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
@@ -287,10 +275,7 @@ class _AccountItemTile extends StatelessWidget {
   final _AccountItem item;
   final bool showDivider;
 
-  const _AccountItemTile({
-    required this.item,
-    required this.showDivider,
-  });
+  const _AccountItemTile({required this.item, required this.showDivider});
 
   @override
   Widget build(BuildContext context) {
@@ -299,34 +284,33 @@ class _AccountItemTile extends StatelessWidget {
     return Column(
       children: [
         InkWell(
-          onTap: item.destination == null
-              ? null
-              : () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => item.destination!),
-                  );
-                },
+          onTap: () {
+            if (item.destination != null) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => item.destination!),
+              );
+            }
+          },
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            padding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             child: Row(
               children: [
                 Icon(item.icon, size: 22),
                 const SizedBox(width: 16),
-                Expanded(
-                  child: Text(
-                    item.title,
-                    style: theme.textTheme.bodyLarge?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
+                Text(
+                  item.title,
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
-                const Icon(Icons.chevron_right, size: 20),
               ],
             ),
           ),
         ),
-        if (showDivider) const Divider(height: 1, indent: 16, endIndent: 16),
+        if (showDivider)
+          const Divider(height: 1, indent: 16, endIndent: 16),
       ],
     );
   }

@@ -24,7 +24,7 @@ class _SignupState extends State<Signup> {
   bool _isPasswordVisible = false;
   bool _isConfirmpasswordVisible = false;
 
-  Widget _socialIcon(FaIconData icon, Color color) {
+  Widget _socialIcon(IconData icon, Color color) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10),
       child: InkWell(

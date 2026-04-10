@@ -12,8 +12,6 @@ import 'controller.dart';
 
 class LoginScreen extends GetView<LoginController> {
   const LoginScreen({super.key});
-
-  // ✅ Social icon (UI only — safe to keep)
   Widget socialIcon(IconData icon, Color color) {
     return InkWell(
       borderRadius: BorderRadius.circular(30),
@@ -53,7 +51,6 @@ class LoginScreen extends GetView<LoginController> {
             child: SingleChildScrollView(
               padding: const EdgeInsets.fromLTRB(24, 0, 24, 40),
               child: Form(
-                key: controller.formKey,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -113,27 +110,29 @@ class LoginScreen extends GetView<LoginController> {
 
                     // ✅ PASSWORD (reactive)
                     Obx(() => CustomTextInput(
-                          controller: controller.state.psw,
-                          labelText: "Password",
-                          hintText: "********",
-                          prefixIcon: Icons.lock,
-                          suffixIcon: controller.state.obscurePassword.value
-                              ? Icons.visibility_off
-                              : Icons.visibility,
-                          isObscure: controller.state.obscurePassword.value,
-                          isPassword: controller.state.obscurePassword.value,
-                          onSuffixIconPressed:
-                              controller.togglePasswordVisibility,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Enter password';
-                            }
-                            if (value.length < 8) {
-                              return 'Min 8 characters';
-                            }
-                            return null;
-                          },
-                        )),
+                      controller: controller.state.psw,
+                      labelText: "Password",
+                      hintText: "********",
+                      prefixIcon: Icons.lock,
+                      suffixIcon: controller.state.obscurePassword.value
+                          ? Icons.visibility_off
+                          : Icons.visibility,
+                      isObscure:
+                      controller.state.obscurePassword.value,
+                      isPassword:
+                      controller.state.obscurePassword.value,
+                      onSuffixIconPressed:
+                      controller.togglePasswordVisibility,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Enter password';
+                        }
+                        if (value.length < 8) {
+                          return 'Min 8 characters';
+                        }
+                        return null;
+                      },
+                    )),
 
                     // ✅ Forgot password
                     Align(
@@ -178,7 +177,8 @@ class LoginScreen extends GetView<LoginController> {
                           onTap: () => Get.to(() => const Signup()),
                           child: const Text(
                             "Sign Up",
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                            style:
+                            TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ),
                       ],
