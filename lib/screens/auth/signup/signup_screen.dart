@@ -5,6 +5,7 @@ import 'package:graville_operations/screens/commons/assets/images.dart';
 import 'package:graville_operations/screens/commons/widgets/custom_button.dart';
 import 'package:graville_operations/screens/commons/widgets/custom_text_input.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:graville_operations/services/api_service.dart';
 
 class Signup extends StatefulWidget {
   const Signup({super.key});
@@ -23,7 +24,7 @@ class _SignupState extends State<Signup> {
   bool _isPasswordVisible = false;
   bool _isConfirmpasswordVisible = false;
 
-  Widget _socialIcon(IconData icon, Color color) {
+  Widget _socialIcon(FaIconData icon, Color color) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10),
       child: InkWell(
@@ -61,16 +62,44 @@ class _SignupState extends State<Signup> {
     super.dispose();
   }
 
-  void signUpUser() {
-    if (_formKey.currentState!.validate()) {
-      print("Signup Successful");
+  void signUpUser() async {
+  if (_formKey.currentState!.validate()) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const Center(child: CircularProgressIndicator()),
+    );
 
-      print("First Name: ${firstNameController.text}");
-      print("Last Name: ${lastNameController.text}");
-      print("Email: ${emailController.text}");
-      print("Password: ${passwordController.text}");
+    final result = await ApiService.adminSignup(
+      firstName: firstNameController.text.trim(),
+      lastName: lastNameController.text.trim(),
+      email: emailController.text.trim(),
+      password: passwordController.text.trim(),
+    );
+
+    Navigator.pop(context);
+
+    if (result['success']) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Account created successfully'),
+          backgroundColor: Colors.green,
+        ),
+      );
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const LoginScreen()),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(result['message']?.toString() ?? 'Signup failed'),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -93,6 +122,8 @@ class _SignupState extends State<Signup> {
             child: SingleChildScrollView(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Form(
+                  key: _formKey,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
 
@@ -127,15 +158,17 @@ class _SignupState extends State<Signup> {
                             labelText: "First Name",
                             hintText: "John",
                             prefixIcon: Icons.person, onSuffixIconPressed: () {  },
+                            validator: (v) => v == null || v.isEmpty ? 'Required' : null,
                           ),
                         ),
                         SizedBox(width: 8),
                         Expanded(
                           child: CustomTextInput(
-                            controller: firstNameController,
+                            controller: lastNameController,
                             labelText: "Last Name",
                             hintText: "Doe",
-                            prefixIcon: Icons.person, onSuffixIconPressed: () {  },
+                            prefixIcon: Icons.person, onSuffixIconPressed: () {},
+                            validator: (v) => v == null || v.isEmpty ? 'Required' : null,
                           ),
                         ),
                       ],
@@ -148,45 +181,50 @@ class _SignupState extends State<Signup> {
                       labelText: "Email",
                       hintText: "example@gmail.com",
                       prefixIcon: Icons.email, onSuffixIconPressed: () {  },
+                      validator: (v) {
+                        if (v == null || v.isEmpty) return 'Required';
+                        if (!isValidEmail(v)) return 'Enter a valid email';
+                        return null;
+                      },   
                     ),
                     //password textfield
                     SizedBox(height: 20),
                     CustomTextInput(
                       controller: passwordController,
-                      isPassword: _isPasswordVisible,
-                      isObscure: !_isPasswordVisible,
-                      onSuffixIconPressed: () {
-                        setState(() {
-                          _isPasswordVisible = !_isPasswordVisible;
-                        });
-                      },
                       labelText: 'Password',
                       hintText: 'at least 8 characters',
                       prefixIcon: Icons.lock,
-                      suffixIcon: _isPasswordVisible
-                          ? Icons.visibility
-                          : Icons.visibility_off,
+                      isPassword: _isPasswordVisible,
+                      isObscure: !_isPasswordVisible,
+                      suffixIcon: _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                      onSuffixIconPressed: () {
+                        setState(() => _isPasswordVisible = !_isPasswordVisible);
+                      },
+                      validator: (v) {
+                        if (v == null || v.isEmpty) return 'Required';
+                        if (v.length < 8) return 'Minimum 8 characters';
+                        return null;
+                      },
                     ),
 
                     SizedBox(height: 20),
                     CustomTextInput(
                       controller: confirmpasswordController,
-                      isPassword: _isConfirmpasswordVisible,
-                      isObscure: !_isConfirmpasswordVisible,
-                      onSuffixIconPressed: () {
-                        setState(() {
-                          _isConfirmpasswordVisible =
-                              !_isConfirmpasswordVisible;
-                        });
-                      },
                       labelText: 'Confirm Password',
                       hintText: 'Password should be equal',
                       prefixIcon: Icons.lock,
-                      suffixIcon: _isConfirmpasswordVisible
-                          ? Icons.visibility
-                          : Icons.visibility_off,
+                      isPassword: _isConfirmpasswordVisible,
+                      isObscure: !_isConfirmpasswordVisible,
+                      suffixIcon: _isConfirmpasswordVisible ? Icons.visibility : Icons.visibility_off,
+                      onSuffixIconPressed: () {
+                        setState(() => _isConfirmpasswordVisible = !_isConfirmpasswordVisible);
+                      },
+                      validator: (v) {
+                        if (v == null || v.isEmpty) return 'Required';
+                        if (v != passwordController.text) return 'Passwords do not match';
+                        return null;
+                      },
                     ),
-
                     //signup button
                     SizedBox(height: 20),
                     CustomButton(
@@ -242,6 +280,7 @@ class _SignupState extends State<Signup> {
                       ],
                     ),
                   ],
+                ),
                 ),
               ),
             ),
