@@ -9,7 +9,6 @@ import 'package:graville_operations/screens/projects/dashboard/binding.dart';
 import 'package:graville_operations/screens/projects/dashboard/view.dart';
 import 'package:graville_operations/screens/sites/create_sites.dart';
 
-import '../../screens/application/widgets/splash_screen.dart';
 import 'routes.dart';
 
 class AppPages {
@@ -20,12 +19,13 @@ class AppPages {
 
   static final List<GetPage> routes = [
     // about bootup of an app
+    // GetPage(
+    //   name: AppRoutes.initial,
+    //   page: () => const SplashScreen(),
+    //   binding: ApplicationBindings()
+    // ),
     GetPage(
       name: AppRoutes.initial,
-      page: () => const SplashScreen()
-    ),
-    GetPage(
-      name: AppRoutes.login,
       page: () => const LoginScreen(),
       binding: LoginBindings(),
     ),
