@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:graville_operations/core/local/entities/menu_data.dart';
+import 'package:graville_operations/core/style/style.dart';
 import 'package:graville_operations/screens/application/widgets/drawer_item.dart';
 
 class AppDrawer extends StatelessWidget {
@@ -10,7 +11,7 @@ class AppDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      backgroundColor: Colors.white,
+      // backgroundColor: Colors.white,
       child: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -19,16 +20,16 @@ class AppDrawer extends StatelessWidget {
             Container(
               width: double.infinity,
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-              color: Colors.blue.shade900,
+              // color: AppTheme.,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Icon(Icons.widgets_rounded, color: Colors.white, size: 32),
                   const SizedBox(height: 8),
                   Text(
-                    "More Options",
+                    "Admin Menus",
                     style: TextStyle(
-                      color: Colors.white,
+                      // color: Colors.white,
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
