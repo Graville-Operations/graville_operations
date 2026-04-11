@@ -11,8 +11,6 @@ class EditProfileScreen extends StatefulWidget {
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
   final _formKey = GlobalKey<FormState>();
-
-  // ✅ Dummy data pre-filled in controllers
   late TextEditingController _firstNameController;
   late TextEditingController _lastNameController;
   late TextEditingController _emailController;
@@ -24,7 +22,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   @override
   void initState() {
     super.initState();
-    // ✅ Pre-filled dummy data
     _firstNameController = TextEditingController(text: 'John');
     _lastNameController = TextEditingController(text: 'Doe');
     _emailController = TextEditingController(text: 'johndoe@gmail.com');
@@ -40,7 +37,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     super.dispose();
   }
 
-  // ✅ Opens camera when camera icon is tapped
   Future<void> _openCamera() async {
     final picker = ImagePicker();
     final picked = await picker.pickImage(source: ImageSource.camera);
@@ -162,8 +158,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ),
 
                     const SizedBox(height: 24),
-
-                    // ✅ First Name
                     _buildLabel('First Name'),
                     const SizedBox(height: 6),
                     TextFormField(
@@ -178,8 +172,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ),
 
                     const SizedBox(height: 16),
-
-                    // ✅ Last Name
                     _buildLabel('Last Name'),
                     const SizedBox(height: 6),
                     TextFormField(
@@ -194,8 +186,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ),
 
                     const SizedBox(height: 16),
-
-                    // ✅ Email
                     _buildLabel('Email'),
                     const SizedBox(height: 6),
                     TextFormField(
@@ -211,8 +201,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ),
 
                     const SizedBox(height: 16),
-
-                    // ✅ Phone Number
                     _buildLabel('Phone Number'),
                     const SizedBox(height: 6),
                     TextFormField(
@@ -233,8 +221,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               ),
             ),
           ),
-
-          // ✅ Cancel & Save buttons pinned at the bottom
           Container(
             color: Colors.white,
             padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
@@ -299,7 +285,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
   }
 
-  // ✅ Reusable field label
   Widget _buildLabel(String text) {
     return Text(
       text,
@@ -311,7 +296,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
   }
 
-  // ✅ Reusable input decoration
   InputDecoration _inputDecoration(
       {required String hint, required IconData icon}) {
     return InputDecoration(
