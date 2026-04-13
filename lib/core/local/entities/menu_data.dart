@@ -1,17 +1,17 @@
 
 class MenuItem{
-  final int id;
-  final String name;
-  final String title;
+  final int? id;
+  final String? name;
+  final String? title;
   final String? link;
   final String? icon;
-  final int priority;
+  final int? priority;
   final List<SubMenu> subMenus;
 
   const MenuItem({
-    required this.id,
-    required this.name,
-    required this.title,
+    this.id,
+    this.name,
+    this.title,
     this.link,
     this.icon,
     required this.priority,
@@ -19,12 +19,12 @@ class MenuItem{
   });
   factory MenuItem.fromJson(json) {
     return MenuItem(
-      id: json['id'] as int,
-      name: json['name'] as String,
-      title: json['title'] as String,
+      id: json['id'] as int?,
+      name: json['name'] as String?,
+      title: json['title'] as String?,
       link: json['link'] as String?,
       icon: json['icon'] as String?,
-      priority: json['priority'] as int,
+      priority: json['priority'] as int?,
       subMenus: (json['sub_menus'] as List<dynamic>?)
           ?.map((e) => SubMenu.fromJson(e as Map<String, dynamic>))
           .toList() ??
@@ -47,29 +47,29 @@ class MenuItem{
 
 
 class SubMenu {
-  final int id;
-  final String name;
-  final String title;
+  final int? id;
+  final String? name;
+  final String? title;
   final String? link;
   final String? icon;
-  final int priority;
+  final int? priority;
 
   const SubMenu({
-    required this.id,
-    required this.name,
-    required this.title,
+    this.id,
+    this.name,
+    this.title,
     this.link,
     this.icon,
-    required this.priority,
+    this.priority,
   });
   factory SubMenu.fromJson(Map<String, dynamic> json) {
     return SubMenu(
-      id: json['id'] as int,
-      name: json['name'] as String,
-      title: json['title'] as String,
+      id: json['id'] as int?,
+      name: json['name'] as String?,
+      title: json['title'] as String?,
       link: json['link'] as String?,
       icon: json['icon'] as String?,
-      priority: json['priority'] as int,
+      priority: json['priority'] as int?,
     );
   }
 

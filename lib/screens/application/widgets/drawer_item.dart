@@ -63,7 +63,7 @@ class _DrawerMenuTileState extends State<DrawerMenuTile>
             color: Colors.blue.shade900,
           ),
           title: Text(
-            widget.menu.title,
+            widget.menu.title??"Unnamed Title",
             style: TextStyle(
               fontWeight: FontWeight.w500,
               color: Colors.blue.shade900,
@@ -103,7 +103,7 @@ class _DrawerMenuTileState extends State<DrawerMenuTile>
                     color: Colors.blue.shade300,
                   ),
                   title: Text(
-                    sub.title,
+                    sub.title??"Invalid Title",
                     style: TextStyle(
                       fontSize: 14,
                       color: Colors.grey.shade700,
