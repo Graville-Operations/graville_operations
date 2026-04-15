@@ -1,11 +1,17 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:graville_operations/application/custom_navigator.dart';
-import 'package:shimmer/shimmer.dart';
 import 'package:graville_operations/models/worker_model.dart';
 import 'package:graville_operations/screens/commons/widgets/custom_dropdown.dart';
+import 'package:graville_operations/screens/commons/widgets/stat_card.dart';
+import 'package:graville_operations/screens/commons/widgets/workers_table.dart';
 import 'package:graville_operations/screens/workers/add_worker_screen.dart';
+import 'package:graville_operations/screens/commons/widgets/bulk_checkin_sheet.dart';
 import 'package:graville_operations/screens/workers/worker_profile_screen.dart';
+import 'package:graville_operations/services/attendance_service.dart';
 import 'package:graville_operations/services/worker_service.dart';
+import 'package:image_picker/image_picker.dart';
 
 class WorkersScreen extends StatefulWidget {
   const WorkersScreen({super.key});
@@ -15,352 +21,301 @@ class WorkersScreen extends StatefulWidget {
 }
 
 class _WorkersScreenState extends State<WorkersScreen> {
-  String? selectedSite;
-  final TextEditingController searchController = TextEditingController();
-
-  final LayerLink _layerLink = LayerLink();
-  OverlayEntry? _overlayEntry;
-
-  List<Worker> _workers = [];
-  List<Worker> _filteredWorkers = [];
+  String? _selectedSite;
   bool _isLoading = true;
   String? _errorMessage;
 
-  final List<String> sites = [
+  List<Worker> _allWorkers = [];        // full DB list — feeds the check-in sheet
+  List<Worker> _checkedInWorkers = [];  // today's present workers — shown in table
+
+  /// true = confirmed present | false = upload in progress (absent from map = not checked in)
+  final Map<int, bool> _checkedIn = {};
+
+  final List<String> _sites = [
     'Mabatini', 'Mishi Mboko', 'Huruma', 'DCC Kibra', 'Ngei', 'Iremele',
   ];
+
+  int get _presentCount => _checkedIn.values.where((v) => v).length;
 
   @override
   void initState() {
     super.initState();
-    _loadWorkers();
+    _loadData();
   }
 
-  Future<void> _loadWorkers() async {
+  Future<void> _loadData() async {
     setState(() { _isLoading = true; _errorMessage = null; });
     try {
-      final workers = await WorkerService.fetchWorkers();
-      setState(() { _workers = workers; _filteredWorkers = workers; _isLoading = false; });
+      final results = await Future.wait([
+        WorkerService.fetchWorkers(),
+        AttendanceService.fetchTodayPresentIds(),
+      ]);
+
+      final all      = results[0] as List<Worker>;
+      final todayIds = results[1] as List<int>;
+      final idSet    = todayIds.toSet();
+
+      setState(() {
+        _allWorkers      = all;
+        _checkedIn.clear();
+        for (final id in todayIds) { _checkedIn[id] = true; }
+        _checkedInWorkers = all.where((w) => w.id != null && idSet.contains(w.id)).toList();
+        _isLoading = false;
+      });
     } on WorkerServiceException catch (e) {
       setState(() { _errorMessage = e.message; _isLoading = false; });
     } catch (_) {
-      setState(() { _errorMessage = 'Failed to load workers. Please try again.'; _isLoading = false; });
+      setState(() { _errorMessage = 'Failed to load data. Please try again.'; _isLoading = false; });
     }
   }
 
-  void _showOverlay() {
-    _removeOverlay();
-    _overlayEntry = OverlayEntry(
-      builder: (context) {
-        final query = searchController.text.toLowerCase();
-        final results = _workers.where((w) => w.fullName.toLowerCase().contains(query)).toList();
-        return Positioned(
-          width: 240,
-          child: CompositedTransformFollower(
-            link: _layerLink, offset: const Offset(0, 50), showWhenUnlinked: false,
-            child: Material(
-              elevation: 4, borderRadius: BorderRadius.circular(8),
-              child: Container(
-                constraints: const BoxConstraints(maxHeight: 200),
-                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8)),
-                child: results.isEmpty
-                    ? const Padding(padding: EdgeInsets.all(12), child: Text("No result"))
-                    : ListView.builder(
-                        padding: EdgeInsets.zero, shrinkWrap: true, itemCount: results.length,
-                        itemBuilder: (context, index) {
-                          final worker = results[index];
-                          return ListTile(
-                            title: Text(worker.fullName),
-                            onTap: () {
-                              _removeOverlay();
-                              searchController.clear();
-                              context.push(WorkerProfileScreen(worker: worker));
-                            },
-                          );
-                        },
-                      ),
-              ),
-            ),
-          ),
-        );
-      },
+  Future<void> _openBulkCheckIn() async {
+    final eligible = _allWorkers
+        .where((w) => w.id != null && _checkedIn[w.id] != true)
+        .toList();
+
+    if (eligible.isEmpty) {
+      _snack('All workers are already checked in today.', Colors.orange.shade700);
+      return;
+    }
+
+    final selected = await showModalBottomSheet<Set<int>>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => BulkCheckInSheet(workers: eligible),
     );
-    Overlay.of(context).insert(_overlayEntry!);
+
+    if (selected == null || selected.isEmpty || !mounted) return;
+
+    setState(() { for (final id in selected) _checkedIn[id] = false; });
+
+    int successCount = 0;
+    final newlyPresent = <Worker>[];
+
+    for (final worker in eligible.where((w) => selected.contains(w.id))) {
+      try {
+        await AttendanceService.checkInWorkerBulk(workerId: worker.id!);
+        if (!mounted) break;
+        setState(() => _checkedIn[worker.id!] = true);
+        newlyPresent.add(worker);
+        successCount++;
+      } catch (_) {
+        if (mounted) setState(() => _checkedIn.remove(worker.id));
+      }
+    }
+
+    if (!mounted) return;
+
+    setState(() {
+      _checkedInWorkers = [..._checkedInWorkers, ...newlyPresent];
+    });
+
+    if (successCount > 0) {
+      _snack('$successCount worker${successCount == 1 ? '' : 's'} checked in ✓', Colors.green.shade600);
+    }
   }
 
-  void _removeOverlay() { _overlayEntry?.remove(); _overlayEntry = null; }
+  Future<void> _handleVerify(Worker worker) async {
+    final workerId = worker.id;
+    if (workerId == null) return;
 
-  @override
-  void dispose() { _removeOverlay(); searchController.dispose(); super.dispose(); }
+    final picked = await ImagePicker().pickImage(source: ImageSource.camera, imageQuality: 80);
+    if (picked == null || !mounted) return;
+
+    setState(() => _checkedIn[workerId] = false);
+    try {
+      await AttendanceService.verifyWorker(workerId: workerId, photo: File(picked.path));
+      if (!mounted) return;
+      setState(() => _checkedIn[workerId] = true);
+      _snack('${worker.fullName} verified ✓', Colors.green.shade600);
+    } on AttendanceServiceException catch (e) {
+      if (!mounted) return;
+      setState(() => _checkedIn.remove(workerId));
+      _snack(e.message, Colors.red.shade600);
+    }
+  }
+
+  void _snack(String msg, Color bg) => ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(content: Text(msg), backgroundColor: bg,
+        behavior: SnackBarBehavior.floating, duration: const Duration(seconds: 2)),
+  );
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F6F8),
       appBar: AppBar(
-        elevation: 0, backgroundColor: const Color(0xFFF5F6F8),
+        elevation: 0,
+        backgroundColor: const Color(0xFFF5F6F8),
         title: const Row(children: [
-          Icon(Icons.home_work_rounded, color: Colors.blue), SizedBox(width: 10),
-          Text("Workers", style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600)),
+          Icon(Icons.home_work_rounded, color: Colors.blue),
+          SizedBox(width: 10),
+          Text('Workers', style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600)),
         ]),
         actions: [
           IconButton(icon: const Icon(Icons.refresh, color: Colors.blue),
-              onPressed: _loadWorkers, tooltip: "Refresh"),
+              onPressed: _loadData, tooltip: 'Refresh'),
         ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-
-          // Site dropdown
-          const Text("Construction Site",
-              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.black87)),
-          const SizedBox(height: 6),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            decoration: BoxDecoration(color: const Color(0xFFF5F7F9),
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: Colors.grey.shade200)),
-            child: CustomDropdown<String>(
-              value: selectedSite, items: sites, displayMapper: (s) => s,
-              onChanged: (v) => setState(() => selectedSite = v),
-              hint: 'Select Site', isExpanded: true, isDense: true,
-              border: InputBorder.none, fillColor: Colors.transparent,
-              borderRadius: BorderRadius.circular(10),
-            ),
+      body: RefreshIndicator(
+        onRefresh: _loadData,
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _SiteSelector(sites: _sites, value: _selectedSite,
+                  onChanged: (v) => setState(() => _selectedSite = v)),
+              const SizedBox(height: 16),
+              _StatsRow(isLoading: _isLoading, total: _allWorkers.length, present: _presentCount),
+              const SizedBox(height: 16),
+              _AddWorkerButton(onTap: () async {
+                final result = await context.push(const AddWorkerScreen());
+                if (result != null) _loadData();
+              }),
+              const SizedBox(height: 12),
+              if (!_isLoading && _errorMessage == null)
+                _BulkCheckInButton(onPressed: _openBulkCheckIn),
+              const SizedBox(height: 20),
+              _AttendanceHeader(presentCount: _checkedInWorkers.length, isLoading: _isLoading),
+              const SizedBox(height: 10),
+              WorkersTable(
+                isLoading: _isLoading,
+                errorMessage: _errorMessage,
+                workers: _checkedInWorkers,
+                checkedIn: _checkedIn,
+                sessionActive: true,
+                onRetry: _loadData,
+                onVerify: _handleVerify,
+                onRowTap: (w) => context.push(WorkerProfileScreen(worker: w)),
+                emptyMessage: 'No workers checked in yet.\nTap "Check In Workers" above.',
+              ),
+              const SizedBox(height: 30),
+            ],
           ),
-
-          const SizedBox(height: 16),
-
-          // Stat cards — shimmer when loading
-          _isLoading
-              ? _ShimmerStatRow()
-              : Row(children: [
-                  Expanded(child: _statCard(
-                    title: '${_workers.length}', subtitle: "Total Workers Assigned",
-                    color: Colors.blue.shade100, textColor: Colors.blue, onTap: () {})),
-                  const SizedBox(width: 12),
-                  Expanded(child: _statCard(
-                    title: '${_workers.length}', subtitle: "Workers Present Today",
-                    color: Colors.orange.shade100, textColor: Colors.orange, onTap: () {})),
-                ]),
-
-          const SizedBox(height: 16),
-
-          // Actions row
-          Row(children: [
-            Expanded(
-              child: GestureDetector(
-                onTap: () async {
-                  final result = await context.push(const AddWorkerScreen());
-                  if (result != null) _loadWorkers();
-                },
-                child: Container(
-                  height: 48,
-                  decoration: BoxDecoration(color: Colors.blue.shade100,
-                      borderRadius: BorderRadius.circular(8)),
-                  child: const Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                    Icon(Icons.person_add, color: Colors.blue, size: 18),
-                    SizedBox(width: 8),
-                    Text("Add Worker", style: TextStyle(color: Colors.blue, fontWeight: FontWeight.w600)),
-                  ]),
-                ),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: CompositedTransformTarget(
-                link: _layerLink,
-                child: TextField(
-                  controller: searchController,
-                  onChanged: (v) => v.isEmpty ? _removeOverlay() : _showOverlay(),
-                  decoration: InputDecoration(
-                    isDense: true, filled: true, fillColor: Colors.white,
-                    prefixIcon: const Icon(Icons.search), hintText: "Search",
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                    enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(color: Colors.grey.shade400)),
-                    focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8),
-                        borderSide: const BorderSide(color: Colors.blue)),
-                  ),
-                ),
-              ),
-            ),
-          ]),
-
-          const SizedBox(height: 20),
-          const Text("Workers List", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-          const SizedBox(height: 10),
-
-          // Table / loading / error / empty
-          if (_isLoading)
-            _ShimmerTable()
-          else if (_errorMessage != null)
-            Center(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 40),
-                child: Column(children: [
-                  Icon(Icons.error_outline, color: Colors.red.shade400, size: 48),
-                  const SizedBox(height: 12),
-                  Text(_errorMessage!, textAlign: TextAlign.center,
-                      style: TextStyle(color: Colors.red.shade600)),
-                  const SizedBox(height: 16),
-                  TextButton.icon(onPressed: _loadWorkers,
-                      icon: const Icon(Icons.refresh), label: const Text("Try Again")),
-                ]),
-              ),
-            )
-          else if (_workers.isEmpty)
-            const Center(
-              child: Padding(padding: EdgeInsets.symmetric(vertical: 60),
-                  child: Text("No workers found.", style: TextStyle(color: Colors.grey))),
-            )
-          else
-            Container(
-              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12),
-                boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04),
-                    blurRadius: 8, offset: const Offset(0, 2))]),
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: DataTable(
-                  showCheckboxColumn: false,
-                  headingRowColor: WidgetStatePropertyAll(Colors.grey.shade100),
-                  columnSpacing: 24, headingRowHeight: 44,
-                  dataRowMinHeight: 52, dataRowMaxHeight: 52,
-                  border: TableBorder(
-                    horizontalInside: BorderSide(color: Colors.grey.shade200),
-                    bottom: BorderSide(color: Colors.grey.shade200),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  columns: _buildHeaderColumns(),
-                  rows: _buildWorkerRows(),
-                ),
-              ),
-            ),
-
-          const SizedBox(height: 30),
-        ]),
-      ),
-    );
-  }
-
-  List<DataColumn> _buildHeaderColumns() {
-    return ["NAME", "ID", "TYPE", "PHONE NO", "SITE", "JOINED"]
-        .map((t) => DataColumn(label: Text(t,
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13,
-                color: Colors.black, letterSpacing: 0.5))))
-        .toList();
-  }
-
-  List<DataRow> _buildWorkerRows() {
-    return _workers.map((worker) => DataRow(
-      onSelectChanged: (s) { if (s == true) context.push(WorkerProfileScreen(worker: worker)); },
-      cells: [
-        DataCell(Text(worker.fullName, style: const TextStyle(fontWeight: FontWeight.w500))),
-        DataCell(Text(worker.nationalId.toString())),
-        DataCell(Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-          decoration: BoxDecoration(
-            color: worker.skillType.toLowerCase() == 'skilled'
-                ? Colors.blue.shade100 : Colors.grey.shade300,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Text(worker.skillType,
-              style: TextStyle(
-                color: worker.skillType.toLowerCase() == 'skilled'
-                    ? Colors.blue.shade800 : Colors.grey.shade800,
-                fontWeight: FontWeight.bold, fontSize: 12)),
-        )),
-        DataCell(Text(worker.phoneNumber)),
-        DataCell(Text(worker.siteId?.toString() ?? '—')),
-        DataCell(Text(worker.createdAt != null
-            ? '${worker.createdAt!.day}/${worker.createdAt!.month}/${worker.createdAt!.year}'
-            : '—')),
-      ],
-    )).toList();
-  }
-}
-
-class _ShimmerStatRow extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Shimmer.fromColors(
-      baseColor: Colors.grey.shade200,
-      highlightColor: Colors.grey.shade50,
-      child: Row(children: [
-        Expanded(child: Container(height: 90,
-            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)))),
-        const SizedBox(width: 12),
-        Expanded(child: Container(height: 90,
-            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)))),
-      ]),
-    );
-  }
-}
-
-class _ShimmerTable extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Shimmer.fromColors(
-      baseColor: Colors.grey.shade200,
-      highlightColor: Colors.grey.shade50,
-      child: Container(
-        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
-        child: Column(children: [
-          // Header placeholder
-          Container(height: 44, color: Colors.grey.shade100),
-          const Divider(height: 1),
-          // Row placeholders
-          ...List.generate(5, (_) => Column(children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-              child: Row(children: [
-                Expanded(flex: 3, child: _SBox(width: double.infinity, height: 12)),
-                const SizedBox(width: 12),
-                Expanded(flex: 2, child: _SBox(width: double.infinity, height: 12)),
-                const SizedBox(width: 12),
-                Expanded(flex: 2, child: _SBox(width: double.infinity, height: 22, radius: 12)),
-                const SizedBox(width: 12),
-                Expanded(flex: 2, child: _SBox(width: double.infinity, height: 12)),
-                const SizedBox(width: 12),
-                Expanded(flex: 1, child: _SBox(width: double.infinity, height: 12)),
-                const SizedBox(width: 12),
-                Expanded(flex: 2, child: _SBox(width: double.infinity, height: 12)),
-              ]),
-            ),
-            const Divider(height: 1),
-          ])),
-        ]),
+        ),
       ),
     );
   }
 }
 
-class _SBox extends StatelessWidget {
-  final double width, height;
-  final double radius;
-  const _SBox({required this.width, required this.height, this.radius = 6});
+
+class _SiteSelector extends StatelessWidget {
+  final List<String> sites;
+  final String? value;
+  final ValueChanged<String?> onChanged;
+  const _SiteSelector({required this.sites, required this.value, required this.onChanged});
 
   @override
-  Widget build(BuildContext context) => Container(
-      width: width, height: height,
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(radius)));
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      const Text('Construction Site',
+          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.black87)),
+      const SizedBox(height: 6),
+      Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        decoration: BoxDecoration(
+          color: const Color(0xFFF5F7F9),
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: Colors.grey.shade200),
+        ),
+        child: CustomDropdown<String>(
+          value: value, items: sites, displayMapper: (s) => s,
+          onChanged: onChanged, hint: 'Select Site', isExpanded: true,
+          isDense: true, border: InputBorder.none,
+          fillColor: Colors.transparent, borderRadius: BorderRadius.circular(10),
+        ),
+      ),
+    ],
+  );
 }
 
-Widget _statCard({
-  required String title, required String subtitle,
-  required Color color, required Color textColor, required VoidCallback onTap,
-}) {
-  return InkWell(
-    onTap: onTap, borderRadius: BorderRadius.circular(12),
+class _StatsRow extends StatelessWidget {
+  final bool isLoading;
+  final int total;
+  final int present;
+  const _StatsRow({required this.isLoading, required this.total, required this.present});
+
+  @override
+  Widget build(BuildContext context) {
+    if (isLoading) {
+      return Row(children: [
+        Expanded(child: _shimmer()), const SizedBox(width: 12), Expanded(child: _shimmer()),
+      ]);
+    }
+    return Row(children: [
+      Expanded(child: StatCard(icon: Icons.people_rounded, title: 'Total Assigned', value: '$total', color: Colors.blue)),
+      const SizedBox(width: 12),
+      Expanded(child: StatCard(icon: Icons.how_to_reg_rounded, title: 'Present Today', value: '$present', color: Colors.green)),
+    ]);
+  }
+
+  Widget _shimmer() => Container(height: 90,
+      decoration: BoxDecoration(color: Colors.grey.shade200, borderRadius: BorderRadius.circular(18)));
+}
+
+class _AddWorkerButton extends StatelessWidget {
+  final VoidCallback onTap;
+  const _AddWorkerButton({required this.onTap});
+
+  @override
+  Widget build(BuildContext context) => GestureDetector(
+    onTap: onTap,
     child: Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(12)),
-      child: Column(children: [
-        Text(title, style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: textColor)),
-        const SizedBox(height: 8),
-        Text(subtitle, textAlign: TextAlign.center, style: const TextStyle(fontSize: 13)),
+      width: double.infinity, height: 48,
+      decoration: BoxDecoration(color: Colors.blue.shade100, borderRadius: BorderRadius.circular(8)),
+      child: const Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+        Icon(Icons.person_add, color: Colors.blue, size: 18),
+        SizedBox(width: 8),
+        Text('Add Worker', style: TextStyle(color: Colors.blue, fontWeight: FontWeight.w600)),
       ]),
     ),
+  );
+}
+
+class _BulkCheckInButton extends StatelessWidget {
+  final VoidCallback onPressed;
+  const _BulkCheckInButton({required this.onPressed});
+
+  @override
+  Widget build(BuildContext context) => SizedBox(
+    width: double.infinity, height: 50,
+    child: ElevatedButton.icon(
+      icon: const Icon(Icons.how_to_reg_rounded),
+      label: const Text('Check In Workers', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.blue.shade700, foregroundColor: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)), elevation: 2,
+      ),
+      onPressed: onPressed,
+    ),
+  );
+}
+
+class _AttendanceHeader extends StatelessWidget {
+  final int presentCount;
+  final bool isLoading;
+  const _AttendanceHeader({required this.presentCount, required this.isLoading});
+
+  @override
+  Widget build(BuildContext context) => Row(
+    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    children: [
+      const Text("Today's Attendance",
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+      if (!isLoading && presentCount > 0)
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+          decoration: BoxDecoration(
+              color: Colors.green.shade50, borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: Colors.green.shade200)),
+          child: Text('$presentCount present',
+              style: TextStyle(fontSize: 12, color: Colors.green.shade700, fontWeight: FontWeight.w600)),
+        ),
+    ],
   );
 }
