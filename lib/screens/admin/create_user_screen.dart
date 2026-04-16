@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:graville_operations/core/style/color.dart';
 import 'package:graville_operations/services/api_service.dart';
 
 class CreateUserScreen extends StatefulWidget {
-  final String role;
-
-  const CreateUserScreen({super.key, required this.role});
+  const CreateUserScreen({super.key});
 
   @override
   State<CreateUserScreen> createState() => _CreateUserScreenState();
@@ -17,6 +16,18 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
   final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
   final _nationalIdController = TextEditingController();
+  final _staffIdController = TextEditingController();
+
+  String? _selectedRole;
+  bool _isSubmitting = false;
+
+  final List<Map<String, dynamic>> _roles = [
+    {'value': 'ADMIN', 'label': 'Admin', 'icon': Icons.admin_panel_settings},
+    {'value': 'FIELD OPERATOR', 'label': 'Field Operator', 'icon': Icons.engineering},
+    {'value': 'AUDITOR', 'label': 'Auditor', 'icon': Icons.fact_check},
+    {'value': 'FOREMAN', 'label': 'Foreman', 'icon': Icons.construction},
+    {'value': 'FINANCE', 'label': 'Finance Department', 'icon': Icons.account_balance},
+  ];
 
   @override
   void dispose() {
@@ -25,71 +36,35 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
     _emailController.dispose();
     _phoneController.dispose();
     _nationalIdController.dispose();
+    _staffIdController.dispose();
     super.dispose();
-  }
-
-  String get _roleTitle {
-    switch (widget.role) {
-      case 'field_engineer':
-        return 'Field Engineer';
-      case 'auditor':
-        return 'Auditor';
-      default:
-        return widget.role;
-    }
-  }
-
-  Color get _roleColor {
-    switch (widget.role) {
-      case 'field_engineer':
-        return Colors.blue;
-      case 'auditor':
-        return Colors.green;
-      default:
-        return Colors.grey;
-    }
-  }
-
-  IconData get _roleIcon {
-    switch (widget.role) {
-      case 'field_engineer':
-        return Icons.engineering;
-      case 'auditor':
-        return Icons.fact_check;
-      default:
-        return Icons.person;
-    }
   }
 
   void _createUser() async {
     if (_formKey.currentState!.validate()) {
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (_) => const Center(child: CircularProgressIndicator()),
-      );
-
-      Map<String, dynamic> result;
-
-      if (widget.role == 'field_engineer') {
-        result = await ApiService.createFieldEngineer(
-          firstName: _firstNameController.text.trim(),
-          lastName: _lastNameController.text.trim(),
-          email: _emailController.text.trim(),
-          phone: _phoneController.text.trim(),
-          nationalId: _nationalIdController.text.trim(),
+      if (_selectedRole == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Please select a user role'),
+            backgroundColor: Colors.red,
+          ),
         );
-      } else {
-        result = await ApiService.createAuditor(
-          firstName: _firstNameController.text.trim(),
-          lastName: _lastNameController.text.trim(),
-          email: _emailController.text.trim(),
-          phone: _phoneController.text.trim(),
-          nationalId: _nationalIdController.text.trim(),
-        );
+        return;
       }
 
-      Navigator.pop(context);
+      setState(() => _isSubmitting = true);
+
+      final result = await ApiService.createMember(
+        firstName: _firstNameController.text.trim(),
+        lastName: _lastNameController.text.trim(),
+        email: _emailController.text.trim(),
+        phone: _phoneController.text.trim(),
+        nationalId: _nationalIdController.text.trim(),
+        staffId: _staffIdController.text.trim(),
+        accountType: _selectedRole!,
+      );
+
+      setState(() => _isSubmitting = false);
 
       if (result['success']) {
         showDialog(
@@ -104,18 +79,18 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: Colors.green.shade50,
+                    color: AppColor.primaryBackground.withOpacity(0.1),
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(
                     Icons.check_circle,
-                    color: Colors.green,
-                    size: 48,
+                    color: AppColor.primaryBackground,
+                    size: 52,
                   ),
                 ),
                 const SizedBox(height: 16),
                 const Text(
-                  'Account Created!',
+                  'User Created!',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -130,16 +105,22 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
               ],
             ),
             actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context); // close dialog
-                  Navigator.pop(context); // go back to dashboard
-                },
-                child: const Text(
-                  'Done',
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.bold,
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    _clearForm();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColor.primaryBackground,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  child: const Text(
+                    'Done',
+                    style: TextStyle(color: Colors.white),
                   ),
                 ),
               ),
@@ -157,160 +138,340 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
     }
   }
 
+  void _clearForm() {
+    _firstNameController.clear();
+    _lastNameController.clear();
+    _emailController.clear();
+    _phoneController.clear();
+    _nationalIdController.clear();
+    _staffIdController.clear();
+    setState(() => _selectedRole = null);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[100],
+      backgroundColor: const Color(0xFFF5F6F8),
       appBar: AppBar(
-        title: Text(
-          'Add $_roleTitle',
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+        title: const Text('Add New User'),
+        backgroundColor: AppColor.primaryBackground,
+        foregroundColor: Colors.white,
         elevation: 0,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(16),
         child: Form(
           key: _formKey,
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Role indicator
+
+              // Role Selector
+              _SectionLabel(label: 'User Role'),
+              const SizedBox(height: 8),
               Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: _roleColor.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: _roleColor.withOpacity(0.3)),
-                ),
-                child: Row(
-                  children: [
-                    Icon(_roleIcon, color: _roleColor),
-                    const SizedBox(width: 12),
-                    Text(
-                      'Creating $_roleTitle account',
-                      style: TextStyle(
-                        color: _roleColor,
-                        fontWeight: FontWeight.bold,
-                      ),
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: AppColor.borderColor),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.shade100,
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
                     ),
                   ],
                 ),
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton<String>(
+                    value: _selectedRole,
+                    isExpanded: true,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    hint: const Row(
+                      children: [
+                        Icon(
+                          Icons.people,
+                          color: AppColor.primaryBackground,
+                          size: 20,
+                        ),
+                        SizedBox(width: 12),
+                        Text(
+                          'Select User Role',
+                          style: TextStyle(color: AppColor.secondaryText),
+                        ),
+                      ],
+                    ),
+                    items: _roles.map((role) {
+                      return DropdownMenuItem<String>(
+                        value: role['value'],
+                        child: Row(
+                          children: [
+                            Icon(
+                              role['icon'] as IconData,
+                              color: AppColor.primaryBackground,
+                              size: 20,
+                            ),
+                            const SizedBox(width: 12),
+                            Text(role['label'] as String),
+                          ],
+                        ),
+                      );
+                    }).toList(),
+                    onChanged: (v) => setState(() => _selectedRole = v),
+                  ),
+                ),
               ),
+
               const SizedBox(height: 24),
 
-              // First & Last Name Row
+              // Personal Details
+              _SectionLabel(label: 'Personal Details'),
+              const SizedBox(height: 12),
+
+              // First & Last Name
               Row(
                 children: [
                   Expanded(
-                    child: TextFormField(
+                    child: _FormField(
                       controller: _firstNameController,
-                      decoration: const InputDecoration(
-                        labelText: 'First Name',
-                        prefixIcon: Icon(Icons.person),
-                        border: OutlineInputBorder(),
-                        filled: true,
-                        fillColor: Colors.white,
-                      ),
+                      label: 'First Name',
+                      hint: 'John',
+                      icon: Icons.person,
                       validator: (v) =>
                           v == null || v.isEmpty ? 'Required' : null,
                     ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
-                    child: TextFormField(
+                    child: _FormField(
                       controller: _lastNameController,
-                      decoration: const InputDecoration(
-                        labelText: 'Last Name',
-                        prefixIcon: Icon(Icons.person_outline),
-                        border: OutlineInputBorder(),
-                        filled: true,
-                        fillColor: Colors.white,
-                      ),
+                      label: 'Last Name',
+                      hint: 'Doe',
+                      icon: Icons.person_outline,
                       validator: (v) =>
                           v == null || v.isEmpty ? 'Required' : null,
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
 
               // Email
-              TextFormField(
+              _FormField(
                 controller: _emailController,
+                label: 'Email Address',
+                hint: 'example@graville.com',
+                icon: Icons.email,
                 keyboardType: TextInputType.emailAddress,
-                decoration: const InputDecoration(
-                  labelText: 'Email',
-                  prefixIcon: Icon(Icons.email),
-                  border: OutlineInputBorder(),
-                  filled: true,
-                  fillColor: Colors.white,
-                  helperText: 'Login credentials will be sent to this email',
-                ),
+                helperText: 'Login credentials will be sent to this email',
                 validator: (v) {
                   if (v == null || v.isEmpty) return 'Required';
                   if (!v.contains('@')) return 'Enter a valid email';
                   return null;
                 },
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
 
               // Phone
-              TextFormField(
+              _FormField(
                 controller: _phoneController,
+                label: 'Phone Number',
+                hint: '+254700000000',
+                icon: Icons.phone,
                 keyboardType: TextInputType.phone,
-                decoration: const InputDecoration(
-                  labelText: 'Phone Number',
-                  prefixIcon: Icon(Icons.phone),
-                  border: OutlineInputBorder(),
-                  filled: true,
-                  fillColor: Colors.white,
-                ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
 
-              // National ID
-              TextFormField(
-                controller: _nationalIdController,
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                  labelText: 'National ID',
-                  prefixIcon: Icon(Icons.badge),
-                  border: OutlineInputBorder(),
-                  filled: true,
-                  fillColor: Colors.white,
-                ),
+              // National ID & Staff ID
+              Row(
+                children: [
+                  Expanded(
+                    child: _FormField(
+                      controller: _nationalIdController,
+                      label: 'National ID',
+                      hint: '12345678',
+                      icon: Icons.badge,
+                      keyboardType: TextInputType.number,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _FormField(
+                      controller: _staffIdController,
+                      label: 'Staff ID',
+                      hint: 'GRV-001',
+                      icon: Icons.work,
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 30),
+
+              const SizedBox(height: 32),
 
               // Submit Button
               SizedBox(
                 width: double.infinity,
                 height: 52,
-                child: ElevatedButton.icon(
-                  onPressed: _createUser,
-                  icon: Icon(_roleIcon, color: Colors.white),
-                  label: Text(
-                    'Create $_roleTitle Account',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                child: ElevatedButton(
+                  onPressed: _isSubmitting ? null : _createUser,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.black,
+                    backgroundColor: AppColor.primaryBackground,
+                    disabledBackgroundColor:
+                        AppColor.primaryBackground.withOpacity(0.5),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
+                  child: _isSubmitting
+                      ? const SizedBox(
+                          height: 24,
+                          width: 24,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2.5,
+                          ),
+                        )
+                      : const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.person_add, color: Colors.white),
+                            SizedBox(width: 10),
+                            Text(
+                              'Create User Account',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
                 ),
               ),
+
+              const SizedBox(height: 16),
+
+              // Info note
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppColor.primaryBackground.withOpacity(0.08),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: AppColor.primaryBackground.withOpacity(0.2),
+                  ),
+                ),
+                child: const Row(
+                  children: [
+                    Icon(
+                      Icons.info_outline,
+                      color: AppColor.primaryBackground,
+                      size: 18,
+                    ),
+                    SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        'A temporary password will be generated and sent to the user\'s email.',
+                        style: TextStyle(
+                          color: AppColor.primaryBackground,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 32),
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _SectionLabel extends StatelessWidget {
+  final String label;
+  const _SectionLabel({required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Container(
+          width: 4,
+          height: 18,
+          decoration: BoxDecoration(
+            color: AppColor.primaryBackground,
+            borderRadius: BorderRadius.circular(2),
+          ),
+        ),
+        const SizedBox(width: 8),
+        Text(
+          label,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+            color: AppColor.primaryText,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _FormField extends StatelessWidget {
+  final TextEditingController controller;
+  final String label;
+  final String hint;
+  final IconData icon;
+  final TextInputType keyboardType;
+  final String? Function(String?)? validator;
+  final String? helperText;
+
+  const _FormField({
+    required this.controller,
+    required this.label,
+    required this.hint,
+    required this.icon,
+    this.keyboardType = TextInputType.text,
+    this.validator,
+    this.helperText,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: AppColor.borderColor),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.shade100,
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: TextFormField(
+        controller: controller,
+        keyboardType: keyboardType,
+        decoration: InputDecoration(
+          labelText: label,
+          hintText: hint,
+          helperText: helperText,
+          hintStyle: const TextStyle(color: AppColor.secondaryText),
+          labelStyle: const TextStyle(color: AppColor.secondaryText),
+          prefixIcon:
+              Icon(icon, color: AppColor.primaryBackground, size: 20),
+          border: InputBorder.none,
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          floatingLabelBehavior: FloatingLabelBehavior.never,
+        ),
+        validator: validator,
       ),
     );
   }
