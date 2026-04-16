@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:graville_operations/core/commons/assets/images.dart';
+import 'package:graville_operations/core/commons/widgets/custom_button.dart';
 import 'package:graville_operations/screens/auth/forgot_password/reset_password_screen.dart';
-import 'package:graville_operations/screens/commons/assets/images.dart';
-import 'package:graville_operations/screens/commons/widgets/custom_button.dart';
 import 'package:graville_operations/services/api_service.dart';
 import 'package:pinput/pinput.dart';
 

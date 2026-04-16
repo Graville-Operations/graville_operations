@@ -44,7 +44,7 @@ class LoginController extends GetxController {
         await UserStore.to.saveProfile(me.toUserData());
         var menus = await MenuApi.getMyMenu();
         await UserStore.to.saveMenus(menus, result.accessToken);
-
+        print("Access tokens is ${result.accessToken}");
         EasyLoading.showSuccess('Logged in Successfully');
 
         Get.offAllNamed(AppRoutes.application);

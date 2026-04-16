@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:graville_operations/screens/commons/widgets/custom_dropdown.dart';
-import 'package:graville_operations/screens/commons/widgets/custom_text_input.dart';
-import 'package:graville_operations/screens/commons/widgets/custom_button.dart';
-import 'package:graville_operations/screens/commons/utils/camera.dart';
 import 'dart:io';
+
+import 'package:graville_operations/core/commons/utils/camera.dart';
+import 'package:graville_operations/core/commons/widgets/custom_button.dart';
+import 'package:graville_operations/core/commons/widgets/custom_dropdown.dart';
+import 'package:graville_operations/core/commons/widgets/custom_text_input.dart';
 
 class AddTransportScreen extends StatefulWidget {
   const AddTransportScreen({super.key});

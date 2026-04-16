@@ -33,7 +33,6 @@ class UserStore extends GetxController {
     super.onInit();
     token = StorageService.to.getString(storageUserTokenKey);
     var profileOffline = StorageService.to.getString(storageUserProfileKey);
-    print("profileOffline: $profileOffline");
     if (profileOffline.isNotEmpty) {
       _isLogin.value = true;
       _profile(UserData.fromJson(jsonDecode(profileOffline)));
@@ -103,5 +102,14 @@ class UserStore extends GetxController {
 
   static Future<void> updateMenu()async{
 
+  }
+
+  Map<String, String>? getAuthorizationHeader() {
+    if (hasToken) {
+      final token = UserStore.to.token;
+      print("Access token is $token");
+      return {'Authorization': 'Bearer $token'};
+    }
+    return null;
   }
 }

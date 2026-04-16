@@ -1,19 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:graville_operations/application/custom_navigator.dart';
+import 'package:graville_operations/core/commons/assets/images.dart';
+import 'package:graville_operations/core/commons/widgets/progress_bar.dart';
+import 'package:graville_operations/core/commons/widgets/section_card.dart';
+import 'package:graville_operations/core/commons/widgets/stat_card.dart';
 import 'package:graville_operations/models/project_status.dart';
-import 'package:graville_operations/screens/commons/widgets/progress_bar.dart';
-import 'package:graville_operations/screens/inventory/add_material.dart';
-import 'package:graville_operations/screens/inventory/update_inventory.dart';
 import 'package:graville_operations/screens/material/receive_material.dart';
 import 'package:graville_operations/screens/material/transfer_material.dart';
-import 'package:graville_operations/screens/sites/create_sites.dart';
-import 'package:graville_operations/screens/sites/sites_list.dart';
+import 'package:graville_operations/screens/sites/create/view.dart';
+import 'package:graville_operations/screens/sites/site_list/sites_list.dart';
+import 'package:graville_operations/screens/store/add_material.dart';
+import 'package:graville_operations/screens/store/update_inventory.dart';
 import 'package:graville_operations/screens/task_screen/task_screen.dart';
 import 'package:graville_operations/screens/workers/add_worker_screen.dart';
-import 'package:graville_operations/screens/commons/assets/images.dart';
-import 'package:graville_operations/screens/commons/widgets/section_card.dart';
-import 'package:graville_operations/screens/commons/widgets/status_chip.dart';
-import 'package:graville_operations/screens/commons/widgets/stat_card.dart';
 
 
 class HomeScreen extends StatefulWidget {
@@ -56,14 +55,6 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             const SizedBox(height: 12),
-            // Tooltip(
-            //   message: "New Site",
-            //   child: miniFab(
-            //     Icons.apartment,
-            //     () => context.push(const CreateSitesScreen()),
-            //   ),
-            // ),
-            const SizedBox(height: 12),
             Tooltip(
             message: "View sites",
             child: miniFab(
@@ -91,7 +82,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             const SizedBox(height: 12),
             Tooltip(
-              message: "Update inventory",
+              message: "Update store",
               child: miniFab(
                 Icons.store,
                 () => context.push(const UpdateInventoryScreen(preSelectedItem: null,)),

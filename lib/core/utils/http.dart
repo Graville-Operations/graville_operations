@@ -69,6 +69,7 @@ class HttpUtil {
         // Do something before request is sent
         if (Get.isRegistered<UserStore>() && UserStore.to.hasToken) {
           final token = UserStore.to.token;
+          print("Access tokens is $token");
           options.headers['Authorization'] = 'Bearer $token';
         }
         return handler.next(options); //continue
@@ -234,12 +235,12 @@ class HttpUtil {
   /// restful post operation
   Future post(
     String path, {
-    dynamic data,
+    dynamic data, // this is a request body
     Map<String, dynamic>? queryParameters,
     Options? options,
   }) async {
     Options requestOptions = options ?? Options();
-    requestOptions.headers = requestOptions.headers ?? {};
+    // requestOptions.headers = requestOptions.headers ?? {};
     var response = await dio.post(
       path,
       data: data,

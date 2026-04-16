@@ -13,20 +13,10 @@ class ApplicationController extends GetxController{
   void onInit() {
     super.onInit();
     loadMenus();
-    // _checkLogin();
   }
   void changeIndex(int index) {
     state.currentIndex.value = index;
   }
-  // void _checkLogin() async {
-  //   await Future.delayed(const Duration(microseconds: 300));
-  //
-  //   if (UserStore.to.isLogin) {
-  //     Get.offAllNamed(AppRoutes.application);
-  //   } else {
-  //     Get.offAllNamed(AppRoutes.login);
-  //   }
-  // }
   void loadMenus() {
     final saved = UserStore.to.getMenus();
     state.bottomMenus.assignAll(

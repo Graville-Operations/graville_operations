@@ -1,16 +1,23 @@
-
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:graville_operations/screens/account_screen/account_screen.dart';
 import 'package:graville_operations/screens/home/home_screen.dart';
-import 'package:graville_operations/screens/inventory/inventory_screen.dart';
+import 'package:graville_operations/screens/store/inventory/binding.dart';
+import 'package:graville_operations/screens/store/inventory/controller.dart';
+import 'package:graville_operations/screens/store/inventory/view.dart';
 import 'package:graville_operations/screens/workers/workers_screen.dart';
 
 class MenuRegistry {
-  static const Map<String, Widget> screens = {
-    'home': HomeScreen(),
-    'workers': WorkersScreen(),
-    'inventory': InventoryScreen(),
-    'account': AccountScreen(),
+  static final Map<String, WidgetBuilder> screens = {
+    'home': (_) => const HomeScreen(),
+    'workers': (_) => const WorkersScreen(),
+    'inventory': (_) {
+      if (!Get.isRegistered<InventoryScreenController>()) {
+        InventoryScreenBinding().dependencies();
+      }
+      return const InventoryScreen();
+    },
+    'account': (_) => const AccountScreen(),
   };
 
   static const Map<String, IconData> activeIcons = {
