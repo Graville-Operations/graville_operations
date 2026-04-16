@@ -3,16 +3,14 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:graville_operations/core/local/store/storage_service.dart';
 import 'package:graville_operations/core/local/store/user_store.dart';
-import 'package:graville_operations/screens/dashboard/dashboard_screen.dart';
+import 'package:graville_operations/screens/invoice/invoice_screen.dart';
+import 'package:graville_operations/global.dart';
+import 'package:graville_operations/models/dashboard/assign_user_screen.dart';
 import 'core/routes/routes.dart';
 import 'core/style/theme.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Get.putAsync<StorageService>(() async {
-    return await StorageService().init();
-  });
-  Get.put(UserStore());
+ await Global.init();
   runApp(const MyApp());
 }
 
@@ -31,7 +29,7 @@ class _MyAppState extends State<MyApp> {
       theme: AppTheme.light,
       initialRoute: AppRoutes.initial,
       getPages: AppPages.routes,
-      builder: EasyLoading.init()
+      builder: EasyLoading.init(),
     );
   }
 }

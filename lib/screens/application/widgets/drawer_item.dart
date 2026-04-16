@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:graville_operations/core/local/entities/menu_data.dart';
 import 'package:graville_operations/screens/application/menu_registry.dart';
 
@@ -41,9 +42,12 @@ class _DrawerMenuTileState extends State<DrawerMenuTile>
   }
 
   void _onSubMenuTap(SubMenu sub) {
-    // TODO: navigate using sub.link e.g Get.toNamed(sub.link!)
-    debugPrint("Navigate to ${sub.link}");
-    Navigator.pop(context); // close drawer
+    if(sub.link!= null){
+      Get.toNamed(sub.link!);
+    }else{
+      Navigator.pop(context);
+    }
+
   }
 
   @override
@@ -59,7 +63,7 @@ class _DrawerMenuTileState extends State<DrawerMenuTile>
             color: Colors.blue.shade900,
           ),
           title: Text(
-            widget.menu.title,
+            widget.menu.title??"Unnamed Title",
             style: TextStyle(
               fontWeight: FontWeight.w500,
               color: Colors.blue.shade900,
@@ -99,7 +103,7 @@ class _DrawerMenuTileState extends State<DrawerMenuTile>
                     color: Colors.blue.shade300,
                   ),
                   title: Text(
-                    sub.title,
+                    sub.title??"Invalid Title",
                     style: TextStyle(
                       fontSize: 14,
                       color: Colors.grey.shade700,

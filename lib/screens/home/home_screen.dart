@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:graville_operations/application/custom_navigator.dart';
 import 'package:graville_operations/models/project_status.dart';
-import 'package:graville_operations/navigation/custom_navigator.dart';
 import 'package:graville_operations/screens/commons/widgets/progress_bar.dart';
 import 'package:graville_operations/screens/inventory/add_material.dart';
 import 'package:graville_operations/screens/inventory/update_inventory.dart';
@@ -14,7 +14,8 @@ import 'package:graville_operations/screens/commons/assets/images.dart';
 import 'package:graville_operations/screens/commons/widgets/section_card.dart';
 import 'package:graville_operations/screens/commons/widgets/status_chip.dart';
 import 'package:graville_operations/screens/commons/widgets/stat_card.dart';
-
+import 'package:graville_operations/screens/invoice/invoice_screen.dart';
+import 'package:graville_operations/services/api_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -25,7 +26,20 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   bool _isFabOpen = false;
-  Widget miniFab(IconData icon, VoidCallback onPressed) {
+  String _role = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadRole();
+  }
+
+  void _loadRole() async {
+    final role = await ApiService.getRole();
+    setState(() => _role = role ?? '');
+  }
+
+  Widget miniFab(IconData icon, VoidCallback onPressed, {Color color = Colors.black}) {
     return SizedBox(
       width: 44,
       height: 44,
@@ -34,9 +48,17 @@ class _HomeScreenState extends State<HomeScreen> {
         mini: true,
         onPressed: onPressed,
         shape: const CircleBorder(),
-        backgroundColor: Colors.black,
+        backgroundColor: color,
         child: Icon(icon, color: Colors.white, size: 20),
       ),
+    );
+  }
+
+  // Mini FAB with label tooltip
+  Widget _labeledMiniFab(String tooltip, IconData icon, VoidCallback onPressed, {Color color = Colors.black}) {
+    return Tooltip(
+      message: tooltip,
+      child: miniFab(icon, onPressed, color: color),
     );
   }
 
@@ -48,73 +70,77 @@ class _HomeScreenState extends State<HomeScreen> {
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           if (_isFabOpen) ...[
-            Tooltip(
-              message: "Add worker",
-              child: miniFab(
-                Icons.person_add,
-                () => context.push(const AddWorkerScreen()),
+
+            // ← Field engineer only: Submit Invoice
+            if (_role == 'field_engineer') ...[
+              _labeledMiniFab(
+                "Submit Invoice",
+                Icons.receipt_long,
+                () {
+                  setState(() => _isFabOpen = false);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const InvoiceScreen()),
+                  );
+                },
+                color: const Color(0xFF33907C), // AppColor.primaryBackground
               ),
+              const SizedBox(height: 12),
+            ],
+
+            _labeledMiniFab(
+              "Add worker",
+              Icons.person_add,
+              () => context.push(const AddWorkerScreen()),
             ),
             const SizedBox(height: 12),
-            Tooltip(
-              message: "New Site",
-              child: miniFab(
-                Icons.apartment,
-                () => context.push(const CreateSitesScreen()),
-              ),
+            _labeledMiniFab(
+              "New Site",
+              Icons.apartment,
+              () => context.push(const CreateSitesScreen()),
             ),
             const SizedBox(height: 12),
-            Tooltip(
-            message: "View sites",
-            child: miniFab(
+            _labeledMiniFab(
+              "View sites",
               Icons.map_outlined,
               () => Navigator.of(context).push(
                 MaterialPageRoute(builder: (_) => const SitesListScreen()),
               ),
             ),
-          ),
-          const SizedBox(height: 12),
-            Tooltip(
-              message: "Hired equipment",
-              child: miniFab(
-                Icons.build,
-                () => context.push(const AddMaterialScreen()),
-              ),
+            const SizedBox(height: 12),
+            _labeledMiniFab(
+              "Hired equipment",
+              Icons.build,
+              () => context.push(const AddMaterialScreen()),
             ),
             const SizedBox(height: 12),
-            Tooltip(
-              message: "Receive material",
-              child: miniFab(
-                Icons.download,
-                () => context.push(const ReceiveMaterialScreen()),
-              ),
+            _labeledMiniFab(
+              "Receive material",
+              Icons.download,
+              () => context.push(const ReceiveMaterialScreen()),
             ),
             const SizedBox(height: 12),
-            Tooltip(
-              message: "Update inventory",
-              child: miniFab(
-                Icons.store,
-                () => context.push(const UpdateInventoryScreen(preSelectedItem: null,)),
-              ),
+            _labeledMiniFab(
+              "Update inventory",
+              Icons.store,
+              () => context.push(const UpdateInventoryScreen(preSelectedItem: null)),
             ),
             const SizedBox(height: 12),
-            Tooltip(
-              message: "Transfer material",
-              child: miniFab(
-                Icons.local_shipping,
-                () => context.push(const TransferMaterialScreen()),
-              ),
+            _labeledMiniFab(
+              "Transfer material",
+              Icons.local_shipping,
+              () => context.push(const TransferMaterialScreen()),
             ),
             const SizedBox(height: 12),
-            Tooltip(
-              message: "create task",
-              child: miniFab(
-                Icons.add,
-                () => context.push(const CreateTaskScreen()),
-              ),
+            _labeledMiniFab(
+              "Create task",
+              Icons.add,
+              () => context.push(const CreateTaskScreen()),
             ),
             const SizedBox(height: 12),
           ],
+
+          // Main FAB
           FloatingActionButton(
             backgroundColor: Colors.black,
             shape: const CircleBorder(),
@@ -131,33 +157,32 @@ class _HomeScreenState extends State<HomeScreen> {
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
-              backgroundColor: Colors.white,
-              elevation: 0,
-              floating: true,
-              snap: true, 
-              automaticallyImplyLeading: false,
-              toolbarHeight: 80,
-              flexibleSpace: SafeArea(
-                child: Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Image.asset(CommonImages.logo, height: 40),
-                      const SizedBox(height: 4),
-                      const Text(
-                        "Graville Operations",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14,
-                          color: Colors.black,
-                        ),
+            backgroundColor: Colors.white,
+            elevation: 0,
+            floating: true,
+            snap: true,
+            automaticallyImplyLeading: false,
+            toolbarHeight: 80,
+            flexibleSpace: SafeArea(
+              child: Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Image.asset(CommonImages.logo, height: 40),
+                    const SizedBox(height: 4),
+                    const Text(
+                      "Graville Operations",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                        color: Colors.black,
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ),
-          
+          ),
 
           SliverPadding(
             padding: const EdgeInsets.all(15),
@@ -166,30 +191,22 @@ class _HomeScreenState extends State<HomeScreen> {
                 SectionCard(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
+                    children: const [
+                      Text(
                         "Current Project",
                         style: TextStyle(color: Colors.grey),
                       ),
-                      const SizedBox(height: 5),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text(
-                            "Sunrise Apartments",
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          //ProjectStatusChip(status: ProjectStatus.onSchedule),
-                        ],
+                      SizedBox(height: 5),
+                      Text(
+                        "Sunrise Apartments",
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ],
                   ),
                 ),
-
-                //Workers
                 const SizedBox(height: 15),
                 const Row(
                   children: [
@@ -214,8 +231,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ],
                 ),
-
-                //Material stock and project completionconst SizedBox(height: 15),
                 const SizedBox(height: 15),
                 IntrinsicHeight(
                   child: Row(
@@ -231,38 +246,26 @@ class _HomeScreenState extends State<HomeScreen> {
                                   SizedBox(width: 8),
                                   Text(
                                     "Material Stock",
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                                    style: TextStyle(fontWeight: FontWeight.bold),
                                   ),
                                 ],
                               ),
                               SizedBox(height: 12),
                               Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text("Cement"),
-                                  Text(
-                                    "250 bags",
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
+                                  Text("250 bags",
+                                      style: TextStyle(fontWeight: FontWeight.bold)),
                                 ],
                               ),
                               SizedBox(height: 6),
                               Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text("Steel"),
-                                  Text(
-                                    "1.5 tons",
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
+                                  Text("1.5 tons",
+                                      style: TextStyle(fontWeight: FontWeight.bold)),
                                 ],
                               ),
                             ],
@@ -294,9 +297,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     ),
                                     const Text(
                                       "68%",
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                      ),
+                                      style: TextStyle(fontWeight: FontWeight.bold),
                                     ),
                                   ],
                                 ),
@@ -308,13 +309,12 @@ class _HomeScreenState extends State<HomeScreen> {
                     ],
                   ),
                 ),
-                //Task progress section
                 const SizedBox(height: 15),
                 SectionCard(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
+                      const Row(
                         children: [
                           Icon(Icons.task, size: 18),
                           SizedBox(width: 8),
@@ -324,38 +324,25 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ],
                       ),
-                      SizedBox(height: 15),
+                      const SizedBox(height: 15),
                       TaskProgress(
-                        title: "Foundation",
-                        percent: 1.0,
-                        color: Colors.green,
-                      ),
+                          title: "Foundation", percent: 1.0, color: Colors.green),
                       TaskProgress(
-                        title: "Framing",
-                        percent: 0.75,
-                        color: Colors.orange,
-                      ),
+                          title: "Framing", percent: 0.75, color: Colors.orange),
                       TaskProgress(
-                        title: "Electrical",
-                        percent: 0.45,
-                        color: Colors.blue,
-                      ),
+                          title: "Electrical", percent: 0.45, color: Colors.blue),
                     ],
                   ),
                 ),
-
-                //Reviews
                 const SizedBox(height: 20),
                 const Text(
                   "Reviews",
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 12),
-
                 LayoutBuilder(
                   builder: (context, constraints) {
                     final isWide = constraints.maxWidth > 700;
-
                     return SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
                       child: ConstrainedBox(
@@ -364,44 +351,32 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         child: DataTable(
                           columnSpacing: 40,
-                          headingRowColor: WidgetStatePropertyAll(
-                            Colors.grey.shade200,
-                          ),
+                          headingRowColor:
+                              WidgetStatePropertyAll(Colors.grey.shade200),
                           columns: const [
                             DataColumn(label: Text("MESSAGE")),
                             DataColumn(label: Text("REVIEWER")),
                             DataColumn(label: Text("DATE")),
                           ],
                           rows: const [
-                            DataRow(
-                              cells: [
-                                DataCell(
-                                  Text(
-                                    "Great job on the installation at the new site.",
-                                  ),
-                                ),
-                                DataCell(Text("James Paterson")),
-                                DataCell(Text("Feb 10")),
-                              ],
-                            ),
-                            DataRow(
-                              cells: [
-                                DataCell(
-                                  Text(
-                                    "Work completed efficiently, update status next time.",
-                                  ),
-                                ),
-                                DataCell(Text("Angela Martinez")),
-                                DataCell(Text("Feb 8")),
-                              ],
-                            ),
+                            DataRow(cells: [
+                              DataCell(Text(
+                                  "Great job on the installation at the new site.")),
+                              DataCell(Text("James Paterson")),
+                              DataCell(Text("Feb 10")),
+                            ]),
+                            DataRow(cells: [
+                              DataCell(Text(
+                                  "Work completed efficiently, update status next time.")),
+                              DataCell(Text("Angela Martinez")),
+                              DataCell(Text("Feb 8")),
+                            ]),
                           ],
                         ),
                       ),
                     );
                   },
                 ),
-
                 const SizedBox(height: 60),
               ]),
             ),

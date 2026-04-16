@@ -3,10 +3,12 @@ import 'dart:async';
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart' hide FormData;
 import 'package:graville_operations/core/local/store/user_store.dart';
 import 'package:graville_operations/core/utils/utils.dart';
+import 'package:flutter/foundation.dart';
 
 /*
   * http operation class
@@ -33,7 +35,7 @@ class HttpUtil {
       connectTimeout: const Duration(milliseconds: 30000),
 
       // The interval between two received data on the response stream, in milliseconds。
-      receiveTimeout: const Duration(milliseconds: 20000),
+      receiveTimeout: const Duration(milliseconds: 60000),
 
       // Http request header.
       headers: {},
