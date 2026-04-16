@@ -1,13 +1,29 @@
 import 'dart:convert';
-import 'package:http/http.dart' as http;
+import 'package:dio/dio.dart';
+import 'package:graville_operations/core/utils/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
+  static const String baseUrl = 'http://192.168.1.73:8000/api/v1';
 
-  // Use 10.0.2.2 for Android emulator, your PC IP for physical device
-  static const String baseUrl = 'https://hello.graville.co.ke/api/v1';
+  static dynamic _decodeResponse(dynamic response) {
+    if (response is String) return jsonDecode(response);
+    return response;
+  }
 
-  // Token Management
+  static Options _jsonOptions() {
+    return Options(headers: {'Content-Type': 'application/json'});
+  }
+
+  static Future<Options> _authJsonOptions() async {
+    final token = await getToken();
+    return Options(headers: {
+      'Content-Type': 'application/json',
+      if (token != null) 'Authorization': 'Bearer $token',
+    });
+  }
+
+  // ─── Token Management
   static Future<void> saveToken(String token) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('token', token);
@@ -45,344 +61,361 @@ class ApiService {
     await prefs.remove('user_id');
   }
 
-  //  Check if admin exists
+  //─── Check if admin exists
   static Future<bool> adminExists() async {
-    final response = await http.get(
-      Uri.parse('$baseUrl/auth/admin/exists'),
-      headers: {'Content-Type': 'application/json'},
-    );
-    final data = jsonDecode(response.body);
-    return data['exists'] ?? false;
+    try {
+      final response = await HttpUtil().get(
+        '/refactor/admin/exists',
+        options: _jsonOptions(),
+      );
+      final data = _decodeResponse(response);
+      return data['exists'] ?? false;
+    } catch (e) {
+      return false;
+    }
   }
 
-  //  Admin Signup
+  // ─── Admin Signup
   static Future<Map<String, dynamic>> adminSignup({
     required String firstName,
     required String lastName,
     required String email,
     required String password,
-    //String? phone,
   }) async {
-    final response = await http.post(
-      Uri.parse('$baseUrl/auth/admin/signup'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({
-        'first_name': firstName,
-        'last_name': lastName,
-        'email': email,
-        'password': password,
-        //'phone': phone,
-      }),
-    );
-    final data = jsonDecode(response.body);
+    try {
+      final response = await HttpUtil().post(
+        '/refactor/admin/signup',
+        options: _jsonOptions(),
+        data: {
+          'first_name': firstName,
+          'last_name': lastName,
+          'email': email,
+          'password': password,
+        },
+      );
+      final data = _decodeResponse(response);
 
-    String message;
-    if (data['detail'] is List) {
-      message = (data['detail'] as List)
-          .map((e) => e['msg']?.toString() ?? '')
-          .join(', ');
-    } else {
-      message = data['message']?.toString() ??
-          data['detail']?.toString() ??
-          'Something went wrong';
-    }
-
-    return {
-      'success': response.statusCode == 200 || response.statusCode == 201,
-      'message': message
-    };
-  }
-
-  //  Login
-  static Future<Map<String, dynamic>> login(
-      String email, String password) async {
-    final response = await http.post(
-      Uri.parse('$baseUrl/auth/login'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'email': email, 'password': password}),
-    );
-
-    final data = jsonDecode(response.body);
-
-    if (response.statusCode == 200) {
-      await saveToken(data['access_token']);
-      await saveRole(data['role']);
-      await saveUserId(data['user']['id']);
-      return {'success': true, 'data': data};
-    } else {
       String message;
       if (data['detail'] is List) {
         message = (data['detail'] as List)
             .map((e) => e['msg']?.toString() ?? '')
             .join(', ');
       } else {
-        message = data['detail']?.toString() ?? 'Login failed';
+        message = data['message']?.toString() ??
+            data['detail']?.toString() ??
+            'Something went wrong';
       }
-      return {'success': false, 'message': message};
+
+      return {
+        'success': data['message'] != null,
+        'message': message
+      };
+    } catch (e) {
+      return {'success': false, 'message': e.toString()};
     }
   }
 
-  //  Forgot Password
-  static Future<Map<String, dynamic>> forgotPassword(String email) async {
-    final response = await http.post(
-      Uri.parse('$baseUrl/auth/forgot-password'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'email': email}),
-    );
+  // ─── Login 
+  static Future<Map<String, dynamic>> login(
+      String email, String password) async {
+    try {
+      final response = await HttpUtil().post(
+        '/refactor/login',  // ← updated endpoint
+        options: _jsonOptions(),
+        data: {'email': email, 'password': password},
+      );
 
-    final data = jsonDecode(response.body);
-    return {'success': response.statusCode == 200, 'message': data['message']};
+      final data = _decodeResponse(response);
+
+      if (data['access_token'] != null) {
+        final token = data['access_token'];
+        final accountType = data['account_type'] ?? '';
+
+        await saveToken(token);
+        await saveRole(accountType);
+
+        // Fetch user profile from /me
+        try {
+          final me = await HttpUtil().get(
+            '/refactor/me',
+            options: Options(headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer $token',
+            }),
+          );
+          final meData = _decodeResponse(me);
+          if (meData['id'] != null) {
+            await saveUserId(meData['id']);
+          }
+          // Return with user data merged
+          return {
+            'success': true,
+            'data': {
+              'access_token': token,
+              'account_type': accountType,
+              'role': accountType,
+              'user': {
+                'id': meData['id'],
+                'first_name': meData['first_name'],
+                'last_name': meData['last_name'],
+                'email': meData['email'],
+                'role': accountType,
+              }
+            }
+          };
+        } catch (e) {
+          // Even if /me fails return success with token
+          return {
+            'success': true,
+            'data': {
+              'access_token': token,
+              'account_type': accountType,
+              'role': accountType,
+              'user': {
+                'id': 0,
+                'first_name': '',
+                'last_name': '',
+                'email': email,
+                'role': accountType,
+              }
+            }
+          };
+        }
+      } else {
+        String message;
+        if (data['detail'] is List) {
+          message = (data['detail'] as List)
+              .map((e) => e['msg']?.toString() ?? '')
+              .join(', ');
+        } else {
+          message = data['detail']?.toString() ?? 'Login failed';
+        }
+        return {'success': false, 'message': message};
+      }
+    } catch (e) {
+      return {'success': false, 'message': e.toString()};
+    }
   }
 
-  //  Verify OTP
+  // ─── Forgot Password
+  static Future<Map<String, dynamic>> forgotPassword(String email) async {
+    try {
+      final response = await HttpUtil().post(
+        '/refactor/forgot-password',
+        options: _jsonOptions(),
+        data: {'email': email},
+      );
+      final data = _decodeResponse(response);
+      return {
+        'success': data['message'] != null,
+        'message': data['message']
+      };
+    } catch (e) {
+      return {'success': false, 'message': e.toString()};
+    }
+  }
+
+  // ─── Verify OTP 
   static Future<Map<String, dynamic>> verifyOtp(
       String email, String code) async {
-    final response = await http.post(
-      Uri.parse('$baseUrl/auth/verify-otp'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'email': email, 'code': code}),
-    );
-
-    final data = jsonDecode(response.body);
-    return {'success': response.statusCode == 200, 'message': data['message']};
+    try {
+      final response = await HttpUtil().post(
+        '/refactor/verify-otp',
+        options: _jsonOptions(),
+        data: {'email': email, 'code': code},
+      );
+      final data = _decodeResponse(response);
+      return {
+        'success': data['message'] != null,
+        'message': data['message']
+      };
+    } catch (e) {
+      return {'success': false, 'message': e.toString()};
+    }
   }
 
-  // Reset Password
+  // ─── Reset Password 
   static Future<Map<String, dynamic>> resetPassword(
       String email, String code, String newPassword) async {
-    final response = await http.post(
-      Uri.parse('$baseUrl/auth/reset-password'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({
-        'email': email,
-        'code': code,
-        'new_password': newPassword,
-      }),
-    );
-
-    final data = jsonDecode(response.body);
-    return {'success': response.statusCode == 200, 'message': data['message']};
+    try {
+      final response = await HttpUtil().post(
+        '/refactor/reset-password',
+        options: _jsonOptions(),
+        data: {
+          'email': email,
+          'code': code,
+          'new_password': newPassword,
+        },
+      );
+      final data = _decodeResponse(response);
+      return {
+        'success': data['message'] != null,
+        'message': data['message']
+      };
+    } catch (e) {
+      return {'success': false, 'message': e.toString()};
+    }
   }
 
-  //  Create Field Engineer (Admin only)
-  static Future<Map<String, dynamic>> createFieldEngineer({
-    required String firstName,
-    required String lastName,
-    required String email,
-    String? phone,
-    String? nationalId,
-  }) async {
-    final token = await getToken();
-    final response = await http.post(
-      Uri.parse('$baseUrl/auth/admin/create-field-engineer'),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
-      body: jsonEncode({
+  // ─── Create member
+  static Future<Map<String, dynamic>> createMember({
+  required String firstName,
+  required String lastName,
+  required String email,
+  String? phone,
+  String? nationalId,
+  String? staffId,
+  required String accountType,
+}) async {
+  try {
+    final response = await HttpUtil().post(
+      '/refactor/create-member',
+      options: await _authJsonOptions(),
+      data: {
         'first_name': firstName,
         'last_name': lastName,
         'email': email,
-        'phone': phone,
-        'national_id': nationalId != null ? int.tryParse(nationalId) : null,
-      }),
-    );
-
-    final data = jsonDecode(response.body);
-    return {
-      'success': response.statusCode == 200,
-      'message': data['message'] ?? data['detail']
-    };
-  }
-
-  //  Create Auditor (Admin only)
-  static Future<Map<String, dynamic>> createAuditor({
-    required String firstName,
-    required String lastName,
-    required String email,
-    String? phone,
-    String? nationalId,
-  }) async {
-    final token = await getToken();
-    final response = await http.post(
-      Uri.parse('$baseUrl/auth/admin/create-auditor'),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
+        'phone_no': phone,
+        'national_id': nationalId,
+        'staff_id': staffId,
+        'account_type': accountType,
       },
-      body: jsonEncode({
-        'first_name': firstName,
-        'last_name': lastName,
-        'email': email,
-        'phone': phone,
-        'national_id': nationalId != null ? int.tryParse(nationalId) : null,
-      }),
     );
-
-    final data = jsonDecode(response.body);
+    final data = _decodeResponse(response);
     return {
-      'success': response.statusCode == 200,
-      'message': data['message'] ?? data['detail']
+      'success': data != null,
+      'message': data['message'] ?? 'User created successfully'
     };
+  } catch (e) {
+    return {'success': false, 'message': e.toString()};
   }
+}
 
   // ─── Get All Users (Admin only)
   static Future<Map<String, dynamic>> getAllUsers() async {
-    final token = await getToken();
-    final response = await http.get(
-      Uri.parse('$baseUrl/auth/admin/users'),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
+  try {
+    final response = await HttpUtil().get(
+      '/refactor/users',  // ← updated endpoint
+      options: await _authJsonOptions(),
     );
-
-    final data = jsonDecode(response.body);
-    return {'success': response.statusCode == 200, 'data': data};
+    final data = _decodeResponse(response);
+    return {'success': data != null, 'data': data};
+  } catch (e) {
+    return {'success': false, 'data': [], 'message': e.toString()};
   }
+}
 
-  //  Delete User (Admin only)
-  static Future<Map<String, dynamic>> deleteUser(
-      int userId, String role) async {
-    final token = await getToken();
-    final response = await http.delete(
-      Uri.parse('$baseUrl/auth/admin/users/$userId?role=$role'),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
+  // ─── Delete User (Admin only) 
+ static Future<Map<String, dynamic>> deleteUser(
+    int userId, String role) async {
+  try {
+    final response = await HttpUtil().delete(
+      '/refactor/users/$userId',  // ← updated endpoint
+      options: await _authJsonOptions(),
     );
-
-    final data = jsonDecode(response.body);
+    final data = _decodeResponse(response);
     return {
-      'success': response.statusCode == 200,
+      'success': data != null,
       'message': data['message'] ?? data['detail']
     };
+  } catch (e) {
+    return {'success': false, 'message': e.toString()};
   }
+}
 
-  //  Get Profile
+  // ─── Get Profile 
   static Future<Map<String, dynamic>> getProfile(int userId) async {
-    final token = await getToken();
-    final response = await http.get(
-      Uri.parse('$baseUrl/profile/$userId'),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
-    );
-    final data = jsonDecode(response.body);
-    return {'success': response.statusCode == 200, 'data': data};
+    try {
+      final response = await HttpUtil().get(
+        '/profile/$userId',
+        options: await _authJsonOptions(),
+      );
+      final data = _decodeResponse(response);
+      return {'success': data != null, 'data': data};
+    } catch (e) {
+      return {'success': false, 'data': null, 'message': e.toString()};
+    }
   }
-
-  //  Update Profile
+// ─── Get Refactor Me 
+static Future<Map<String, dynamic>> getRefactorMe() async {
+  try {
+    final response = await HttpUtil().get(
+      '/refactor/me',
+      options: await _authJsonOptions(),
+    );
+    final data = _decodeResponse(response);
+    return {'success': data != null, 'data': data};
+  } catch (e) {
+    return {'success': false, 'data': null, 'message': e.toString()};
+  }
+}
+  // ─── Update Profile 
   static Future<Map<String, dynamic>> updateProfile(
       int userId, Map<String, dynamic> profileData) async {
-    final token = await getToken();
-    final response = await http.put(
-      Uri.parse('$baseUrl/profile/$userId'),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
-      body: jsonEncode(profileData),
-    );
-    final data = jsonDecode(response.body);
-    return {
-      'success': response.statusCode == 200,
-      'data': data,
-      'message': data['detail'] ?? 'Updated successfully'
-    };
+    try {
+      final response = await HttpUtil().put(
+        '/profile/$userId',
+        options: await _authJsonOptions(),
+        data: profileData,
+      );
+      final data = _decodeResponse(response);
+      return {
+        'success': data != null,
+        'data': data,
+        'message': data['detail'] ?? 'Updated successfully'
+      };
+    } catch (e) {
+      return {'success': false, 'message': e.toString()};
+    }
   }
 
-  //  Update Personal Settings
+  // ─── Update Personal Settings
   static Future<Map<String, dynamic>> updatePersonalSettings(
       int userId, Map<String, dynamic> settings) async {
-    final token = await getToken();
-    final response = await http.put(
-      Uri.parse('$baseUrl/profile/personal-settings/$userId'),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
-      body: jsonEncode(settings),
-    );
-    final data = jsonDecode(response.body);
-    return {
-      'success': response.statusCode == 200,
-      'data': data,
-      'message': data['detail'] ?? 'Settings updated successfully'
-    };
-  }
-
-  //  Authenticated Requests
-  static Future<Map<String, dynamic>> authenticatedGet(String endpoint) async {
-    final token = await getToken();
-
-    if (token == null) {
-      return {'success': false, 'data': 'No token found'};
-    }
-
     try {
-      final response = await http.get(
-        Uri.parse('$baseUrl$endpoint'),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-        },
+      final response = await HttpUtil().put(
+        '/profile/personal-settings/$userId',
+        options: await _authJsonOptions(),
+        data: settings,
       );
-
-      final data = jsonDecode(response.body);
-
-      if (response.statusCode == 200) {
-        return {'success': true, 'data': data};
-      } else if (response.statusCode == 401) {
-        await clearSession();
-        return {
-          'success': false,
-          'data': 'Session expired. Please login again.'
-        };
-      } else {
-        return {'success': false, 'data': data};
-      }
+      final data = _decodeResponse(response);
+      return {
+        'success': data != null,
+        'data': data,
+        'message': data['detail'] ?? 'Settings updated successfully'
+      };
     } catch (e) {
-      return {'success': false, 'data': e.toString()};
+      return {'success': false, 'message': e.toString()};
     }
   }
 
-  // Authenticated Requests - POST
+  // ─── Authenticated GET 
+  static Future<Map<String, dynamic>> authenticatedGet(String endpoint) async {
+    try {
+      final response = await HttpUtil().get(
+        endpoint,
+        options: await _authJsonOptions(),
+      );
+      final data = _decodeResponse(response);
+      return {'success': data != null, 'data': data};
+    } catch (e) {
+      return {'success': false, 'data': null, 'message': e.toString()};
+    }
+  }
+
+  // ─── Authenticated POST 
   static Future<Map<String, dynamic>> authenticatedPost(
       String endpoint, Map<String, dynamic> body) async {
-    final token = await getToken();
-
-    if (token == null) {
-      return {'success': false, 'data': 'No token found'};
-    }
-
     try {
-      final response = await http.post(
-        Uri.parse('$baseUrl$endpoint'),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-        },
-        body: jsonEncode(body),
+      final response = await HttpUtil().post(
+        endpoint,
+        options: await _authJsonOptions(),
+        data: body,
       );
-
-      final data = jsonDecode(response.body);
-
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        return {'success': true, 'data': data};
-      } else if (response.statusCode == 401) {
-        await clearSession();
-        return {
-          'success': false,
-          'data': 'Session expired. Please login again.'
-        };
-      } else {
-        return {'success': false, 'data': data};
-      }
+      final data = _decodeResponse(response);
+      return {'success': data != null, 'data': data};
     } catch (e) {
-      return {'success': false, 'data': e.toString()};
+      return {'success': false, 'data': null, 'message': e.toString()};
     }
   }
 }

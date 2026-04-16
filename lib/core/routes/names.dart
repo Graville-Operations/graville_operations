@@ -6,7 +6,10 @@ class AppRoutes {
   static const projectDashboard = '/projects/dashboard';
   static const financeDashboard = '/finance/dashboard';
   static const createProject = '/projects/new';
-  static const financeInvoices = '/finance/invoices';
   static const departmentMenus = '/departments/menus';
   static const subMenusScreens = '/departments/sub-menus';
+  static const usersDashboard = '/users/dashboard';
+  static const createUser = '/users/new';
+  static const userRoles = '/users/roles';
+  static const financeInvoices = '/finance/invoices';
 }
