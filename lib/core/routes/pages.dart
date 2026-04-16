@@ -12,6 +12,8 @@ import 'package:graville_operations/screens/invoice/invoice_screen.dart';
 import 'package:graville_operations/screens/projects/dashboard/binding.dart';
 import 'package:graville_operations/screens/projects/dashboard/view.dart';
 import 'package:graville_operations/screens/sites/create_sites.dart';
+import 'package:graville_operations/screens/finance_dashboard/finance_dashboard.dart';
+
 import '../../screens/application/widgets/splash_screen.dart';
 import 'routes.dart';
 
@@ -32,6 +34,17 @@ class AppPages {
       binding: LoginBindings(),
     ),
     GetPage(
+        name: AppPages.application,
+        page: () => ApplicationScreen(),
+        binding: ApplicationBindings(),
+        middlewares: [AuthMiddleware(priority: 0)]),
+    GetPage(
+        name: AppRoutes.projectDashboard,
+        page: () => ProjectDashboardScreen(),
+        binding: ProjectDashboardBindings()),
+    GetPage(name: AppRoutes.createProject, page: () => CreateSitesScreen()),
+    GetPage(
+        name: AppRoutes.financeDashboard, page: () => FinanceDashboardApp()),
       name: AppPages.application,
       page: () => ApplicationScreen(),
       binding: ApplicationBindings(),
