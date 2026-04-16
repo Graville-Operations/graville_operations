@@ -38,7 +38,7 @@ class LoginScreen extends GetView<LoginController> {
           ),
         ),
 
-        // ✅ Blur overlay
+        // ✅ Blur overlay (optional)
         Positioned.fill(
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 0, sigmaY: 0),
@@ -46,38 +46,47 @@ class LoginScreen extends GetView<LoginController> {
           ),
         ),
 
-        // ✅ Main content
         SafeArea(
           child: SingleChildScrollView(
             padding: const EdgeInsets.fromLTRB(24, 0, 24, 40),
             child: Form(
+              key: controller.formKey,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const SizedBox(height: 20),
-
-                  // ✅ Logo
                   Image.asset(
                     'assets/images/logo.png',
                     height: 100,
+                    width: 500,
                   ),
-
                   const SizedBox(height: 10),
-
-                  const Text(
+                  Text(
                     'Welcome to Graville Enterprises Limited!',
                     textAlign: TextAlign.center,
-                    style: TextStyle(
+                    style: const TextStyle(
+                      color: Colors.black,
                       fontWeight: FontWeight.bold,
                       fontSize: 20,
                     ),
                   ),
-
                   const Text(
                     'Please enter your credentials',
-                    style: TextStyle(color: Colors.blueGrey),
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.blueGrey,
+                      fontSize: 18,
+                    ),
                   ),
-
+                  const SizedBox(height: 8),
+                  const Text(
+                    "Log in to your account",
+                    style: TextStyle(
+                      fontSize: 23,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blue,
+                    ),
+                  ),
                   const SizedBox(height: 20),
 
                   // ✅ EMAIL
@@ -134,7 +143,7 @@ class LoginScreen extends GetView<LoginController> {
 
                   const SizedBox(height: 10),
 
-                  // ✅ LOGIN BUTTON (ONLY ONE)
+                  // ✅ LOGIN BUTTON
                   CustomButton(
                     label: "Log In",
                     width: double.infinity,
@@ -178,17 +187,6 @@ class LoginScreen extends GetView<LoginController> {
                   Wrap(
                     alignment: WrapAlignment.center,
                     spacing: 15,
-                    // children: [
-                    //   socialIcon(FontAwesomeIcons.google, Colors.red),
-                    //   socialIcon(FontAwesomeIcons.linkedinIn,
-                    //       Colors.blueAccent),
-                    //   socialIcon(FontAwesomeIcons.facebookF,
-                    //       Colors.blue),
-                    //   socialIcon(FontAwesomeIcons.instagram,
-                    //       Colors.purple),
-                    //   socialIcon(
-                    //       FontAwesomeIcons.xTwitter, Colors.black),
-                    // ],
                   ),
                 ],
               ),

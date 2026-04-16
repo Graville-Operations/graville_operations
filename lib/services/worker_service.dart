@@ -7,6 +7,8 @@ class WorkerService {
   static const String _path = '/workers';
   static  HttpUtil _http =  HttpUtil();
 
+  static get dio => null;
+
 
   static Future<Worker> createWorker(Worker worker) async {
       final data = await _http.post('$_path/', data: worker.toCreateJson());
