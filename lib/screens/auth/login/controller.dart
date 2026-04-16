@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
+import 'package:graville_operations/core/local/entities/menu_data.dart';
 import 'package:graville_operations/core/local/entities/user_data.dart';
 import 'package:graville_operations/core/local/store/user_store.dart';
-import 'package:graville_operations/core/remote/api/auth_api.dart';
-import 'package:graville_operations/core/remote/dto/requests/login.dart';
+import 'package:graville_operations/core/remote/api/menus.dart';
 import 'package:graville_operations/core/routes/routes.dart';
 import 'package:graville_operations/screens/auth/login/state.dart';
+import 'package:graville_operations/services/api_service.dart';
 
 class LoginController extends GetxController {
-  final formKey = GlobalKey<FormState>(); // ✅ ADD THIS
+  final formKey = GlobalKey<FormState>();
 
   var state = LoginState();
 
@@ -26,41 +27,79 @@ class LoginController extends GetxController {
   }
 
   Future<String> login() async {
-    // ✅ validate BEFORE login
     if (!formKey.currentState!.validate()) {
       return "Invalid form";
     }
 
-    String res = "Unexpected Error Occurred";
     EasyLoading.show(status: "Logging you in....");
 
     try {
-      LoginRequest request = LoginRequest(
-        username: state.email.text,
-        password: state.psw.text,
+      // Use ApiService which hits /refactor/login
+      final result = await ApiService.login(
+        state.email.text.trim(),
+        state.psw.text.trim(),
       );
 
-      var result = await AuthApi.login(request);
+      if (result['success']) {
+        final data = result['data'];
+        final token = data['access_token'];
+        final accountType = data['account_type'] ?? '';
+        final user = data['user'];
 
-      EasyLoading.show(status: 'Updating profile info .....');
+        // Save token to UserStore
+        await UserStore.to.setToken(token);
 
-      await UserStore.to.setToken(result.accessToken);
+        // Save profile to UserStore
+        await UserStore.to.saveProfile(UserData(
+          id: user['id'],
+          email: user['email'],
+          firstName: user['first_name'],
+          lastName: user['last_name'],
+          accountType: accountType,
+          enabled: true,
+          groups: [],
+        ));
 
-      var me = await AuthApi.me();
-      await UserStore.to.saveProfile(me.toUserData());
+        // Save role and user id to SharedPreferences
+        await ApiService.saveRole(accountType);
+        await ApiService.saveUserId(user['id'] ?? 0);
 
-      EasyLoading.showSuccess('Logged in Successfully');
+        EasyLoading.show(status: 'Loading your menus.....');
 
-      Get.offAllNamed(AppRoutes.application);
+        // Fetch menus from backend, fall back to defaults if fails
+        try {
+          var menus = await MenuApi.getMyMenu();
+          if (menus.isEmpty) {
+            await _assignDefaultMenus(accountType, token);
+          } else {
+            await UserStore.to.saveMenus(menus, token);
+          }
+        } catch (e) {
+          debugPrint('Menu fetch failed: $e — using defaults');
+          await _assignDefaultMenus(accountType, token);
+        }
 
-      return "Success";
+        EasyLoading.showSuccess('Logged in Successfully');
+        Get.offAllNamed(AppRoutes.application);
+        return "Success";
+      } else {
+        EasyLoading.showError(result['message'] ?? 'Login failed');
+        return result['message'] ?? 'Login failed';
+      }
     } catch (e) {
-      res = "...error in login ${e.toString()}";
-      debugPrint(res);
-
-      EasyLoading.showError("Login failed"); // ✅ better UX
-
-      return res;
+      debugPrint("...error in login ${e.toString()}");
+      EasyLoading.showError("Login failed");
+      return e.toString();
     }
+  }
+
+  Future<void> _assignDefaultMenus(String role, String token) async {
+    final defaultMenus = [
+      const MenuItem(id: 1, name: 'home', title: 'Home', priority: 1),
+      const MenuItem(id: 2, name: 'workers', title: 'Workers', priority: 2),
+      const MenuItem(id: 3, name: 'inventory', title: 'Inventory', priority: 3),
+      const MenuItem(id: 4, name: 'account', title: 'Account', priority: 4),
+    ];
+    await UserStore.to.saveMenus(defaultMenus, token);
   }
 }

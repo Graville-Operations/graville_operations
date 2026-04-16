@@ -51,7 +51,8 @@ class LoginScreen extends GetView<LoginController> {
             child: SingleChildScrollView(
               padding: const EdgeInsets.fromLTRB(24, 0, 24, 40),
               child: Form(
-                child: Column(
+              key: controller.formKey,
+              child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const SizedBox(height: 20),

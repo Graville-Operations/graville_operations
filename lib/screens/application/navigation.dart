@@ -3,9 +3,9 @@ import 'package:graville_operations/screens/account_screen/account_screen.dart';
 import 'package:graville_operations/screens/home/home_screen.dart';
 import 'package:graville_operations/screens/inventory/inventory_screen.dart';
 import 'package:graville_operations/screens/workers/workers_screen.dart';
-import 'package:graville_operations/screens/admin/admin_dashboard.dart';
+//import 'package:graville_operations/screens/admin/admin_dashboard.dart';
 import 'package:graville_operations/services/api_service.dart';
-import 'package:graville_operations/screens/finance/finance_dashboard_screen.dart';
+//import 'package:graville_operations/screens/finance/finance_dashboard_screen.dart';
 
 class ApplicationScreen extends StatefulWidget {
   const ApplicationScreen({super.key});
@@ -16,7 +16,7 @@ class ApplicationScreen extends StatefulWidget {
 
 class _ApplicationScreenState extends State<ApplicationScreen> {
   int _currentIndex = 0;
-  String _role = '';
+ // String _role = '';
   bool _isLoading = true;
 
   @override
@@ -26,9 +26,9 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
   }
 
   void _loadRole() async {
-    final role = await ApiService.getRole();
+    //final role = await ApiService.getRole();
     setState(() {
-      _role = role ?? '';
+      //_role = role ?? '';
       _isLoading = false;
     });
   }
@@ -41,10 +41,10 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
       const AccountScreen(),
     ];
 
-    if (_role == 'admin') {
-      base.add(const AdminDashboard());
-      base.add(const FinanceDashboardScreen());
-    }
+    // if (_role == 'admin') {
+    //   //base.add(const AdminDashboard());
+    //   //base.add(const FinanceDashboardScreen());
+    // }
 
     return base;
   }
@@ -76,20 +76,6 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
       ),
     ];
 
-    if (_role == 'admin') {
-      base.add(
-        BottomNavigationBarItem(
-          icon: Icon(Icons.admin_panel_settings_outlined, color: inActiveColor),
-          activeIcon: Icon(Icons.admin_panel_settings, color: activeColor),
-          label: "Admin",
-        ),
-      );
-       base.add(BottomNavigationBarItem(
-    icon: Icon(Icons.bar_chart_outlined, color: inActiveColor),
-    activeIcon: Icon(Icons.bar_chart, color: activeColor),
-    label: "Finance",
-  ));
-    }
 
     return base;
   }

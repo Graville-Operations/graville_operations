@@ -3,6 +3,7 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:graville_operations/core/local/store/storage_service.dart';
 import 'package:graville_operations/core/local/store/user_store.dart';
+import 'package:graville_operations/screens/invoice/invoice_screen.dart';
 import 'core/routes/routes.dart';
 import 'core/style/theme.dart';
 
