@@ -9,6 +9,7 @@ import 'package:graville_operations/screens/auth/login/binding.dart';
 import 'package:graville_operations/screens/auth/login/view.dart';
 import 'package:graville_operations/screens/finance/finance_dashboard_screen.dart';
 import 'package:graville_operations/screens/invoice/invoice_screen.dart';
+import 'package:graville_operations/screens/menus/menus.dart';
 import 'package:graville_operations/screens/projects/dashboard/binding.dart';
 import 'package:graville_operations/screens/projects/dashboard/view.dart';
 import 'package:graville_operations/screens/sites/create_sites.dart';
@@ -78,5 +79,6 @@ class AppPages {
       name: AppRoutes.financeInvoices,
       page: () => const InvoiceScreen(),
     ),
+    GetPage(name: AppRoutes.menuDepartments, page: ()=>const MenusScreen())
   ];
 }
