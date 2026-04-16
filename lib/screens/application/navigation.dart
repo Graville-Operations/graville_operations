@@ -40,9 +40,9 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
       const AccountScreen(),
     ];
 
-    if (_role == 'admin') {
-      base.add(const AdminDashboard());
-    }
+    // if (_role == 'admin') {
+    //   base.add(const AdminDashboard());
+    // }
 
     return base;
   }

@@ -9,4 +9,5 @@ class AppRoutes {
   static const financeInvoices = '/finance/invoices';
   static const departmentMenus = '/departments/menus';
   static const subMenusScreens = '/departments/sub-menus';
+  static const userDepartment = "/departments/users";
 }

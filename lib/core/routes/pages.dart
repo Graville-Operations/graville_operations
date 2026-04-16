@@ -5,6 +5,7 @@ import 'package:graville_operations/screens/application/binding.dart';
 import 'package:graville_operations/screens/application/view.dart';
 import 'package:graville_operations/screens/auth/login/binding.dart';
 import 'package:graville_operations/screens/auth/login/view.dart';
+import 'package:graville_operations/screens/projects/dashboard/assign_user_screen.dart';
 import 'package:graville_operations/screens/projects/dashboard/binding.dart';
 import 'package:graville_operations/screens/projects/dashboard/view.dart';
 import 'package:graville_operations/screens/sites/create_sites.dart';
@@ -33,16 +34,13 @@ class AppPages {
         name: AppPages.application,
         page: () => ApplicationScreen(),
         binding: ApplicationBindings(),
-        middlewares: [AuthMiddleware(priority: 0)]
-    ),
+        middlewares: [AuthMiddleware(priority: 0)]),
     GetPage(
         name: AppRoutes.projectDashboard,
         page: () => ProjectDashboardScreen(),
-        binding: ProjectDashboardBindings()
-    ),
+        binding: ProjectDashboardBindings()),
+    GetPage(name: AppRoutes.createProject, page: () => CreateSitesScreen()),
     GetPage(
-      name: AppRoutes.createProject,
-      page: ()=> CreateSitesScreen()
-    ),
+        name: AppRoutes.userDepartment, page: () => AssignUserToGroupScreen()),
   ];
 }
