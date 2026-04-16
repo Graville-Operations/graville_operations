@@ -40,10 +40,7 @@ packages:
       sha256: f71061c654a3380576a52b451dd5532377954cf9dbd272a78fc8479606670803
       url: "https://pub.dev"
     source: hosted
-<<<<<<< HEAD
     version: "1.4.0"
-=======
-    version: "1.4.1"
   checked_yaml:
     dependency: transitive
     description:
@@ -60,7 +57,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.4.2"
->>>>>>> 5be962deee318d52b0e12364afa246c759fb761c
   clock:
     dependency: transitive
     description:
@@ -248,17 +244,10 @@ packages:
     dependency: "direct main"
     description:
       name: font_awesome_flutter
-<<<<<<< HEAD
       sha256: b738e35f8bb4957896c34957baf922f99c5d415b38ddc8b070d14b7fa95715d4
       url: "https://pub.dev"
     source: hosted
     version: "10.9.1"
-=======
-      sha256: b9011df3a1fa02993630b8fb83526368cf2206a711259830325bab2f1d2a4eb0
-      url: "https://pub.dev"
-    source: hosted
-    version: "10.12.0"
->>>>>>> 5be962deee318d52b0e12364afa246c759fb761c
   get:
     dependency: "direct main"
     description:
@@ -399,17 +388,10 @@ packages:
     dependency: transitive
     description:
       name: matcher
-<<<<<<< HEAD
       sha256: dc58c723c3c24bf8d3e2d3ad3f2f9d7bd9cf43ec6feaa64181775e60190153f2
       url: "https://pub.dev"
     source: hosted
     version: "0.12.17"
-=======
-      sha256: "12956d0ad8390bbcc63ca2e1469c0619946ccb52809807067a7020d57e647aa6"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.12.18"
->>>>>>> 5be962deee318d52b0e12364afa246c759fb761c
   material_color_utilities:
     dependency: transitive
     description:
