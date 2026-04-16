@@ -27,4 +27,10 @@ class AppRoutes {
   // materials
 static const addHiredTool = '/materials/add-hired-tool';
 
+  static const usersDashboard = '/users/dashboard';
+  static const createUser = '/users/new';
+  static const userRoles = '/users/roles';
+
+  static const menuDepartments = "/departments/menus";
+
 }

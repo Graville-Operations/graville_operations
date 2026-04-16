@@ -1,12 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:graville_operations/core/local/store/user_store.dart';
-import 'package:graville_operations/core/remote/api/auth_api.dart';
-import 'package:graville_operations/core/routes/names.dart';
-//import 'package:graville_operations/screens/auth/login/login_screen.dart';
-import 'package:graville_operations/screens/auth/login/view.dart';
+import 'package:graville_operations/screens/settings/edit_profile_screen.dart';
 import 'package:graville_operations/screens/support/support_screen.dart';
-import 'package:graville_operations/services/api_service.dart';
 
 class AccountScreen extends StatefulWidget {
   const AccountScreen({super.key});
@@ -16,302 +10,364 @@ class AccountScreen extends StatefulWidget {
 }
 
 class _AccountScreenState extends State<AccountScreen> {
-  String firstName = '';
-  String lastName = '';
-  String email = '';
-  String role = '';
-  bool _isLoading = true;
+  String _selectedLanguage = 'English';
+  String _selectedTheme = 'System';
 
   @override
-  void initState() {
-    super.initState();
-    _loadProfile();
-  }
-
-  void _loadProfile() async {
-    final userId = await ApiService.getUserId();
-    if (userId != null) {
-      final result = await ApiService.getProfile(userId);
-      if (result['success']) {
-        setState(() {
-          firstName = result['data']['first_name'] ?? '';
-          lastName = result['data']['last_name'] ?? '';
-          email = result['data']['email'] ?? '';
-          _isLoading = false;
-        });
-      } else {
-        setState(() => _isLoading = false);
-      }
-    } else {
-      setState(() => _isLoading = false);
-    }
-
-    final savedRole = await ApiService.getRole();
-    setState(() {
-      role = savedRole ?? '';
-    });
-  }
-
-  void _logout() async {
-    final confirm = await showDialog<bool>(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: const Text('Logout'),
-        content: const Text('Are you sure you want to logout?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFFF5F5F5),
+      appBar: AppBar(
+        elevation: 2,
+        centerTitle: true,
+        title: const Text(
+          'Account',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: Colors.white,
           ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text(
-              'Logout',
-              style: TextStyle(color: Colors.red),
+        ),
+      ),
+      body: ListView(
+        padding: const EdgeInsets.only(bottom: 40),
+        children: [
+          // ── Profile Card ───────────────────────────────────────────────────
+          _buildProfileCard(),
+
+          // ── Account Section ────────────────────────────────────────────────
+          _buildSectionLabel('Account'),
+          _buildCard([
+            _buildNavItem(
+              icon: Icons.edit,
+              label: 'Edit Profile',
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const EditProfileScreen()),
+              ),
+            ),
+            _buildNavItem(icon: Icons.lock, label: 'Security', onTap: () {}),
+            _buildNavItem(
+                icon: Icons.notifications,
+                label: 'Notifications',
+                onTap: () {}),
+            _buildNavItem(
+                icon: Icons.security,
+                label: 'Privacy',
+                onTap: () {},
+                isLast: true),
+          ]),
+
+          // ── Preferences Section ────────────────────────────────────────────
+          _buildSectionLabel('Preferences'),
+          _buildCard([
+            _buildDropdownItem(
+              icon: Icons.language,
+              label: 'Language',
+              value: _selectedLanguage,
+              options: const ['English', 'Swahili'],
+              onChanged: (val) => setState(() => _selectedLanguage = val!),
+            ),
+            _buildDropdownItem(
+              icon: Icons.brightness_6,
+              label: 'Theme',
+              value: _selectedTheme,
+              options: const ['Light', 'Dark', 'System'],
+              onChanged: (val) => setState(() => _selectedTheme = val!),
+              isLast: true,
+            ),
+          ]),
+
+          // ── Support & About Section ────────────────────────────────────────
+          _buildSectionLabel('Support & About'),
+          _buildCard([
+            _buildNavItem(
+              icon: Icons.help,
+              label: 'Help & Support',
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const SupportScreen()),
+              ),
+            ),
+            _buildNavItem(
+              icon: Icons.description,
+              label: 'Terms & Policies',
+              onTap: () {},
+              isLast: true,
+            ),
+          ]),
+
+          // ── Actions Section ────────────────────────────────────────────────
+          _buildSectionLabel('Actions'),
+          _buildCard([
+            _buildNavItem(
+                icon: Icons.flag, label: 'Report a Problem', onTap: () {}),
+            _buildNavItem(
+                icon: Icons.person_add, label: 'Add Account', onTap: () {}),
+            _buildNavItem(
+                icon: Icons.open_in_browser,
+                label: 'Visit Our Website',
+                onTap: () {}),
+            _buildNavItem(
+              icon: Icons.logout,
+              label: 'Log Out',
+              onTap: _showLogoutDialog,
+              isDanger: true,
+              showChevron: false,
+              isLast: true,
+            ),
+          ]),
+        ],
+      ),
+    );
+  }
+
+  // ── Profile Card ─────────────────────────────────────────────────────────────
+  Widget _buildProfileCard() {
+    return Container(
+      margin: const EdgeInsets.fromLTRB(16, 20, 16, 4),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.07),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Stack(
+            children: [
+              Container(
+                width: 70,
+                height: 70,
+                decoration: const BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Color(0xFF2196F3),
+                ),
+                child: const Icon(Icons.person, size: 40, color: Colors.white),
+              ),
+              Positioned(
+                bottom: 2,
+                right: 2,
+                child: Container(
+                  width: 22,
+                  height: 22,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: const Color(0xFFE0E0E0)),
+                  ),
+                  child: const Icon(Icons.camera_alt,
+                      size: 13, color: Colors.black87),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(width: 16),
+          const Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'John Doe',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF1A1A1A),
+                  ),
+                ),
+                SizedBox(height: 4),
+                Text(
+                  'johndoe@gmail.com',
+                  style: TextStyle(fontSize: 13, color: Color(0xFF757575)),
+                ),
+                SizedBox(height: 2),
+                Text(
+                  '+254 712 345 678',
+                  style: TextStyle(fontSize: 13, color: Color(0xFF757575)),
+                ),
+              ],
             ),
           ),
         ],
       ),
     );
-
-    if (confirm == true) {
-      await ApiService.clearSession();
-      await AuthApi.logout();
-      Get.offNamed(AppRoutes.login);
-    }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Account'),
-        leading: Navigator.canPop(context)
-            ? IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-        )
-            : null,
-      ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            // Profile Card
-            _ProfileCard(
-              firstName: firstName,
-              lastName: lastName,
-              email: email,
-              role: role,
-              onTap: () async {
-                final userId = await ApiService.getUserId();
-                if (userId != null) {
-                  // Navigate to edit profile when ready
-                  debugPrint('Edit profile tapped for user $userId');
-                }
-              },
-            ),
-            const SizedBox(height: 16),
-
-            // Account Items
-            Card(
-              child: Column(
-                children: List.generate(
-                  _accountItems.length,
-                      (index) => _AccountItemTile(
-                    item: _accountItems[index],
-                    showDivider: index != _accountItems.length - 1,
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            // Logout Button
-            Card(
-              child: ListTile(
-                leading: const Icon(Icons.logout, color: Colors.red),
-                title: const Text(
-                  'Logout',
-                  style: TextStyle(
-                    color: Colors.red,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                onTap: _logout,
-              ),
-            ),
-          ],
+  // ── Section Label ─────────────────────────────────────────────────────────────
+  Widget _buildSectionLabel(String label) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 6),
+      child: Text(
+        label,
+        style: const TextStyle(
+          fontSize: 13,
+          fontWeight: FontWeight.w700,
+          color: Color(0xFF1A1A1A),
         ),
       ),
     );
   }
-}
 
-final List<_AccountItem> _accountItems = [
-  _AccountItem(
-    icon: Icons.settings,
-    title: 'Settings',
-    // destination: SettingsScreen(),
-  ),
-  _AccountItem(
-    icon: Icons.support_agent,
-    title: 'Contact Support',
-    destination: SupportScreen(),
-  ),
-  _AccountItem(icon: Icons.description, title: 'Terms & Policies'),
-  _AccountItem(icon: Icons.language, title: 'Visit Our Website'),
-];
-
-class _ProfileCard extends StatelessWidget {
-  final String firstName;
-  final String lastName;
-  final String email;
-  final String role;
-  final VoidCallback onTap;
-
-  const _ProfileCard({
-    required this.firstName,
-    required this.lastName,
-    required this.email,
-    required this.role,
-    required this.onTap,
-  });
-
-  Color get _roleColor {
-    switch (role) {
-      case 'field_engineer':
-        return Colors.blue;
-      case 'auditor':
-        return Colors.green;
-      default:
-        return Colors.grey;
-    }
-  }
-
-  String get _roleLabel {
-    return role.replaceAll('_', ' ').toUpperCase();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Card(
-      child: InkWell(
-        borderRadius: BorderRadius.circular(12),
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            children: [
-              CircleAvatar(
-                radius: 32,
-                backgroundColor: theme.colorScheme.surfaceContainerHighest,
-                child: Icon(
-                  Icons.person,
-                  size: 32,
-                  color: theme.colorScheme.onSurfaceVariant,
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '$firstName $lastName',
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(email, style: theme.textTheme.bodySmall),
-                    const SizedBox(height: 6),
-                    if (role.isNotEmpty)
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: _roleColor.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Text(
-                          _roleLabel,
-                          style: TextStyle(
-                            color: _roleColor,
-                            fontSize: 11,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-              const Icon(Icons.edit, size: 18, color: Colors.grey),
-            ],
+  // ── Card Wrapper ──────────────────────────────────────────────────────────────
+  Widget _buildCard(List<Widget> children) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.06),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
           ),
-        ),
+        ],
       ),
+      child: Column(children: children),
     );
   }
-}
 
-class _AccountItem {
-  final IconData icon;
-  final String title;
-  final Widget? destination;
-
-  const _AccountItem({
-    required this.icon,
-    required this.title,
-    this.destination,
-  });
-}
-
-class _AccountItemTile extends StatelessWidget {
-  final _AccountItem item;
-  final bool showDivider;
-
-  const _AccountItemTile({required this.item, required this.showDivider});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+  // ── Navigation Item ───────────────────────────────────────────────────────────
+  Widget _buildNavItem({
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+    bool isDanger = false,
+    bool showChevron = true,
+    bool isLast = false,
+  }) {
+    final color = isDanger ? const Color(0xFFE53E3E) : const Color(0xFF1A1A1A);
 
     return Column(
       children: [
         InkWell(
-          onTap: () {
-            if (item.destination != null) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => item.destination!),
-              );
-            }
-          },
+          onTap: onTap,
+          borderRadius: isLast
+              ? const BorderRadius.only(
+                  bottomLeft: Radius.circular(14),
+                  bottomRight: Radius.circular(14),
+                )
+              : BorderRadius.zero,
           child: Padding(
-            padding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
             child: Row(
               children: [
-                Icon(item.icon, size: 22),
+                Icon(icon, size: 22, color: color),
                 const SizedBox(width: 16),
-                Text(
-                  item.title,
-                  style: theme.textTheme.bodyLarge?.copyWith(
-                    fontWeight: FontWeight.w600,
+                Expanded(
+                  child: Text(
+                    label,
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
+                      color: color,
+                    ),
                   ),
                 ),
+                if (showChevron)
+                  const Icon(Icons.chevron_right,
+                      size: 22, color: Color(0xFFBDBDBD)),
               ],
             ),
           ),
         ),
-        if (showDivider)
-          const Divider(height: 1, indent: 16, endIndent: 16),
+        if (!isLast)
+          const Divider(
+              height: 1, indent: 54, endIndent: 0, color: Color(0xFFE0E0E0)),
       ],
+    );
+  }
+
+  // ── Dropdown Item ─────────────────────────────────────────────────────────────
+  Widget _buildDropdownItem({
+    required IconData icon,
+    required String label,
+    required String value,
+    required List<String> options,
+    required ValueChanged<String?> onChanged,
+    bool isLast = false,
+  }) {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+          child: Row(
+            children: [
+              Icon(icon, size: 22, color: const Color(0xFF1A1A1A)),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Text(
+                  label,
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w500,
+                    color: Color(0xFF1A1A1A),
+                  ),
+                ),
+              ),
+              DropdownButtonHideUnderline(
+                child: DropdownButton<String>(
+                  value: value,
+                  icon: const Icon(Icons.keyboard_arrow_down,
+                      color: Color(0xFF1A1A1A), size: 22),
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: Color(0xFF1A1A1A),
+                  ),
+                  dropdownColor: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  onChanged: onChanged,
+                  items: options
+                      .map((opt) =>
+                          DropdownMenuItem(value: opt, child: Text(opt)))
+                      .toList(),
+                ),
+              ),
+            ],
+          ),
+        ),
+        if (!isLast)
+          const Divider(
+              height: 1, indent: 54, endIndent: 0, color: Color(0xFFE0E0E0)),
+      ],
+    );
+  }
+
+  // ── Logout Dialog ─────────────────────────────────────────────────────────────
+  void _showLogoutDialog() {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text('Log Out',
+            style: TextStyle(fontWeight: FontWeight.w700)),
+        content:
+            const Text('Are you sure you want to log out of your account?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancel',
+                style: TextStyle(color: Color(0xFF757575))),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text(
+              'Log Out',
+              style: TextStyle(
+                color: Color(0xFFE53E3E),
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
