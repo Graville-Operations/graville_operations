@@ -25,11 +25,20 @@ class _WorkersScreenState extends State<WorkersScreen> {
   bool _isLoading = true;
   String? _errorMessage;
 
-  List<Worker> _allWorkers = [];        // full DB list — feeds the check-in sheet
-  List<Worker> _checkedInWorkers = [];  // today's present workers — shown in table
+  List<Worker> _allWorkers = [];
+  List<Worker> _checkedInWorkers = [];
 
-  /// true = confirmed present | false = upload in progress (absent from map = not checked in)
   final Map<int, bool> _checkedIn = {};
+
+  final TextEditingController _attendanceSearch = TextEditingController();
+
+  List<Worker> get _filteredAttendance {
+    final q = _attendanceSearch.text.toLowerCase().trim();
+    if (q.isEmpty) return _checkedInWorkers;
+    return _checkedInWorkers.where((w) =>
+        w.fullName.toLowerCase().contains(q) ||
+        w.nationalId.toString().contains(q)).toList();
+  }
 
   final List<String> _sites = [
     'Mabatini', 'Mishi Mboko', 'Huruma', 'DCC Kibra', 'Ngei', 'Iremele',
@@ -42,6 +51,13 @@ class _WorkersScreenState extends State<WorkersScreen> {
     super.initState();
     _loadData();
   }
+
+  @override
+  void dispose() {
+    _attendanceSearch.dispose();
+    super.dispose();
+  }
+
 
   Future<void> _loadData() async {
     setState(() { _isLoading = true; _errorMessage = null; });
@@ -56,11 +72,11 @@ class _WorkersScreenState extends State<WorkersScreen> {
       final idSet    = todayIds.toSet();
 
       setState(() {
-        _allWorkers      = all;
+        _allWorkers       = all;
         _checkedIn.clear();
         for (final id in todayIds) { _checkedIn[id] = true; }
         _checkedInWorkers = all.where((w) => w.id != null && idSet.contains(w.id)).toList();
-        _isLoading = false;
+        _isLoading        = false;
       });
     } on WorkerServiceException catch (e) {
       setState(() { _errorMessage = e.message; _isLoading = false; });
@@ -68,6 +84,7 @@ class _WorkersScreenState extends State<WorkersScreen> {
       setState(() { _errorMessage = 'Failed to load data. Please try again.'; _isLoading = false; });
     }
   }
+
 
   Future<void> _openBulkCheckIn() async {
     final eligible = _allWorkers
@@ -116,6 +133,7 @@ class _WorkersScreenState extends State<WorkersScreen> {
     }
   }
 
+
   Future<void> _handleVerify(Worker worker) async {
     final workerId = worker.id;
     if (workerId == null) return;
@@ -141,7 +159,6 @@ class _WorkersScreenState extends State<WorkersScreen> {
         behavior: SnackBarBehavior.floating, duration: const Duration(seconds: 2)),
   );
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -154,11 +171,11 @@ class _WorkersScreenState extends State<WorkersScreen> {
           SizedBox(width: 10),
           Text('Workers', style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600)),
         ]),
-        actions: [
-          IconButton(icon: const Icon(Icons.refresh, color: Colors.blue),
-              onPressed: _loadData, tooltip: 'Refresh'),
-        ],
-      ),
+      //   actions: [
+      //     IconButton(icon: const Icon(Icons.refresh, color: Colors.blue),
+      //         onPressed: _loadData, tooltip: 'Refresh'),
+      //   ],
+       ),
       body: RefreshIndicator(
         onRefresh: _loadData,
         child: SingleChildScrollView(
@@ -180,18 +197,27 @@ class _WorkersScreenState extends State<WorkersScreen> {
               if (!_isLoading && _errorMessage == null)
                 _BulkCheckInButton(onPressed: _openBulkCheckIn),
               const SizedBox(height: 20),
-              _AttendanceHeader(presentCount: _checkedInWorkers.length, isLoading: _isLoading),
+
+              _AttendanceHeader(
+                presentCount: _checkedInWorkers.length,
+                isLoading: _isLoading,
+                searchController: _attendanceSearch,
+                onSearchChanged: () => setState(() {}),
+              ),
               const SizedBox(height: 10),
+
               WorkersTable(
                 isLoading: _isLoading,
                 errorMessage: _errorMessage,
-                workers: _checkedInWorkers,
+                workers: _filteredAttendance,   // ← filtered list
                 checkedIn: _checkedIn,
                 sessionActive: true,
                 onRetry: _loadData,
                 onVerify: _handleVerify,
                 onRowTap: (w) => context.push(WorkerProfileScreen(worker: w)),
-                emptyMessage: 'No workers checked in yet.\nTap "Check In Workers" above.',
+                emptyMessage: _attendanceSearch.text.trim().isNotEmpty
+                    ? 'No matching workers found.'
+                    : 'No workers checked in yet.\nTap "Check In Workers" above.',
               ),
               const SizedBox(height: 30),
             ],
@@ -201,7 +227,6 @@ class _WorkersScreenState extends State<WorkersScreen> {
     );
   }
 }
-
 
 class _SiteSelector extends StatelessWidget {
   final List<String> sites;
@@ -248,14 +273,17 @@ class _StatsRow extends StatelessWidget {
       ]);
     }
     return Row(children: [
-      Expanded(child: StatCard(icon: Icons.people_rounded, title: 'Total Assigned', value: '$total', color: Colors.blue)),
+      Expanded(child: StatCard(icon: Icons.people_rounded, title: 'Total Assigned',
+          value: '$total', color: Colors.blue)),
       const SizedBox(width: 12),
-      Expanded(child: StatCard(icon: Icons.how_to_reg_rounded, title: 'Present Today', value: '$present', color: Colors.green)),
+      Expanded(child: StatCard(icon: Icons.how_to_reg_rounded, title: 'Present Today',
+          value: '$present', color: Colors.green)),
     ]);
   }
 
   Widget _shimmer() => Container(height: 90,
-      decoration: BoxDecoration(color: Colors.grey.shade200, borderRadius: BorderRadius.circular(18)));
+      decoration: BoxDecoration(color: Colors.grey.shade200,
+          borderRadius: BorderRadius.circular(18)));
 }
 
 class _AddWorkerButton extends StatelessWidget {
@@ -267,7 +295,8 @@ class _AddWorkerButton extends StatelessWidget {
     onTap: onTap,
     child: Container(
       width: double.infinity, height: 48,
-      decoration: BoxDecoration(color: Colors.blue.shade100, borderRadius: BorderRadius.circular(8)),
+      decoration: BoxDecoration(
+          color: Colors.blue.shade100, borderRadius: BorderRadius.circular(8)),
       child: const Row(mainAxisAlignment: MainAxisAlignment.center, children: [
         Icon(Icons.person_add, color: Colors.blue, size: 18),
         SizedBox(width: 8),
@@ -286,10 +315,12 @@ class _BulkCheckInButton extends StatelessWidget {
     width: double.infinity, height: 50,
     child: ElevatedButton.icon(
       icon: const Icon(Icons.how_to_reg_rounded),
-      label: const Text('Check In Workers', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
+      label: const Text('Check In Workers',
+          style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.blue.shade700, foregroundColor: Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)), elevation: 2,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        elevation: 2,
       ),
       onPressed: onPressed,
     ),
@@ -299,23 +330,71 @@ class _BulkCheckInButton extends StatelessWidget {
 class _AttendanceHeader extends StatelessWidget {
   final int presentCount;
   final bool isLoading;
-  const _AttendanceHeader({required this.presentCount, required this.isLoading});
+  final TextEditingController searchController;
+  final VoidCallback onSearchChanged;
+
+  const _AttendanceHeader({
+    required this.presentCount,
+    required this.isLoading,
+    required this.searchController,
+    required this.onSearchChanged,
+  });
 
   @override
-  Widget build(BuildContext context) => Row(
-    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-    children: [
-      const Text("Today's Attendance",
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-      if (!isLoading && presentCount > 0)
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-          decoration: BoxDecoration(
-              color: Colors.green.shade50, borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: Colors.green.shade200)),
-          child: Text('$presentCount present',
-              style: TextStyle(fontSize: 12, color: Colors.green.shade700, fontWeight: FontWeight.w600)),
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            const Text("Today's Attendance",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+            const SizedBox(width: 8),
+            if (!isLoading && presentCount > 0)
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: Colors.green.shade50,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: Colors.green.shade200),
+                ),
+                child: Text('$presentCount present',
+                    style: TextStyle(fontSize: 11, color: Colors.green.shade700,
+                        fontWeight: FontWeight.w600)),
+              ),
+          ],
         ),
-    ],
-  );
+        const SizedBox(height: 8),
+        // Search bar
+        TextField(
+          controller: searchController,
+          onChanged: (_) => onSearchChanged(),
+          decoration: InputDecoration(
+            isDense: true,
+            filled: true,
+            fillColor: Colors.white,
+            prefixIcon: const Icon(Icons.search, size: 20),
+            suffixIcon: searchController.text.isNotEmpty
+                ? IconButton(
+                    icon: const Icon(Icons.clear, size: 18),
+                    onPressed: () {
+                      searchController.clear();
+                      onSearchChanged();
+                    },
+                  )
+                : null,
+            hintText: 'Search by name or ID…',
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+            enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: Colors.grey.shade300)),
+            focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: const BorderSide(color: Colors.blue)),
+            contentPadding: const EdgeInsets.symmetric(vertical: 10),
+          ),
+        ),
+      ],
+    );
+  }
 }
