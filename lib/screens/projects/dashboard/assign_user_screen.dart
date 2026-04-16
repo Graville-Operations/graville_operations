@@ -416,6 +416,7 @@ class _GroupDetailCard extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.fromLTRB(12, 12, 12, 10),
             child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
                   width: 40,
@@ -434,7 +435,9 @@ class _GroupDetailCard extends StatelessWidget {
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
+                      // ✅ Group name FIRST (top)
                       Text(
                         group.name,
                         style: const TextStyle(
@@ -443,12 +446,15 @@ class _GroupDetailCard extends StatelessWidget {
                           color: Color(0xFF1A1A1A),
                         ),
                       ),
-                      const SizedBox(height: 2),
+
+                      const SizedBox(height: 4),
+
+                      // ✅ Then roles assigned BELOW
                       Text(
                         '${group.roles.length} roles assigned',
                         style: const TextStyle(
                           fontSize: 11,
-                          fontWeight: FontWeight.w700,
+                          fontWeight: FontWeight.w500,
                           color: Color.fromARGB(255, 6, 10, 8),
                         ),
                       ),

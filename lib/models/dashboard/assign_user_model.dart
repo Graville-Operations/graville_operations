@@ -64,15 +64,32 @@ class GroupModel {
     final rawRoles = json['roles'];
     List<String> roleList = [];
     if (rawRoles is List) {
-      roleList = rawRoles.map((r) {
-        if (r is Map) return r['name']?.toString() ?? r.toString();
-        return r.toString();
-      }).toList();
+      roleList = rawRoles
+          .map((r) {
+            if (r is Map<String, dynamic>) {
+              return r['name']?.toString() ?? r['title']?.toString() ?? '';
+            }
+
+            final str = r.toString();
+
+            final nameMatch = RegExp(r'name:\s*([^,}]+)').firstMatch(str);
+            if (nameMatch != null) return nameMatch.group(1)!.trim();
+
+            final titleMatch = RegExp(r'title:\s*([^,}]+)').firstMatch(str);
+            if (titleMatch != null) return titleMatch.group(1)!.trim();
+
+            return '';
+          })
+          .where((e) => e.isNotEmpty)
+          .toList();
     }
 
     return GroupModel(
       id: json['id'] as int,
-      name: json['name']?.toString() ?? '',
+      name: json['name']?.toString() ??
+          json['group_name']?.toString() ??
+          json['title']?.toString() ??
+          '',
       description: json['description']?.toString() ?? '',
       roles: roleList,
       color: pair[0],
