@@ -78,10 +78,10 @@ class AppPages {
       page: () => AccountScreen(),
       // binding: InventoryScreenBinding(),
     ),
-    GetPage(
-      name: AppRoutes.addHiredTool,
-      page: () => AddHiredTool(),
-      binding: AddHiredToolBindings(),
-    )
+    // GetPage(
+    //   name: AppRoutes.addHiredTool,
+    //   page: () => AddHiredTool(),
+    //   binding: AddHiredToolBindings(),
+    // )
   ];
 }
