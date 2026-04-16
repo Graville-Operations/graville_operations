@@ -29,15 +29,14 @@ class LoginScreen extends GetView<LoginController> {
     return Scaffold(
       resizeToAvoidBottomInset: true,
       backgroundColor: Colors.grey[500],
-      body: Stack(
-        children: [
-          // ✅ Background
-          SizedBox.expand(
-            child: Image.asset(
-              'assets/images/background.png',
-              fit: BoxFit.cover,
-            ),
+      body: Stack(children: [
+        // ✅ Background
+        SizedBox.expand(
+          child: Image.asset(
+            'assets/images/background.png',
+            fit: BoxFit.cover,
           ),
+        ),
 
           // ✅ Blur overlay (optional)
           Positioned.fill(
@@ -197,8 +196,8 @@ class LoginScreen extends GetView<LoginController> {
               ),
             ),
           ),
-        ],
-      ),
+        ),
+      ]),
     );
   }
 }
