@@ -83,7 +83,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     MaterialPageRoute(builder: (_) => const InvoiceScreen()),
                   );
                 },
-                color: const Color(0xFF33907C), // AppColor.primaryBackground
+                color: const Color(0xFF33907C),
               ),
               const SizedBox(height: 12),
             ],

@@ -44,7 +44,6 @@ class AppPages {
         binding: ProjectDashboardBindings()),
     GetPage(name: AppRoutes.createProject, page: () => CreateSitesScreen()),
     GetPage(
-        name: AppRoutes.financeDashboard, page: () => FinanceDashboardApp()),
       name: AppPages.application,
       page: () => ApplicationScreen(),
       binding: ApplicationBindings(),
@@ -62,11 +61,11 @@ class AppPages {
     // Users menu routes
     GetPage(
       name: AppRoutes.usersDashboard,
-      page: () => const UsersListScreen(),      // ← view all users
+      page: () => const UsersListScreen(),    
     ),
     GetPage(
       name: AppRoutes.createUser,
-      page: () => const CreateUserScreen(),       // ← add new user (your AdminDashboard)
+      page: () => const CreateUserScreen(),      
     ),
     GetPage(
       name: AppRoutes.userRoles,
@@ -76,7 +75,7 @@ class AppPages {
     // ─── Finance menu routes 
     GetPage(
       name: AppRoutes.financeDashboard,
-      page: () => const FinanceDashboardScreen(),
+      page: () => const FinanceDashboardApp(),
     ),
     GetPage(
       name: AppRoutes.financeInvoices,
