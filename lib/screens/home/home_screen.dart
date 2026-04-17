@@ -27,6 +27,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   bool _isFabOpen = false;
 
+ 
   int _totalWorkers = 0;
   int _presentToday = 0;
   bool _statsLoading = true;
@@ -210,6 +211,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
 
+                // Workers — tappable stat cards with live data
                 const SizedBox(height: 15),
                 Row(
                   children: [
