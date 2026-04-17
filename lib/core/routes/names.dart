@@ -8,6 +8,7 @@ class AppRoutes {
   static const createProject = '/projects/new';
   static const departmentMenus = '/departments/menus';
   static const subMenusScreens = '/departments/sub-menus';
+  static const userDepartment = "/departments/users";
   static const usersDashboard = '/users/dashboard';
   static const createUser = '/users/new';
   static const userRoles = '/users/roles';

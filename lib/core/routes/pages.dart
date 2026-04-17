@@ -7,13 +7,12 @@ import 'package:graville_operations/screens/application/binding.dart';
 import 'package:graville_operations/screens/application/view.dart';
 import 'package:graville_operations/screens/auth/login/binding.dart';
 import 'package:graville_operations/screens/auth/login/view.dart';
+import 'package:graville_operations/screens/projects/dashboard/assign_user_screen.dart';
 import 'package:graville_operations/screens/finance/finance_dashboard_screen.dart';
 import 'package:graville_operations/screens/invoice/invoice_screen.dart';
 import 'package:graville_operations/screens/projects/dashboard/binding.dart';
 import 'package:graville_operations/screens/projects/dashboard/view.dart';
 import 'package:graville_operations/screens/sites/create_sites.dart';
-import 'package:graville_operations/screens/finance_dashboard/finance_dashboard.dart';
-
 import '../../screens/application/widgets/splash_screen.dart';
 import 'routes.dart';
 
@@ -44,12 +43,12 @@ class AppPages {
         binding: ProjectDashboardBindings()),
     GetPage(name: AppRoutes.createProject, page: () => CreateSitesScreen()),
     GetPage(
-        name: AppRoutes.financeDashboard, page: () => FinanceDashboardApp()),
-      name: AppPages.application,
-      page: () => ApplicationScreen(),
-      binding: ApplicationBindings(),
-      middlewares: [AuthMiddleware(priority: 0)],
-    ),
+        name: AppRoutes.userDepartment, page: () => AssignUserToGroupScreen()),
+    //   name: AppPages.application,
+    //   page: () => ApplicationScreen(),
+    //   binding: ApplicationBindings(),
+    //   middlewares: [AuthMiddleware(priority: 0)],
+    // ),
     GetPage(
       name: AppRoutes.projectDashboard,
       page: () => ProjectDashboardScreen(),
@@ -62,18 +61,19 @@ class AppPages {
     // Users menu routes
     GetPage(
       name: AppRoutes.usersDashboard,
-      page: () => const UsersListScreen(),      // ← view all users
+      page: () => const UsersListScreen(), // ← view all users
     ),
     GetPage(
       name: AppRoutes.createUser,
-      page: () => const CreateUserScreen(),       // ← add new user (your AdminDashboard)
+      page: () =>
+          const CreateUserScreen(), // ← add new user (your AdminDashboard)
     ),
     GetPage(
       name: AppRoutes.userRoles,
       page: () => const UsersListScreen(),
     ),
 
-    // ─── Finance menu routes 
+    // ─── Finance menu routes
     GetPage(
       name: AppRoutes.financeDashboard,
       page: () => const FinanceDashboardScreen(),
