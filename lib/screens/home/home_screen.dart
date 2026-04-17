@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:graville_operations/application/custom_navigator.dart';
-import 'package:graville_operations/models/project_status.dart';
 import 'package:graville_operations/screens/commons/widgets/progress_bar.dart';
 import 'package:graville_operations/screens/inventory/add_material.dart';
 import 'package:graville_operations/screens/inventory/update_inventory.dart';
 import 'package:graville_operations/screens/material/receive_material.dart';
 import 'package:graville_operations/screens/material/transfer_material.dart';
-import 'package:graville_operations/screens/sites/create_sites.dart';
 import 'package:graville_operations/screens/sites/sites_list.dart';
 import 'package:graville_operations/screens/task_screen/task_screen.dart';
 import 'package:graville_operations/screens/workers/add_worker_screen.dart';
+import 'package:graville_operations/screens/workers/all_workers_screen.dart';
+import 'package:graville_operations/screens/workers/present_workers_screen.dart';
 import 'package:graville_operations/screens/commons/assets/images.dart';
 import 'package:graville_operations/screens/commons/widgets/section_card.dart';
-import 'package:graville_operations/screens/commons/widgets/status_chip.dart';
 import 'package:graville_operations/screens/commons/widgets/stat_card.dart';
+import 'package:graville_operations/services/attendance_service.dart';
+import 'package:graville_operations/services/worker_service.dart';
 
 
 class HomeScreen extends StatefulWidget {
@@ -25,6 +26,36 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   bool _isFabOpen = false;
+
+  int _totalWorkers = 0;
+  int _presentToday = 0;
+  bool _statsLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadStats();
+  }
+
+  Future<void> _loadStats() async {
+    setState(() => _statsLoading = true);
+    try {
+      final results = await Future.wait([
+        WorkerService.fetchWorkers(),
+        AttendanceService.fetchTodayPresentIds(),
+      ]);
+      if (!mounted) return;
+      setState(() {
+        _totalWorkers  = (results[0] as List).length;
+        _presentToday  = (results[1] as List).length;
+        _statsLoading  = false;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _statsLoading = false);
+    }
+  }
+
   Widget miniFab(IconData icon, VoidCallback onPressed) {
     return SizedBox(
       width: 44,
@@ -56,24 +87,16 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             const SizedBox(height: 12),
-            // Tooltip(
-            //   message: "New Site",
-            //   child: miniFab(
-            //     Icons.apartment,
-            //     () => context.push(const CreateSitesScreen()),
-            //   ),
-            // ),
-            const SizedBox(height: 12),
             Tooltip(
-            message: "View sites",
-            child: miniFab(
-              Icons.map_outlined,
-              () => Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => const SitesListScreen()),
+              message: "View sites",
+              child: miniFab(
+                Icons.map_outlined,
+                () => Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const SitesListScreen()),
+                ),
               ),
             ),
-          ),
-          const SizedBox(height: 12),
+            const SizedBox(height: 12),
             Tooltip(
               message: "Hired equipment",
               child: miniFab(
@@ -94,7 +117,7 @@ class _HomeScreenState extends State<HomeScreen> {
               message: "Update inventory",
               child: miniFab(
                 Icons.store,
-                () => context.push(const UpdateInventoryScreen(preSelectedItem: null,)),
+                () => context.push(const UpdateInventoryScreen(preSelectedItem: null)),
               ),
             ),
             const SizedBox(height: 12),
@@ -107,7 +130,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             const SizedBox(height: 12),
             Tooltip(
-              message: "create task",
+              message: "Create task",
               child: miniFab(
                 Icons.add,
                 () => context.push(const CreateTaskScreen()),
@@ -131,33 +154,32 @@ class _HomeScreenState extends State<HomeScreen> {
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
-              backgroundColor: Colors.white,
-              elevation: 0,
-              floating: true,
-              snap: true, 
-              automaticallyImplyLeading: false,
-              toolbarHeight: 80,
-              flexibleSpace: SafeArea(
-                child: Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Image.asset(CommonImages.logo, height: 40),
-                      const SizedBox(height: 4),
-                      const Text(
-                        "Graville Operations",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14,
-                          color: Colors.black,
-                        ),
+            backgroundColor: Colors.white,
+            elevation: 0,
+            floating: true,
+            snap: true,
+            automaticallyImplyLeading: false,
+            toolbarHeight: 80,
+            flexibleSpace: SafeArea(
+              child: Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Image.asset(CommonImages.logo, height: 40),
+                    const SizedBox(height: 4),
+                    const Text(
+                      "Graville Operations",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                        color: Colors.black,
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ),
-          
+          ),
 
           SliverPadding(
             padding: const EdgeInsets.all(15),
@@ -174,48 +196,56 @@ class _HomeScreenState extends State<HomeScreen> {
                       const SizedBox(height: 5),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text(
+                        children: const [
+                          Text(
                             "Sunrise Apartments",
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          //ProjectStatusChip(status: ProjectStatus.onSchedule),
                         ],
                       ),
                     ],
                   ),
                 ),
 
-                //Workers
                 const SizedBox(height: 15),
-                const Row(
+                Row(
                   children: [
                     Expanded(
-                      child: StatCard(
-                        icon: Icons.people,
-                        title: "Total Workers",
-                        value: "152",
-                        subtitle: "Ever Assigned",
-                        color: Color(0xff5b7cfa),
-                      ),
+                      child: _statsLoading
+                          ? _StatShimmer()
+                          : GestureDetector(
+                              onTap: () => context.push(const AllWorkersScreen()),
+                              child: StatCard(
+                                icon: Icons.people,
+                                title: "Total Workers",
+                                value: "$_totalWorkers",
+                                subtitle: "Ever Assigned",
+                                color: const Color(0xff5b7cfa),
+                              ),
+                            ),
                     ),
-                    SizedBox(width: 12),
+                    const SizedBox(width: 12),
                     Expanded(
-                      child: StatCard(
-                        icon: Icons.person,
-                        title: "Present Today",
-                        value: "87",
-                        subtitle: "Active on Site",
-                        color: Color(0xff1db954),
-                      ),
+                      child: _statsLoading
+                          ? _StatShimmer()
+                          : GestureDetector(
+                              onTap: () => context.push(const PresentWorkersScreen()),
+                              child: StatCard(
+                                icon: Icons.person,
+                                title: "Present Today",
+                                value: "$_presentToday",
+                                subtitle: "Active on Site",
+                                color: const Color(0xff1db954),
+                              ),
+                            ),
                     ),
                   ],
                 ),
 
-                //Material stock and project completionconst SizedBox(height: 15),
+                // Material stock and project completion
                 const SizedBox(height: 15),
                 IntrinsicHeight(
                   child: Row(
@@ -231,38 +261,26 @@ class _HomeScreenState extends State<HomeScreen> {
                                   SizedBox(width: 8),
                                   Text(
                                     "Material Stock",
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                                    style: TextStyle(fontWeight: FontWeight.bold),
                                   ),
                                 ],
                               ),
                               SizedBox(height: 12),
                               Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text("Cement"),
-                                  Text(
-                                    "250 bags",
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
+                                  Text("250 bags",
+                                      style: TextStyle(fontWeight: FontWeight.bold)),
                                 ],
                               ),
                               SizedBox(height: 6),
                               Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text("Steel"),
-                                  Text(
-                                    "1.5 tons",
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
+                                  Text("1.5 tons",
+                                      style: TextStyle(fontWeight: FontWeight.bold)),
                                 ],
                               ),
                             ],
@@ -294,9 +312,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     ),
                                     const Text(
                                       "68%",
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                      ),
+                                      style: TextStyle(fontWeight: FontWeight.bold),
                                     ),
                                   ],
                                 ),
@@ -308,13 +324,14 @@ class _HomeScreenState extends State<HomeScreen> {
                     ],
                   ),
                 ),
-                //Task progress section
+
+                // Task progress section
                 const SizedBox(height: 15),
                 SectionCard(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
+                      const Row(
                         children: [
                           Icon(Icons.task, size: 18),
                           SizedBox(width: 8),
@@ -324,7 +341,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ],
                       ),
-                      SizedBox(height: 15),
+                      const SizedBox(height: 15),
                       TaskProgress(
                         title: "Foundation",
                         percent: 1.0,
@@ -344,7 +361,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
 
-                //Reviews
+                // Reviews
                 const SizedBox(height: 20),
                 const Text(
                   "Reviews",
@@ -355,7 +372,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 LayoutBuilder(
                   builder: (context, constraints) {
                     final isWide = constraints.maxWidth > 700;
-
                     return SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
                       child: ConstrainedBox(
@@ -375,22 +391,16 @@ class _HomeScreenState extends State<HomeScreen> {
                           rows: const [
                             DataRow(
                               cells: [
-                                DataCell(
-                                  Text(
-                                    "Great job on the installation at the new site.",
-                                  ),
-                                ),
+                                DataCell(Text(
+                                    "Great job on the installation at the new site.")),
                                 DataCell(Text("James Paterson")),
                                 DataCell(Text("Feb 10")),
                               ],
                             ),
                             DataRow(
                               cells: [
-                                DataCell(
-                                  Text(
-                                    "Work completed efficiently, update status next time.",
-                                  ),
-                                ),
+                                DataCell(Text(
+                                    "Work completed efficiently, update status next time.")),
                                 DataCell(Text("Angela Martinez")),
                                 DataCell(Text("Feb 8")),
                               ],
@@ -407,6 +417,19 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _StatShimmer extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 90,
+      decoration: BoxDecoration(
+        color: Colors.grey.shade200,
+        borderRadius: BorderRadius.circular(18),
       ),
     );
   }
