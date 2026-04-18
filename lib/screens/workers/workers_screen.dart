@@ -60,6 +60,7 @@ class _WorkersScreenState extends State<WorkersScreen> {
 
 
   Future<void> _loadData() async {
+    if (!mounted) return;
     setState(() { _isLoading = true; _errorMessage = null; });
     try {
       final results = await Future.wait([
@@ -71,6 +72,7 @@ class _WorkersScreenState extends State<WorkersScreen> {
       final todayIds = results[1] as List<int>;
       final idSet    = todayIds.toSet();
 
+      if (!mounted) return;
       setState(() {
         _allWorkers       = all;
         _checkedIn.clear();
@@ -79,8 +81,10 @@ class _WorkersScreenState extends State<WorkersScreen> {
         _isLoading        = false;
       });
     } on WorkerServiceException catch (e) {
+      if (!mounted) return;
       setState(() { _errorMessage = e.message; _isLoading = false; });
     } catch (_) {
+      if (!mounted) return;
       setState(() { _errorMessage = 'Failed to load data. Please try again.'; _isLoading = false; });
     }
   }

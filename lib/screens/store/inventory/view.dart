@@ -86,7 +86,8 @@ class InventoryScreen extends GetView<InventoryScreenController> {
                     width: double.infinity,
                     child: CustomButton(
                       label: "Add Hired Tool",
-                      onPressed: () => Get.toNamed(AppRoutes.addHiredTool),
+                      // onPressed: () => Get.toNamed(AppRoutes.addHiredTool),
+                      onPressed: () {},
                       buttonStyle: OutlinedButton.styleFrom(side: BorderSide(color: Colors.grey.shade300),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                           padding: const EdgeInsets.symmetric(vertical: 12)),

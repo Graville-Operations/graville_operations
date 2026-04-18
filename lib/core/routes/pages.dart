@@ -1,23 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:graville_operations/core/middleware/auth_middleware.dart';
-import 'package:graville_operations/screens/account_screen/binding.dart';
-import 'package:graville_operations/screens/account_screen/view.dart';
+import 'package:graville_operations/screens/admin/create_user_screen.dart';
+import 'package:graville_operations/screens/admin/users_list_screen.dart';
 import 'package:graville_operations/screens/application/binding.dart';
 import 'package:graville_operations/screens/application/view.dart';
 import 'package:graville_operations/screens/auth/login/binding.dart';
 import 'package:graville_operations/screens/auth/login/view.dart';
-import 'package:graville_operations/screens/home/home_screen.dart';
+import 'package:graville_operations/screens/finance/finance_dashboard_screen.dart';
+import 'package:graville_operations/screens/invoice/invoice_screen.dart';
+import 'package:graville_operations/screens/menus/menus.dart';
 import 'package:graville_operations/screens/projects/dashboard/binding.dart';
 import 'package:graville_operations/screens/projects/dashboard/view.dart';
-import 'package:graville_operations/screens/sites/create/bindings.dart';
 import 'package:graville_operations/screens/sites/create/view.dart';
-import 'package:graville_operations/screens/store/hired_tools/bindings.dart';
-import 'package:graville_operations/screens/store/hired_tools/view.dart';
-import 'package:graville_operations/screens/store/inventory/binding.dart';
-import 'package:graville_operations/screens/store/inventory/view.dart';
-import 'package:graville_operations/screens/workers/workers_screen.dart';
+import 'package:graville_operations/screens/finance_dashboard/finance_dashboard.dart';
 
+import '../../screens/application/widgets/splash_screen.dart';
 import 'routes.dart';
 
 class AppPages {
@@ -25,30 +23,31 @@ class AppPages {
   static const application = AppRoutes.application;
   static final RouteObserver<Route> observer = RouteObservers();
   static List<String> history = [];
-
   static final List<GetPage> routes = _rawRoutes
       .map((page) => GetPage(
-            name: page.name,
-            page: page.page,
-            binding: page.binding,
-            middlewares: [AuthMiddleware(priority: 0)],
-          ))
+    name: page.name,
+    page: page.page,
+    binding: page.binding,
+    middlewares: [AuthMiddleware(priority: 0)],
+  ))
       .toList();
+
   static final List<GetPage> _rawRoutes = [
-    // about bootup of an app
-    // GetPage(
-    //   name: AppRoutes.initial,
-    //   page: () => const SplashScreen(),
-    //   binding: ApplicationBindings()
-    // ),
     GetPage(
-        name: AppRoutes.initial,
-        page: () => const LoginScreen(),
-        binding: LoginBindings()),
+      name: AppRoutes.login,
+      page: () => const LoginScreen(),
+      binding: LoginBindings(),
+    ),
     GetPage(
-        name: AppPages.application,
-        page: () => ApplicationScreen(),
-        binding: ApplicationBindings()),
+      name: AppPages.initial,
+      page: () => ApplicationScreen(),
+      binding: ApplicationBindings(),
+    ),
+    GetPage(
+      name: AppRoutes.projectDashboard,
+      page: () => ProjectDashboardScreen(),
+      binding: ProjectDashboardBindings(),
+    ),
     GetPage(
       name: AppRoutes.projectDashboard,
       page: () => ProjectDashboardScreen(),
@@ -57,32 +56,33 @@ class AppPages {
     GetPage(
       name: AppRoutes.createProject,
       page: () => CreateSitesScreen(),
-      binding: CreateSiteBindings(),
+    ),
+    // Users menu routes
+    GetPage(
+      name: AppRoutes.usersDashboard,
+      page: () => const UsersListScreen(),
     ),
     GetPage(
-      name: AppRoutes.home,
-      page: () => HomeScreen(),
-      // binding: Home(),
+      name: AppRoutes.createUser,
+      page: () => const CreateUserScreen(),
     ),
     GetPage(
-      name: AppRoutes.workers,
-      page: () => WorkersScreen(),
-      // binding: InventoryScreenBinding(),
+      name: AppRoutes.userRoles,
+      page: () => const UsersListScreen(),
+    ),
+
+    // ─── Finance menu routes
+    GetPage(
+      name: AppRoutes.financeDashboard,
+      page: () => const FinanceDashboardApp(),
     ),
     GetPage(
-      name: AppRoutes.store,
-      page: () => InventoryScreen(),
-      binding: InventoryScreenBinding(),
+      name: AppRoutes.financeInvoices,
+      page: () => const InvoiceScreen(),
     ),
     GetPage(
-      name: AppRoutes.account,
-      page: () => AccountScreen(),
-      // binding: InventoryScreenBinding(),
-    ),
-    GetPage(
-      name: AppRoutes.account,
-      page: () => AccountScreen(),
-      binding: AccountScreenBinding(),
+      name: AppRoutes.menuDepartments,
+      page: () => const MenusScreen(),
     )
   ];
 }
