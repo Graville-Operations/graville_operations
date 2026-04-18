@@ -31,8 +31,6 @@ class AttendanceService {
           e.response?.data?['detail'] ?? 'Check-in failed. Please try again.');
     }
   }
-
-
   static Future<List<int>> fetchTodayPresentIds() async {
     try {
       final data = await _http.get(AppRoutes.todayAttendance);
