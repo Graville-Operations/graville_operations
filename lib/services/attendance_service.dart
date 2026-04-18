@@ -32,8 +32,6 @@ class AttendanceService {
           e.response?.data?['detail'] ?? 'Check-in failed. Please try again.');
     }
   }
-
-  /// Returns worker IDs checked in today.
   static Future<List<int>> fetchTodayPresentIds() async {
     try {
       final response = await _dio.get('/workers/attendance/today');
