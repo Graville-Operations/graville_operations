@@ -36,7 +36,7 @@ class _WorkersScreenState extends State<WorkersScreen> {
     final q = _attendanceSearch.text.toLowerCase().trim();
     if (q.isEmpty) return _checkedInWorkers;
     return _checkedInWorkers.where((w) =>
-        w.fullName.toLowerCase().contains(q) ||
+    w.fullName.toLowerCase().contains(q) ||
         w.nationalId.toString().contains(q)).toList();
   }
 
@@ -60,7 +60,6 @@ class _WorkersScreenState extends State<WorkersScreen> {
 
 
   Future<void> _loadData() async {
-    if (!mounted) return;
     setState(() { _isLoading = true; _errorMessage = null; });
     try {
       final results = await Future.wait([
@@ -72,7 +71,6 @@ class _WorkersScreenState extends State<WorkersScreen> {
       final todayIds = results[1] as List<int>;
       final idSet    = todayIds.toSet();
 
-      if (!mounted) return;
       setState(() {
         _allWorkers       = all;
         _checkedIn.clear();
@@ -81,10 +79,8 @@ class _WorkersScreenState extends State<WorkersScreen> {
         _isLoading        = false;
       });
     } on WorkerServiceException catch (e) {
-      if (!mounted) return;
       setState(() { _errorMessage = e.message; _isLoading = false; });
     } catch (_) {
-      if (!mounted) return;
       setState(() { _errorMessage = 'Failed to load data. Please try again.'; _isLoading = false; });
     }
   }
@@ -175,11 +171,11 @@ class _WorkersScreenState extends State<WorkersScreen> {
           SizedBox(width: 10),
           Text('Workers', style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600)),
         ]),
-      //   actions: [
-      //     IconButton(icon: const Icon(Icons.refresh, color: Colors.blue),
-      //         onPressed: _loadData, tooltip: 'Refresh'),
-      //   ],
-       ),
+        //   actions: [
+        //     IconButton(icon: const Icon(Icons.refresh, color: Colors.blue),
+        //         onPressed: _loadData, tooltip: 'Refresh'),
+        //   ],
+      ),
       body: RefreshIndicator(
         onRefresh: _loadData,
         child: SingleChildScrollView(
@@ -380,12 +376,12 @@ class _AttendanceHeader extends StatelessWidget {
             prefixIcon: const Icon(Icons.search, size: 20),
             suffixIcon: searchController.text.isNotEmpty
                 ? IconButton(
-                    icon: const Icon(Icons.clear, size: 18),
-                    onPressed: () {
-                      searchController.clear();
-                      onSearchChanged();
-                    },
-                  )
+              icon: const Icon(Icons.clear, size: 18),
+              onPressed: () {
+                searchController.clear();
+                onSearchChanged();
+              },
+            )
                 : null,
             hintText: 'Search by name or ID…',
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),

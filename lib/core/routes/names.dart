@@ -14,6 +14,7 @@ class AppRoutes {
   static const financeInvoices = '/finance/invoices';
 
   static const menuDepartments = "/departments/menus";
+  static const userDepartment = "/departments/users";
 
   // Base
   static const String baseUrl = 'http://192.168.1.73:8000/api/v1';

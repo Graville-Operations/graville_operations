@@ -113,7 +113,7 @@ class HttpUtil {
         EasyLoading.showError(eInfo.message);
         break;
       default:
-        EasyLoading.showError('unknown error');
+        // EasyLoading.showError('unknown error');
         break;
     }
   }
