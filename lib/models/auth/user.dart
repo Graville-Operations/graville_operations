@@ -118,4 +118,33 @@ class User {
     final l = lastName.isNotEmpty ? lastName[0].toUpperCase() : '';
     return '$f$l';
   }
+
+  factory User.empty() {
+    return User(
+      id: 0,
+      refId: '',
+      nationalId: '',
+      email: '',
+      phoneNo: '',
+      firstName: '',
+      middleName: '',
+      lastName: '',
+      accountType: '',
+      accountStatus: '',
+      gender: '',
+      createdBy: '',
+      modifiedBy: '',
+      createdAt: '',
+      updatedAt: '',
+      emailVerified: false,
+      phoneVerified: false,
+      kycComplete: false,
+      enabled: false,
+      groups: [],
+      company: null,
+      staffId: null,
+      longitude: null,
+      latitude: null,
+    );
+  }
 }
