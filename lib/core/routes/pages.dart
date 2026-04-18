@@ -61,12 +61,11 @@ class AppPages {
     // Users menu routes
     GetPage(
       name: AppRoutes.usersDashboard,
-      page: () => const UsersListScreen(), // ← view all users
+      page: () => const UsersListScreen(),
     ),
     GetPage(
       name: AppRoutes.createUser,
-      page: () =>
-          const CreateUserScreen(), // ← add new user (your AdminDashboard)
+      page: () => const CreateUserScreen(),
     ),
     GetPage(
       name: AppRoutes.userRoles,
