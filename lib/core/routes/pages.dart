@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:graville_operations/core/middleware/auth_middleware.dart';
-import 'package:graville_operations/screens/account_screen/account_screen.dart';
+import 'package:graville_operations/screens/account_screen/binding.dart';
+import 'package:graville_operations/screens/account_screen/view.dart';
 import 'package:graville_operations/screens/application/binding.dart';
 import 'package:graville_operations/screens/application/view.dart';
 import 'package:graville_operations/screens/auth/login/binding.dart';
@@ -78,10 +79,10 @@ class AppPages {
       page: () => AccountScreen(),
       // binding: InventoryScreenBinding(),
     ),
-    // GetPage(
-    //   name: AppRoutes.addHiredTool,
-    //   page: () => AddHiredTool(),
-    //   binding: AddHiredToolBindings(),
-    // )
+    GetPage(
+      name: AppRoutes.account,
+      page: () => AccountScreen(),
+      binding: AccountScreenBinding(),
+    )
   ];
 }

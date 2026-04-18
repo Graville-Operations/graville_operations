@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:graville_operations/screens/account_screen/account_screen.dart';
+import 'package:graville_operations/screens/account_screen/binding.dart';
+import 'package:graville_operations/screens/account_screen/controller.dart';
+import 'package:graville_operations/screens/account_screen/view.dart';
 import 'package:graville_operations/screens/home/home_screen.dart';
 import 'package:graville_operations/screens/store/inventory/binding.dart';
 import 'package:graville_operations/screens/store/inventory/controller.dart';
@@ -17,7 +19,12 @@ class MenuRegistry {
       }
       return const InventoryScreen();
     },
-    'account': (_) => const AccountScreen(),
+    'account': (_) {
+      if (!Get.isRegistered<AccountScreenController>()) {
+        AccountScreenBinding().dependencies();
+      }
+      return const AccountScreen();
+    },
   };
 
   static const Map<String, IconData> activeIcons = {
