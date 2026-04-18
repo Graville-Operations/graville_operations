@@ -7,8 +7,8 @@ import 'package:graville_operations/screens/application/binding.dart';
 import 'package:graville_operations/screens/application/view.dart';
 import 'package:graville_operations/screens/auth/login/binding.dart';
 import 'package:graville_operations/screens/auth/login/view.dart';
+import 'package:graville_operations/screens/finance_dashboard/finance_dashboard.dart';
 import 'package:graville_operations/screens/projects/dashboard/assign_user_screen.dart';
-import 'package:graville_operations/screens/finance/finance_dashboard_screen.dart';
 import 'package:graville_operations/screens/invoice/invoice_screen.dart';
 import 'package:graville_operations/screens/projects/dashboard/binding.dart';
 import 'package:graville_operations/screens/projects/dashboard/view.dart';
@@ -76,7 +76,7 @@ class AppPages {
     // ─── Finance menu routes
     GetPage(
       name: AppRoutes.financeDashboard,
-      page: () => const FinanceDashboardScreen(),
+      page: () => const FinanceDashboardApp(),
     ),
     GetPage(
       name: AppRoutes.financeInvoices,
