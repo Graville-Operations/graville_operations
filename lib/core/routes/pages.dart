@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:graville_operations/core/middleware/auth_middleware.dart';
+import 'package:graville_operations/models/dashboard/assign_user_screen.dart';
 import 'package:graville_operations/screens/admin/create_user_screen.dart';
 import 'package:graville_operations/screens/admin/users_list_screen.dart';
 import 'package:graville_operations/screens/application/binding.dart';
@@ -10,9 +11,13 @@ import 'package:graville_operations/screens/auth/login/view.dart';
 import 'package:graville_operations/screens/finance_dashboard/finance_dashboard.dart';
 import 'package:graville_operations/screens/projects/dashboard/assign_user_screen.dart';
 import 'package:graville_operations/screens/invoice/invoice_screen.dart';
+import 'package:graville_operations/screens/menus/menus.dart';
 import 'package:graville_operations/screens/projects/dashboard/binding.dart';
 import 'package:graville_operations/screens/projects/dashboard/view.dart';
 import 'package:graville_operations/screens/sites/create_sites.dart';
+import 'package:graville_operations/screens/sites/create/view.dart';
+import 'package:graville_operations/screens/finance_dashboard/finance_dashboard.dart';
+
 import '../../screens/application/widgets/splash_screen.dart';
 import 'routes.dart';
 
@@ -21,12 +26,16 @@ class AppPages {
   static const application = AppRoutes.application;
   static final RouteObserver<Route> observer = RouteObservers();
   static List<String> history = [];
+  static final List<GetPage> routes = _rawRoutes
+      .map((page) => GetPage(
+    name: page.name,
+    page: page.page,
+    binding: page.binding,
+    middlewares: [AuthMiddleware(priority: 0)],
+  ))
+      .toList();
 
-  static final List<GetPage> routes = [
-    GetPage(
-      name: AppRoutes.initial,
-      page: () => const SplashScreen(),
-    ),
+  static final List<GetPage> _rawRoutes = [
     GetPage(
       name: AppRoutes.login,
       page: () => const LoginScreen(),
@@ -71,6 +80,7 @@ class AppPages {
       name: AppRoutes.userRoles,
       page: () => const UsersListScreen(),
     ),
+    GetPage(name: AppRoutes.userDepartment, page: ()=>AssignUserToGroupScreen(),),
 
     // ─── Finance menu routes
     GetPage(
@@ -81,5 +91,9 @@ class AppPages {
       name: AppRoutes.financeInvoices,
       page: () => const InvoiceScreen(),
     ),
+    GetPage(
+      name: AppRoutes.menuDepartments,
+      page: () => const MenusScreen(),
+    )
   ];
 }

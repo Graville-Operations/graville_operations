@@ -1,11 +1,12 @@
 import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:graville_operations/core/routes/names.dart';
+import 'package:graville_operations/core/utils/constants.dart';
 import 'package:graville_operations/core/utils/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
-  static const String baseUrl = AppRoutes.baseUrl;
+  static const String baseUrl = appBaseUrl;
 
   static dynamic _decodeResponse(dynamic response) {
     if (response is String) return jsonDecode(response);

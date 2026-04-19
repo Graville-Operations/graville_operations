@@ -1,7 +1,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:graville_operations/core/local/entities/menu_data.dart';
-import 'package:graville_operations/core/style/style.dart';
 import 'package:graville_operations/screens/application/widgets/drawer_item.dart';
 
 class AppDrawer extends StatelessWidget {

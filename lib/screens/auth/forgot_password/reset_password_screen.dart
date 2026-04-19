@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:graville_operations/screens/commons/assets/images.dart';
-import 'package:graville_operations/screens/commons/widgets/custom_button.dart';
+import 'package:graville_operations/core/commons/assets/images.dart';
+import 'package:graville_operations/core/commons/widgets/custom_button.dart';
 import 'package:graville_operations/services/api_service.dart';
 
 class ResetPasswordScreen extends StatefulWidget {
