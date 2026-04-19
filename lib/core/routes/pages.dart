@@ -8,11 +8,13 @@ import 'package:graville_operations/screens/application/binding.dart';
 import 'package:graville_operations/screens/application/view.dart';
 import 'package:graville_operations/screens/auth/login/binding.dart';
 import 'package:graville_operations/screens/auth/login/view.dart';
-import 'package:graville_operations/screens/finance/finance_dashboard_screen.dart';
+import 'package:graville_operations/screens/finance_dashboard/finance_dashboard.dart';
+import 'package:graville_operations/screens/projects/dashboard/assign_user_screen.dart';
 import 'package:graville_operations/screens/invoice/invoice_screen.dart';
 import 'package:graville_operations/screens/menus/menus.dart';
 import 'package:graville_operations/screens/projects/dashboard/binding.dart';
 import 'package:graville_operations/screens/projects/dashboard/view.dart';
+import 'package:graville_operations/screens/sites/create_sites.dart';
 import 'package:graville_operations/screens/sites/create/view.dart';
 import 'package:graville_operations/screens/finance_dashboard/finance_dashboard.dart';
 
@@ -40,15 +42,22 @@ class AppPages {
       binding: LoginBindings(),
     ),
     GetPage(
-      name: AppPages.initial,
-      page: () => ApplicationScreen(),
-      binding: ApplicationBindings(),
-    ),
+        name: AppPages.application,
+        page: () => ApplicationScreen(),
+        binding: ApplicationBindings(),
+        middlewares: [AuthMiddleware(priority: 0)]),
     GetPage(
-      name: AppRoutes.projectDashboard,
-      page: () => ProjectDashboardScreen(),
-      binding: ProjectDashboardBindings(),
-    ),
+        name: AppRoutes.projectDashboard,
+        page: () => ProjectDashboardScreen(),
+        binding: ProjectDashboardBindings()),
+    GetPage(name: AppRoutes.createProject, page: () => CreateSitesScreen()),
+    GetPage(
+        name: AppRoutes.userDepartment, page: () => AssignUserToGroupScreen()),
+    //   name: AppPages.application,
+    //   page: () => ApplicationScreen(),
+    //   binding: ApplicationBindings(),
+    //   middlewares: [AuthMiddleware(priority: 0)],
+    // ),
     GetPage(
       name: AppRoutes.projectDashboard,
       page: () => ProjectDashboardScreen(),

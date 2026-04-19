@@ -25,7 +25,6 @@ class ApiService {
     });
   }
 
-
   static Future<void> saveToken(String token) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('token', token);
@@ -63,7 +62,6 @@ class ApiService {
     await prefs.remove('user_id');
   }
 
-
   static Future<bool> adminExists() async {
     try {
       final response = await HttpUtil().get(
@@ -76,7 +74,6 @@ class ApiService {
       return false;
     }
   }
-
 
   static Future<Map<String, dynamic>> adminSignup({
     required String firstName,
@@ -113,7 +110,6 @@ class ApiService {
       return {'success': false, 'message': e.toString()};
     }
   }
-
 
   static Future<Map<String, dynamic>> login(
       String email, String password) async {
@@ -161,7 +157,6 @@ class ApiService {
             }
           };
         } catch (e) {
-        
           return {
             'success': true,
             'data': {
@@ -194,7 +189,6 @@ class ApiService {
     }
   }
 
-
   static Future<Map<String, dynamic>> forgotPassword(String email) async {
     try {
       final response = await HttpUtil().post(
@@ -203,15 +197,11 @@ class ApiService {
         data: {'email': email},
       );
       final data = _decodeResponse(response);
-      return {
-        'success': data['message'] != null,
-        'message': data['message']
-      };
+      return {'success': data['message'] != null, 'message': data['message']};
     } catch (e) {
       return {'success': false, 'message': e.toString()};
     }
   }
-
 
   static Future<Map<String, dynamic>> verifyOtp(
       String email, String code) async {
@@ -222,15 +212,11 @@ class ApiService {
         data: {'email': email, 'code': code},
       );
       final data = _decodeResponse(response);
-      return {
-        'success': data['message'] != null,
-        'message': data['message']
-      };
+      return {'success': data['message'] != null, 'message': data['message']};
     } catch (e) {
       return {'success': false, 'message': e.toString()};
     }
   }
-
 
   static Future<Map<String, dynamic>> resetPassword(
       String email, String code, String newPassword) async {
@@ -245,15 +231,11 @@ class ApiService {
         },
       );
       final data = _decodeResponse(response);
-      return {
-        'success': data['message'] != null,
-        'message': data['message']
-      };
+      return {'success': data['message'] != null, 'message': data['message']};
     } catch (e) {
       return {'success': false, 'message': e.toString()};
     }
   }
-
 
   static Future<Map<String, dynamic>> createMember({
     required String firstName,
@@ -288,7 +270,6 @@ class ApiService {
     }
   }
 
-
   static Future<Map<String, dynamic>> getAllUsers() async {
     try {
       final response = await HttpUtil().get(
@@ -301,7 +282,6 @@ class ApiService {
       return {'success': false, 'data': [], 'message': e.toString()};
     }
   }
-
 
   static Future<Map<String, dynamic>> deleteUser(
       int userId, String role) async {
@@ -320,7 +300,6 @@ class ApiService {
     }
   }
 
-
   static Future<Map<String, dynamic>> getProfile(int userId) async {
     try {
       final response = await HttpUtil().get(
@@ -334,7 +313,6 @@ class ApiService {
     }
   }
 
-
   static Future<Map<String, dynamic>> getRefactorMe() async {
     try {
       final response = await HttpUtil().get(
@@ -347,7 +325,6 @@ class ApiService {
       return {'success': false, 'data': null, 'message': e.toString()};
     }
   }
- 
 
   static Future<Map<String, dynamic>> updateProfile(
       int userId, Map<String, dynamic> profileData) async {
@@ -367,7 +344,6 @@ class ApiService {
       return {'success': false, 'message': e.toString()};
     }
   }
- 
 
   // static Future<Map<String, dynamic>> updatePersonalSettings(
   //     int userId, Map<String, dynamic> settings) async {
@@ -388,9 +364,7 @@ class ApiService {
   //   }
   // }
 
-
-  static Future<Map<String, dynamic>> authenticatedGet(
-      String endpoint) async {
+  static Future<Map<String, dynamic>> authenticatedGet(String endpoint) async {
     try {
       final response = await HttpUtil().get(
         endpoint,
@@ -402,7 +376,6 @@ class ApiService {
       return {'success': false, 'data': null, 'message': e.toString()};
     }
   }
-
 
   static Future<Map<String, dynamic>> authenticatedPost(
       String endpoint, Map<String, dynamic> body) async {

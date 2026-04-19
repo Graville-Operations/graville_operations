@@ -16,7 +16,7 @@ class ApplicationScreen extends StatefulWidget {
 
 class _ApplicationScreenState extends State<ApplicationScreen> {
   int _currentIndex = 0;
- // String _role = '';
+  // String _role = '';
   bool _isLoading = true;
 
   @override
@@ -75,7 +75,6 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
         label: "Account",
       ),
     ];
-
 
     return base;
   }
