@@ -320,7 +320,8 @@ class HttpUtil {
     requestOptions.headers = requestOptions.headers ?? {};
     var response = await dio.post(
       path,
-      data: FormData.fromMap(data),
+      data: data,
+      //data: FormData.fromMap(data),
       queryParameters: queryParameters,
       options: requestOptions,
       cancelToken: cancelToken,
