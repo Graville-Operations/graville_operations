@@ -8,13 +8,14 @@ import 'package:graville_operations/screens/application/view.dart';
 import 'package:graville_operations/screens/auth/login/binding.dart';
 import 'package:graville_operations/screens/auth/login/view.dart';
 import 'package:graville_operations/screens/finance_dashboard/finance_dashboard.dart';
-import 'package:graville_operations/screens/home/widgets/app_drawer.dart';
 import 'package:graville_operations/screens/invoice/invoice_screen.dart';
 import 'package:graville_operations/screens/menus/menus.dart';
 import 'package:graville_operations/screens/projects/dashboard/assign_user_screen.dart';
 import 'package:graville_operations/screens/projects/dashboard/binding.dart';
 import 'package:graville_operations/screens/projects/dashboard/view.dart';
 import 'package:graville_operations/screens/sites/create/view.dart';
+import 'package:graville_operations/screens/menus/binding.dart';
+
 import 'routes.dart';
 
 class AppPages {
@@ -33,17 +34,17 @@ class AppPages {
 
   static final List<GetPage> _rawRoutes = [
     GetPage(
-      name: AppRoutes.initial,
+      name: AppRoutes.login,
       page: () => const LoginScreen(),
       binding: LoginBindings(),
     ),
     GetPage(
-      name: AppPages.application,
+      name: AppPages.initial,
       page: () => ApplicationScreen(),
       binding: ApplicationBindings(),
     ),
     GetPage(
-        name: AppRoutes.userDepartment, page: () => AssignUserToGroupScreen()),
+        name: AppRoutes.userDepartment, page: () => AssignUserToGroupScreen(),),
     GetPage(
       name: AppRoutes.projectDashboard,
       page: () => ProjectDashboardScreen(),
@@ -76,7 +77,7 @@ class AppPages {
     GetPage(
       name: AppRoutes.menuDepartments,
       page: () => const MenusScreen(),
-    ),
-    GetPage(name: AppRoutes.drawer, page: ()=>AppDrawer(drawerMenus: Get.arguments ?? []))
+       binding: MenusBinding(),
+    )
   ];
 }
