@@ -67,7 +67,7 @@ class UserStore extends GetxController {
     await StorageService.to.remove(storageUserProfileKey);
     _isLogin.value = false;
     token = '';
-    Get.offAllNamed(AppRoutes.login);
+    Get.offAllNamed(AppRoutes.loginScreen);
   }
   Future<void> saveMenusIfNeeded(List<MenuItem> menus, String currentToken) async {
     final savedToken = StorageService.to.getString(menuTokenKey);

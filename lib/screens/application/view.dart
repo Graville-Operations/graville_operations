@@ -3,7 +3,6 @@ import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:get/get_state_manager/src/simple/get_view.dart';
 import 'package:graville_operations/screens/application/controller.dart';
 import 'package:graville_operations/screens/application/menu_registry.dart';
-import 'package:graville_operations/screens/application/widgets/app_drawer.dart';
 import 'package:graville_operations/screens/application/widgets/no_access_screen.dart';
 
 class ApplicationScreen extends GetView<ApplicationController> {
@@ -15,7 +14,6 @@ class ApplicationScreen extends GetView<ApplicationController> {
     final Color inActiveColor = Colors.blue.shade100;
 
     final bottomMenus = controller.state.bottomMenus;
-    final drawerMenus = controller.state.drawerMenus;
 
     if (bottomMenus.isEmpty) return const NoAccessScreen();
 
@@ -48,9 +46,6 @@ class ApplicationScreen extends GetView<ApplicationController> {
       controller.state.currentIndex.value.clamp(0, screens.length - 1);
 
       return Scaffold(
-        drawer: drawerMenus.isNotEmpty
-            ? AppDrawer(drawerMenus: drawerMenus)
-            : null,
         body: LazyIndexedStack(
           index: safeIndex,
           children: screens,
