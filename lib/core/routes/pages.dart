@@ -44,7 +44,6 @@ class AppPages {
         binding: ProjectDashboardBindings()),
     GetPage(name: AppRoutes.createProject, page: () => CreateSitesScreen()),
     GetPage(
-        name: AppRoutes.financeDashboard, page: () => FinanceDashboardApp()),
       name: AppPages.application,
       page: () => ApplicationScreen(),
       binding: ApplicationBindings(),
