@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:graville_operations/screens/store/add_material.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:graville_operations/application/custom_navigator.dart';
 import 'package:graville_operations/models/inventory/inventory%20_model.dart';
-import 'package:graville_operations/screens/inventory/add_material.dart';
 import 'package:graville_operations/services/inventory_service.dart';
 
 class MaterialsListScreen extends StatefulWidget {

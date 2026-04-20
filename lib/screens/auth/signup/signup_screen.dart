@@ -1,9 +1,9 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:graville_operations/core/commons/assets/images.dart';
+import 'package:graville_operations/core/commons/widgets/custom_button.dart';
+import 'package:graville_operations/core/commons/widgets/custom_text_input.dart';
 import 'package:graville_operations/screens/auth/login/view.dart';
-import 'package:graville_operations/screens/commons/assets/images.dart';
-import 'package:graville_operations/screens/commons/widgets/custom_button.dart';
-import 'package:graville_operations/screens/commons/widgets/custom_text_input.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:graville_operations/services/api_service.dart';
 

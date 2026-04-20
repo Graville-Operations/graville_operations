@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:graville_operations/screens/commons/widgets/support_tile.dart';
+import 'package:graville_operations/core/commons/widgets/support_tile.dart';
 
 class SupportScreen extends StatelessWidget {
   const SupportScreen({super.key});

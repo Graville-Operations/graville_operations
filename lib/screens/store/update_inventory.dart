@@ -1,10 +1,10 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:graville_operations/core/commons/widgets/custom_button.dart';
+import 'package:graville_operations/core/commons/widgets/custom_dropdown.dart';
+import 'package:graville_operations/core/commons/widgets/custom_text_input.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:graville_operations/models/inventory/inventory _model.dart';
-import 'package:graville_operations/screens/commons/widgets/custom_button.dart';
-import 'package:graville_operations/screens/commons/widgets/custom_dropdown.dart';
-import 'package:graville_operations/screens/commons/widgets/custom_text_input.dart';
 import 'package:graville_operations/services/inventory_service.dart';
 
 class _InventoryEntry {
@@ -86,7 +86,7 @@ class UpdateInventoryScreenState extends State<UpdateInventoryScreen> {
     } on MaterialServiceException catch (e) {
       setState(() { _loadError = e.message; _isLoadingItems = false; });
     } catch (_) {
-      setState(() { _loadError = 'Failed to load inventory items.'; _isLoadingItems = false; });
+      setState(() { _loadError = 'Failed to load store items.'; _isLoadingItems = false; });
     }
   }
 
@@ -289,7 +289,7 @@ class UpdateInventoryScreenState extends State<UpdateInventoryScreen> {
                   value: entry.selectedInventory, items: _inventoryItems,
                   displayMapper: (item) => item.name,
                   onChanged: (item) { if (item != null) setState(() => entry.fillFrom(item)); },
-                  hint: 'Select inventory item', isExpanded: true, isDense: true,
+                  hint: 'Select store item', isExpanded: true, isDense: true,
                   border: InputBorder.none, fillColor: Colors.transparent,
                   borderRadius: BorderRadius.circular(10),
                 ),

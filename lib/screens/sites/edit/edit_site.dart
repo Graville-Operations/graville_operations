@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:graville_operations/screens/commons/widgets/section_card.dart';
-import 'package:graville_operations/screens/commons/widgets/custom_button.dart';
-import 'package:graville_operations/screens/commons/widgets/custom_text_input.dart';
-import 'package:graville_operations/screens/commons/widgets/custom_dropdown.dart';
+import 'package:graville_operations/core/commons/widgets/custom_button.dart';
+import 'package:graville_operations/core/commons/widgets/custom_dropdown.dart';
+import 'package:graville_operations/core/commons/widgets/custom_text_input.dart';
+import 'package:graville_operations/core/commons/widgets/section_card.dart';
 import 'package:graville_operations/models/site/site_model.dart';
 import 'package:graville_operations/services/site_service.dart';
 

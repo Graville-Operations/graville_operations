@@ -4,7 +4,6 @@ import 'package:graville_operations/services/api_service.dart';
 
 class AssignUserToGroupScreen extends StatefulWidget {
   const AssignUserToGroupScreen({super.key});
-
   @override
   State<AssignUserToGroupScreen> createState() =>
       _AssignUserToGroupScreenState();
@@ -12,7 +11,6 @@ class AssignUserToGroupScreen extends StatefulWidget {
 
 class _AssignUserToGroupScreenState extends State<AssignUserToGroupScreen> {
   static const Color kGreen = Color(0xFF1D9E75);
-
   UserModel? _selectedUser;
   GroupModel? _selectedGroup;
   List<UserModel> _users = [];
@@ -21,7 +19,6 @@ class _AssignUserToGroupScreenState extends State<AssignUserToGroupScreen> {
   bool _loadingGroups = false;
   String? _usersError;
   String? _groupsError;
-
   @override
   void initState() {
     super.initState();
@@ -113,19 +110,15 @@ class _AssignUserToGroupScreenState extends State<AssignUserToGroupScreen> {
 
   Future<void> _assign() async {
     if (_selectedUser == null || _selectedGroup == null) return;
-
     final result = await ApiService.authenticatedPost(
-      '/group/${_selectedGroup!.id}/users/${_selectedUser!.id}',
+      '/group${_selectedGroup!.id}/users/${_selectedUser!.id}',
       {},
     );
-
     if (!mounted) return;
-
     final success = result['success'] == true;
     final message = success
         ? '${_selectedUser!.fullName} assigned to ${_selectedGroup!.name}'
         : result['message']?.toString() ?? 'Assignment failed';
-
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
@@ -134,12 +127,16 @@ class _AssignUserToGroupScreenState extends State<AssignUserToGroupScreen> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       ),
     );
+    if (success) {
+      await Future.delayed(const Duration(milliseconds: 800));
+
+      Navigator.pop(context);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final canAssign = _selectedUser != null && _selectedGroup != null;
-
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7F6),
       appBar: AppBar(
@@ -250,7 +247,6 @@ class _AssignUserToGroupScreenState extends State<AssignUserToGroupScreen> {
 class _LoadingField extends StatelessWidget {
   final IconData icon;
   const _LoadingField({required this.icon});
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -290,7 +286,6 @@ class _ErrorField extends StatelessWidget {
   final String message;
   final VoidCallback onRetry;
   const _ErrorField({required this.message, required this.onRetry});
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -326,7 +321,6 @@ class _ErrorField extends StatelessWidget {
 class _GroupNameTile extends StatelessWidget {
   final GroupModel group;
   const _GroupNameTile({required this.group});
-
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -356,7 +350,6 @@ class _GroupNameTile extends StatelessWidget {
 
 class _EmptyDetailCard extends StatelessWidget {
   const _EmptyDetailCard({super.key});
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -397,11 +390,9 @@ class _EmptyDetailCard extends StatelessWidget {
 class _GroupDetailCard extends StatelessWidget {
   final GroupModel group;
   const _GroupDetailCard({super.key, required this.group});
-
   static const Color kGreen = Color(0xFF1D9E75);
   static const Color kGreenLight = Color(0xFFE1F5EE);
   static const Color kGreenDark = Color(0xFF0F6E56);
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -518,7 +509,6 @@ class _GroupDetailCard extends StatelessWidget {
 class _FieldLabel extends StatelessWidget {
   final String label;
   const _FieldLabel({required this.label});
-
   @override
   Widget build(BuildContext context) {
     return Text(
@@ -537,13 +527,11 @@ class _SelectorField extends StatelessWidget {
   final VoidCallback onTap;
   final Widget child;
   final bool isSelected;
-
   const _SelectorField({
     required this.onTap,
     required this.child,
     this.isSelected = false,
   });
-
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -578,7 +566,6 @@ class _FieldPlaceholder extends StatelessWidget {
   final IconData icon;
   final String text;
   const _FieldPlaceholder({required this.icon, required this.text});
-
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -606,7 +593,6 @@ class _FieldPlaceholder extends StatelessWidget {
 class _UserTile extends StatelessWidget {
   final UserModel user;
   const _UserTile({required this.user});
-
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -653,13 +639,11 @@ class _UserPickerSheet extends StatefulWidget {
   final List<UserModel> users;
   final UserModel? selected;
   final ValueChanged<UserModel> onPicked;
-
   const _UserPickerSheet({
     required this.users,
     required this.selected,
     required this.onPicked,
   });
-
   @override
   State<_UserPickerSheet> createState() => _UserPickerSheetState();
 }
@@ -667,7 +651,6 @@ class _UserPickerSheet extends StatefulWidget {
 class _UserPickerSheetState extends State<_UserPickerSheet> {
   late List<UserModel> _filtered;
   final TextEditingController _ctrl = TextEditingController();
-
   @override
   void initState() {
     super.initState();
@@ -742,13 +725,11 @@ class _GroupPickerSheet extends StatefulWidget {
   final List<GroupModel> groups;
   final GroupModel? selected;
   final ValueChanged<GroupModel> onPicked;
-
   const _GroupPickerSheet({
     required this.groups,
     required this.selected,
     required this.onPicked,
   });
-
   @override
   State<_GroupPickerSheet> createState() => _GroupPickerSheetState();
 }
@@ -756,7 +737,6 @@ class _GroupPickerSheet extends StatefulWidget {
 class _GroupPickerSheetState extends State<_GroupPickerSheet> {
   late List<GroupModel> _filtered;
   final TextEditingController _ctrl = TextEditingController();
-
   @override
   void initState() {
     super.initState();
@@ -832,14 +812,12 @@ class _BottomSheetWrapper extends StatelessWidget {
   final TextEditingController searchController;
   final ValueChanged<String> onSearch;
   final Widget child;
-
   const _BottomSheetWrapper({
     required this.title,
     required this.searchController,
     required this.onSearch,
     required this.child,
   });
-
   @override
   Widget build(BuildContext context) {
     return DraggableScrollableSheet(
@@ -938,7 +916,6 @@ class _BottomSheetWrapper extends StatelessWidget {
 class _SheetSectionLabel extends StatelessWidget {
   final String label;
   const _SheetSectionLabel({required this.label});
-
   @override
   Widget build(BuildContext context) {
     return Padding(

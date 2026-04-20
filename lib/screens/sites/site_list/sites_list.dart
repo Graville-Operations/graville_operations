@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:graville_operations/core/commons/widgets/section_card.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:graville_operations/models/site/site_model.dart';
-import 'package:graville_operations/screens/sites/edit_site.dart';
+import 'package:graville_operations/screens/sites/edit/edit_site.dart';
 import 'package:graville_operations/services/site_service.dart';
-import 'package:graville_operations/screens/commons/widgets/section_card.dart';
 
 const _projectStatuses = ['On-going', 'Completed', 'Delayed'];
 
