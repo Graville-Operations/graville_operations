@@ -9,7 +9,5 @@ class ApplicationBindings implements Bindings {
   @override
   void dependencies() async{
     Get.lazyPut<ApplicationController>(() => ApplicationController());
-    await Get.putAsync<StorageService>(() => StorageService().init());
-    Get.lazyPut<UserStore>(()=>UserStore());
   }
 }

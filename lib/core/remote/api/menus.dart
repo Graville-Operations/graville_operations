@@ -1,13 +1,26 @@
 import 'package:flutter/cupertino.dart';
 import 'package:graville_operations/core/local/entities/menu_data.dart';
+import 'package:graville_operations/core/local/store/user_store.dart';
 import 'package:graville_operations/core/remote/routes/menu_route.dart';
 import 'package:graville_operations/core/utils/http.dart';
 
 class MenuApi {
   static Future<List<MenuItem>> getMyMenu() async {
-    final  result = await HttpUtil().get(MenuRoute.myMenus);
-    debugPrint("...... remote getmenu()  ${result.toString()}");
-    return (result as List<dynamic>)  // casting results to List of dynamic
-        .map((menu)=>MenuItem.fromJson(menu)).toList(); // error was here since I passed MenuItem.fromJson(result)) which is the whole list
+    final currentToken = UserStore.to.token;
+    final cachedMenus = UserStore.to.getMenus();
+    if (cachedMenus.isNotEmpty) {
+      return cachedMenus;
+    }
+    try {
+      final result = await HttpUtil().get(MenuRoute.myMenus);
+      List<MenuItem> menus = (result as List<dynamic>)
+          .map((menu) => MenuItem.fromJson(menu))
+          .toList();
+      await UserStore.to.saveMenus(menus, currentToken);
+      return menus;
+    } catch (e) {
+      debugPrint("Error fetching menus: $e");
+      rethrow;
+    }
   }
 }

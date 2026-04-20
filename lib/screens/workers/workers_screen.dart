@@ -2,12 +2,12 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:graville_operations/application/custom_navigator.dart';
+import 'package:graville_operations/core/commons/widgets/bulk_checkin_sheet.dart';
+import 'package:graville_operations/core/commons/widgets/custom_dropdown.dart';
+import 'package:graville_operations/core/commons/widgets/stat_card.dart';
+import 'package:graville_operations/core/commons/widgets/workers_table.dart';
 import 'package:graville_operations/models/worker_model.dart';
-import 'package:graville_operations/screens/commons/widgets/custom_dropdown.dart';
-import 'package:graville_operations/screens/commons/widgets/stat_card.dart';
-import 'package:graville_operations/screens/commons/widgets/workers_table.dart';
 import 'package:graville_operations/screens/workers/add_worker_screen.dart';
-import 'package:graville_operations/screens/commons/widgets/bulk_checkin_sheet.dart';
 import 'package:graville_operations/screens/workers/worker_profile_screen.dart';
 import 'package:graville_operations/services/attendance_service.dart';
 import 'package:graville_operations/services/worker_service.dart';
@@ -36,7 +36,7 @@ class _WorkersScreenState extends State<WorkersScreen> {
     final q = _attendanceSearch.text.toLowerCase().trim();
     if (q.isEmpty) return _checkedInWorkers;
     return _checkedInWorkers.where((w) =>
-        w.fullName.toLowerCase().contains(q) ||
+    w.fullName.toLowerCase().contains(q) ||
         w.nationalId.toString().contains(q)).toList();
   }
 
@@ -171,11 +171,11 @@ class _WorkersScreenState extends State<WorkersScreen> {
           SizedBox(width: 10),
           Text('Workers', style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600)),
         ]),
-      //   actions: [
-      //     IconButton(icon: const Icon(Icons.refresh, color: Colors.blue),
-      //         onPressed: _loadData, tooltip: 'Refresh'),
-      //   ],
-       ),
+        //   actions: [
+        //     IconButton(icon: const Icon(Icons.refresh, color: Colors.blue),
+        //         onPressed: _loadData, tooltip: 'Refresh'),
+        //   ],
+      ),
       body: RefreshIndicator(
         onRefresh: _loadData,
         child: SingleChildScrollView(
@@ -376,12 +376,12 @@ class _AttendanceHeader extends StatelessWidget {
             prefixIcon: const Icon(Icons.search, size: 20),
             suffixIcon: searchController.text.isNotEmpty
                 ? IconButton(
-                    icon: const Icon(Icons.clear, size: 18),
-                    onPressed: () {
-                      searchController.clear();
-                      onSearchChanged();
-                    },
-                  )
+              icon: const Icon(Icons.clear, size: 18),
+              onPressed: () {
+                searchController.clear();
+                onSearchChanged();
+              },
+            )
                 : null,
             hintText: 'Search by name or ID…',
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),

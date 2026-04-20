@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:graville_operations/application/custom_navigator.dart';
-import 'package:graville_operations/models/project_status.dart';
-import 'package:graville_operations/screens/commons/widgets/progress_bar.dart';
-import 'package:graville_operations/screens/inventory/add_material.dart';
-import 'package:graville_operations/screens/inventory/update_inventory.dart';
+import 'package:graville_operations/core/commons/assets/images.dart';
+import 'package:graville_operations/core/commons/widgets/progress_bar.dart';
+import 'package:graville_operations/core/commons/widgets/section_card.dart';
+import 'package:graville_operations/core/commons/widgets/stat_card.dart';
 import 'package:graville_operations/screens/material/receive_material.dart';
 import 'package:graville_operations/screens/material/transfer_material.dart';
-import 'package:graville_operations/screens/sites/create_sites.dart';
-import 'package:graville_operations/screens/sites/sites_list.dart';
+import 'package:graville_operations/screens/sites/site_list/sites_list.dart';
+import 'package:graville_operations/screens/store/add_material.dart';
+import 'package:graville_operations/screens/store/update_inventory.dart';
 import 'package:graville_operations/screens/task_screen/task_screen.dart';
 import 'package:graville_operations/screens/workers/add_worker_screen.dart';
-import 'package:graville_operations/screens/commons/assets/images.dart';
-import 'package:graville_operations/screens/commons/widgets/section_card.dart';
-import 'package:graville_operations/screens/commons/widgets/status_chip.dart';
-import 'package:graville_operations/screens/commons/widgets/stat_card.dart';
-import 'package:graville_operations/screens/invoice/invoice_screen.dart';
-import 'package:graville_operations/services/api_service.dart';
+import 'package:graville_operations/screens/workers/all_workers_screen.dart';
+import 'package:graville_operations/screens/workers/present_workers_screen.dart';
+import 'package:graville_operations/services/attendance_service.dart';
+import 'package:graville_operations/services/worker_service.dart';
+
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -26,20 +26,38 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   bool _isFabOpen = false;
-  String _role = '';
+
+ 
+  int _totalWorkers = 0;
+  int _presentToday = 0;
+  bool _statsLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _loadRole();
+    _loadStats();
   }
 
-  void _loadRole() async {
-    final role = await ApiService.getRole();
-    setState(() => _role = role ?? '');
+  Future<void> _loadStats() async {
+    setState(() => _statsLoading = true);
+    try {
+      final results = await Future.wait([
+        WorkerService.fetchWorkers(),
+        AttendanceService.fetchTodayPresentIds(),
+      ]);
+      if (!mounted) return;
+      setState(() {
+        _totalWorkers  = (results[0] as List).length;
+        _presentToday  = (results[1] as List).length;
+        _statsLoading  = false;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _statsLoading = false);
+    }
   }
 
-  Widget miniFab(IconData icon, VoidCallback onPressed, {Color color = Colors.black}) {
+  Widget miniFab(IconData icon, VoidCallback onPressed) {
     return SizedBox(
       width: 44,
       height: 44,
@@ -48,17 +66,9 @@ class _HomeScreenState extends State<HomeScreen> {
         mini: true,
         onPressed: onPressed,
         shape: const CircleBorder(),
-        backgroundColor: color,
+        backgroundColor: Colors.black,
         child: Icon(icon, color: Colors.white, size: 20),
       ),
-    );
-  }
-
-  // Mini FAB with label tooltip
-  Widget _labeledMiniFab(String tooltip, IconData icon, VoidCallback onPressed, {Color color = Colors.black}) {
-    return Tooltip(
-      message: tooltip,
-      child: miniFab(icon, onPressed, color: color),
     );
   }
 
@@ -70,77 +80,65 @@ class _HomeScreenState extends State<HomeScreen> {
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           if (_isFabOpen) ...[
-
-            // ← Field engineer only: Submit Invoice
-            if (_role == 'field_engineer') ...[
-              _labeledMiniFab(
-                "Submit Invoice",
-                Icons.receipt_long,
-                () {
-                  setState(() => _isFabOpen = false);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const InvoiceScreen()),
-                  );
-                },
-                color: const Color(0xFF33907C), // AppColor.primaryBackground
-              ),
-              const SizedBox(height: 12),
-            ],
-
-            _labeledMiniFab(
-              "Add worker",
-              Icons.person_add,
-              () => context.push(const AddWorkerScreen()),
-            ),
-            const SizedBox(height: 12),
-            _labeledMiniFab(
-              "New Site",
-              Icons.apartment,
-              () => context.push(const CreateSitesScreen()),
-            ),
-            const SizedBox(height: 12),
-            _labeledMiniFab(
-              "View sites",
-              Icons.map_outlined,
-              () => Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => const SitesListScreen()),
+            Tooltip(
+              message: "Add worker",
+              child: miniFab(
+                Icons.person_add,
+                () => context.push(const AddWorkerScreen()),
               ),
             ),
             const SizedBox(height: 12),
-            _labeledMiniFab(
-              "Hired equipment",
-              Icons.build,
-              () => context.push(const AddMaterialScreen()),
+            Tooltip(
+              message: "View sites",
+              child: miniFab(
+                Icons.map_outlined,
+                () => Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const SitesListScreen()),
+                ),
+              ),
             ),
             const SizedBox(height: 12),
-            _labeledMiniFab(
-              "Receive material",
-              Icons.download,
-              () => context.push(const ReceiveMaterialScreen()),
+            Tooltip(
+              message: "Hired equipment",
+              child: miniFab(
+                Icons.build,
+                () => context.push(const AddMaterialScreen()),
+              ),
             ),
             const SizedBox(height: 12),
-            _labeledMiniFab(
-              "Update inventory",
-              Icons.store,
-              () => context.push(const UpdateInventoryScreen(preSelectedItem: null)),
+            Tooltip(
+              message: "Receive material",
+              child: miniFab(
+                Icons.download,
+                () => context.push(const ReceiveMaterialScreen()),
+              ),
             ),
             const SizedBox(height: 12),
-            _labeledMiniFab(
-              "Transfer material",
-              Icons.local_shipping,
-              () => context.push(const TransferMaterialScreen()),
+            Tooltip(
+              message: "Update inventory",
+              child: miniFab(
+                Icons.store,
+                () => context.push(const UpdateInventoryScreen(preSelectedItem: null)),
+              ),
             ),
             const SizedBox(height: 12),
-            _labeledMiniFab(
-              "Create task",
-              Icons.add,
-              () => context.push(const CreateTaskScreen()),
+            Tooltip(
+              message: "Transfer material",
+              child: miniFab(
+                Icons.local_shipping,
+                () => context.push(const TransferMaterialScreen()),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Tooltip(
+              message: "Create task",
+              child: miniFab(
+                Icons.add,
+                () => context.push(const CreateTaskScreen()),
+              ),
             ),
             const SizedBox(height: 12),
           ],
-
-          // Main FAB
           FloatingActionButton(
             backgroundColor: Colors.black,
             shape: const CircleBorder(),
@@ -191,46 +189,65 @@ class _HomeScreenState extends State<HomeScreen> {
                 SectionCard(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
-                      Text(
+                    children: [
+                      const Text(
                         "Current Project",
                         style: TextStyle(color: Colors.grey),
                       ),
-                      SizedBox(height: 5),
-                      Text(
-                        "Sunrise Apartments",
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
+                      const SizedBox(height: 5),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: const [
+                          Text(
+                            "Sunrise Apartments",
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
                 ),
+
+                // Workers — tappable stat cards with live data
                 const SizedBox(height: 15),
-                const Row(
+                Row(
                   children: [
                     Expanded(
-                      child: StatCard(
-                        icon: Icons.people,
-                        title: "Total Workers",
-                        value: "152",
-                        subtitle: "Ever Assigned",
-                        color: Color(0xff5b7cfa),
-                      ),
+                      child: _statsLoading
+                          ? _StatShimmer()
+                          : GestureDetector(
+                              onTap: () => context.push(const AllWorkersScreen()),
+                              child: StatCard(
+                                icon: Icons.people,
+                                title: "Total Workers",
+                                value: "$_totalWorkers",
+                                subtitle: "Ever Assigned",
+                                color: const Color(0xff5b7cfa),
+                              ),
+                            ),
                     ),
-                    SizedBox(width: 12),
+                    const SizedBox(width: 12),
                     Expanded(
-                      child: StatCard(
-                        icon: Icons.person,
-                        title: "Present Today",
-                        value: "87",
-                        subtitle: "Active on Site",
-                        color: Color(0xff1db954),
-                      ),
+                      child: _statsLoading
+                          ? _StatShimmer()
+                          : GestureDetector(
+                              onTap: () => context.push(const PresentWorkersScreen()),
+                              child: StatCard(
+                                icon: Icons.person,
+                                title: "Present Today",
+                                value: "$_presentToday",
+                                subtitle: "Active on Site",
+                                color: const Color(0xff1db954),
+                              ),
+                            ),
                     ),
                   ],
                 ),
+
+                // Material stock and project completion
                 const SizedBox(height: 15),
                 IntrinsicHeight(
                   child: Row(
@@ -309,6 +326,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     ],
                   ),
                 ),
+
+                // Task progress section
                 const SizedBox(height: 15),
                 SectionCard(
                   child: Column(
@@ -326,20 +345,32 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       const SizedBox(height: 15),
                       TaskProgress(
-                          title: "Foundation", percent: 1.0, color: Colors.green),
+                        title: "Foundation",
+                        percent: 1.0,
+                        color: Colors.green,
+                      ),
                       TaskProgress(
-                          title: "Framing", percent: 0.75, color: Colors.orange),
+                        title: "Framing",
+                        percent: 0.75,
+                        color: Colors.orange,
+                      ),
                       TaskProgress(
-                          title: "Electrical", percent: 0.45, color: Colors.blue),
+                        title: "Electrical",
+                        percent: 0.45,
+                        color: Colors.blue,
+                      ),
                     ],
                   ),
                 ),
+
+                // Reviews
                 const SizedBox(height: 20),
                 const Text(
                   "Reviews",
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 12),
+
                 LayoutBuilder(
                   builder: (context, constraints) {
                     final isWide = constraints.maxWidth > 700;
@@ -351,37 +382,56 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         child: DataTable(
                           columnSpacing: 40,
-                          headingRowColor:
-                              WidgetStatePropertyAll(Colors.grey.shade200),
+                          headingRowColor: WidgetStatePropertyAll(
+                            Colors.grey.shade200,
+                          ),
                           columns: const [
                             DataColumn(label: Text("MESSAGE")),
                             DataColumn(label: Text("REVIEWER")),
                             DataColumn(label: Text("DATE")),
                           ],
                           rows: const [
-                            DataRow(cells: [
-                              DataCell(Text(
-                                  "Great job on the installation at the new site.")),
-                              DataCell(Text("James Paterson")),
-                              DataCell(Text("Feb 10")),
-                            ]),
-                            DataRow(cells: [
-                              DataCell(Text(
-                                  "Work completed efficiently, update status next time.")),
-                              DataCell(Text("Angela Martinez")),
-                              DataCell(Text("Feb 8")),
-                            ]),
+                            DataRow(
+                              cells: [
+                                DataCell(Text(
+                                    "Great job on the installation at the new site.")),
+                                DataCell(Text("James Paterson")),
+                                DataCell(Text("Feb 10")),
+                              ],
+                            ),
+                            DataRow(
+                              cells: [
+                                DataCell(Text(
+                                    "Work completed efficiently, update status next time.")),
+                                DataCell(Text("Angela Martinez")),
+                                DataCell(Text("Feb 8")),
+                              ],
+                            ),
                           ],
                         ),
                       ),
                     );
                   },
                 ),
+
                 const SizedBox(height: 60),
               ]),
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _StatShimmer extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 90,
+      decoration: BoxDecoration(
+        color: Colors.grey.shade200,
+        borderRadius: BorderRadius.circular(18),
       ),
     );
   }
