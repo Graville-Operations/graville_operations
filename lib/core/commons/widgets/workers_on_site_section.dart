@@ -3,15 +3,14 @@ import 'package:graville_operations/application/custom_navigator.dart';
 import 'package:graville_operations/core/commons/widgets/day_chip.dart';
 import 'package:graville_operations/core/commons/widgets/stat_card.dart';
 import 'package:graville_operations/core/commons/widgets/worker_preview_card.dart';
-import 'package:graville_operations/screens/workers/all_workers_screen.dart'; 
+import 'package:graville_operations/screens/workers/all_workers_screen.dart';
 import 'package:graville_operations/screens/workers/present_workers_screen.dart';
 import 'package:graville_operations/services/attendance_service.dart';
+import 'package:graville_operations/services/worker_service.dart'; 
 import 'package:intl/intl.dart';
 
 class WorkersOnSiteSection extends StatefulWidget {
-  final int totalWorkers;
-
-  const WorkersOnSiteSection({super.key, required this.totalWorkers});
+  const WorkersOnSiteSection({super.key});
 
   @override
   State<WorkersOnSiteSection> createState() => _WorkersOnSiteSectionState();
@@ -22,21 +21,32 @@ class _WorkersOnSiteSectionState extends State<WorkersOnSiteSection> {
   bool _loading = true;
   String? _error;
   late int _activeDayIndex;
+  int _totalWorkers = 0;
 
   @override
   void initState() {
     super.initState();
-    _activeDayIndex = DateTime.now().weekday % 7; 
+    _activeDayIndex = DateTime.now().weekday % 7;
     _load();
   }
 
   Future<void> _load() async {
     setState(() { _loading = true; _error = null; });
     try {
-      final week = await AttendanceService.fetchWeekAttendance();
-      if (mounted) setState(() { _week = week; _loading = false; });
+      final results = await Future.wait([
+        AttendanceService.fetchWeekAttendance(),
+        WorkerService.fetchWorkers(),
+      ]);
+      if (!mounted) return;
+      setState(() {
+        _week         = results[0] as WeekAttendance;
+        _totalWorkers = (results[1] as List).length; // live count from DB
+        _loading      = false;
+      });
     } on AttendanceServiceException catch (e) {
       if (mounted) setState(() { _error = e.message; _loading = false; });
+    } catch (_) {
+      if (mounted) setState(() { _error = 'Failed to load attendance.'; _loading = false; });
     }
   }
 
@@ -78,6 +88,7 @@ class _WorkersOnSiteSectionState extends State<WorkersOnSiteSection> {
           ),
         ),
         const SizedBox(height: 12),
+
         Row(
           children: [
             Expanded(
@@ -85,8 +96,8 @@ class _WorkersOnSiteSectionState extends State<WorkersOnSiteSection> {
                 onTap: () => context.push(const AllWorkersScreen()),
                 child: StatCard(
                   icon: Icons.people_rounded,
-                  title: 'Total (All Time)',
-                  value: '${widget.totalWorkers}',
+                  title: 'Total Workers',
+                  value: '$_totalWorkers',
                   color: const Color(0xFF1A5CFF),
                 ),
               ),
@@ -106,6 +117,7 @@ class _WorkersOnSiteSectionState extends State<WorkersOnSiteSection> {
           ],
         ),
         const SizedBox(height: 12),
+
         Container(
           decoration: BoxDecoration(
             color: Colors.white,
@@ -116,10 +128,8 @@ class _WorkersOnSiteSectionState extends State<WorkersOnSiteSection> {
               ? const Padding(
                   padding: EdgeInsets.all(24),
                   child: Center(
-                    child: Text(
-                      'No worker records for this day.',
-                      style: TextStyle(color: Color(0xFF7A7E8E), fontSize: 13),
-                    ),
+                    child: Text('No worker records for this day.',
+                        style: TextStyle(color: Color(0xFF7A7E8E), fontSize: 13)),
                   ),
                 )
               : Column(
@@ -134,7 +144,7 @@ class _WorkersOnSiteSectionState extends State<WorkersOnSiteSection> {
                         children: [
                           SizedBox(width: 28, child: Text('#', style: _hStyle)),
                           Expanded(child: Text('NAME', style: _hStyle)),
-                          SizedBox(width: 90, child: Text('ROLE', style: _hStyle)),
+                          SizedBox(width: 100, child: Text('SKILL TYPE', style: _hStyle)),
                         ],
                       ),
                     ),
@@ -157,15 +167,12 @@ class _WorkersOnSiteSectionState extends State<WorkersOnSiteSection> {
                               top: BorderSide(color: Colors.black.withOpacity(0.06)),
                             ),
                           ),
-                          child: const Text(
-                            'See all →',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Color(0xFF1A5CFF),
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
+                          child: const Text('See all →',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                  fontSize: 12,
+                                  color: Color(0xFF1A5CFF),
+                                  fontWeight: FontWeight.w600)),
                         ),
                       ),
                   ],
