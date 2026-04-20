@@ -43,20 +43,12 @@ class AppPages {
         binding: ProjectDashboardBindings()),
     GetPage(name: AppRoutes.createProject, page: () => CreateSitesScreen()),
     GetPage(
-<<<<<<< HEAD
         name: AppRoutes.userDepartment, page: () => AssignUserToGroupScreen()),
     //   name: AppPages.application,
     //   page: () => ApplicationScreen(),
     //   binding: ApplicationBindings(),
     //   middlewares: [AuthMiddleware(priority: 0)],
     // ),
-=======
-      name: AppPages.application,
-      page: () => ApplicationScreen(),
-      binding: ApplicationBindings(),
-      middlewares: [AuthMiddleware(priority: 0)],
-    ),
->>>>>>> 3a289059013c8c4c7bad92df6fb39d1141366bdb
     GetPage(
       name: AppRoutes.projectDashboard,
       page: () => ProjectDashboardScreen(),
@@ -69,20 +61,11 @@ class AppPages {
     // Users menu routes
     GetPage(
       name: AppRoutes.usersDashboard,
-<<<<<<< HEAD
-      page: () => const UsersListScreen(), // ← view all users
+      page: () => const UsersListScreen(),
     ),
     GetPage(
       name: AppRoutes.createUser,
-      page: () =>
-          const CreateUserScreen(), // ← add new user (your AdminDashboard)
-=======
-      page: () => const UsersListScreen(),    
-    ),
-    GetPage(
-      name: AppRoutes.createUser,
-      page: () => const CreateUserScreen(),      
->>>>>>> 3a289059013c8c4c7bad92df6fb39d1141366bdb
+      page: () => const CreateUserScreen(),
     ),
     GetPage(
       name: AppRoutes.userRoles,
