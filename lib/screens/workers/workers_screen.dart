@@ -86,7 +86,7 @@ class _WorkersScreenState extends State<WorkersScreen> {
   }
 
 
-  Future<void> _openBulkCheckIn() async {
+Future<void> _openBulkCheckIn() async {
     final eligible = _allWorkers
         .where((w) => w.id != null && _checkedIn[w.id] != true)
         .toList();
@@ -117,8 +117,15 @@ class _WorkersScreenState extends State<WorkersScreen> {
         setState(() => _checkedIn[worker.id!] = true);
         newlyPresent.add(worker);
         successCount++;
-      } catch (_) {
-        if (mounted) setState(() => _checkedIn.remove(worker.id));
+      } on AttendanceServiceException catch (e) {
+        debugPrint('Check-in failed for ${worker.fullName}: ${e.message}');
+        if (!mounted) break;
+        setState(() => _checkedIn.remove(worker.id));
+        _snack('Failed: ${worker.fullName} — ${e.message}', Colors.red.shade600);
+      } catch (e, st) {
+        debugPrint('Unexpected check-in error for worker ${worker.id}: $e\n$st');
+        if (!mounted) break;
+        setState(() => _checkedIn.remove(worker.id));
       }
     }
 
@@ -132,7 +139,6 @@ class _WorkersScreenState extends State<WorkersScreen> {
       _snack('$successCount worker${successCount == 1 ? '' : 's'} checked in ✓', Colors.green.shade600);
     }
   }
-
 
   Future<void> _handleVerify(Worker worker) async {
     final workerId = worker.id;

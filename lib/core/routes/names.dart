@@ -1,7 +1,7 @@
 class AppRoutes {
   static const initial = '/';
   static const application = '/application';
-  //static const login = '/login';
+  static const loginScreen = '/login';
   static const signup = '/signup';
   static const projectDashboard = '/projects/dashboard';
   static const financeDashboard = '/finance/dashboard';
@@ -53,4 +53,6 @@ class AppRoutes {
   static const String checkInBulk         = '/workers/attendance/check-in/bulk';
   static const String todayAttendance     = '/workers/attendance/today';
   static const String verifyAttendance    = '/workers/attendance/verify';
+  static const String weekAttendance      = '/workers/attendance/week';
+
 }
