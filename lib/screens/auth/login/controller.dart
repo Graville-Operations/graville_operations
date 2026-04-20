@@ -12,7 +12,7 @@ import 'package:graville_operations/screens/auth/login/state.dart';
 
 class LoginController extends GetxController {
   var state = LoginState();
-  final formKey = GlobalKey<FormState>();
+  Key? get formKey => null;
 
   void goToSignUp() {
     Get.toNamed(AppRoutes.signup);
@@ -27,7 +27,6 @@ class LoginController extends GetxController {
   }
 
   Future<String> login() async {
-    if (!formKey.currentState!.validate()) return "Validation failed";
     String res = "Unexpected Error Occurred";
     EasyLoading.show(status: "Logging you in....");
     try {

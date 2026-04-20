@@ -8,9 +8,9 @@ import 'package:graville_operations/screens/application/view.dart';
 import 'package:graville_operations/screens/auth/login/binding.dart';
 import 'package:graville_operations/screens/auth/login/view.dart';
 import 'package:graville_operations/screens/finance_dashboard/finance_dashboard.dart';
-import 'package:graville_operations/screens/projects/dashboard/assign_user_screen.dart';
 import 'package:graville_operations/screens/invoice/invoice_screen.dart';
 import 'package:graville_operations/screens/menus/menus.dart';
+import 'package:graville_operations/screens/projects/dashboard/assign_user_screen.dart';
 import 'package:graville_operations/screens/projects/dashboard/binding.dart';
 import 'package:graville_operations/screens/projects/dashboard/view.dart';
 import 'package:graville_operations/screens/sites/create/view.dart';
@@ -23,27 +23,62 @@ class AppPages {
   static const application = AppRoutes.application;
   static final RouteObserver<Route> observer = RouteObservers();
   static List<String> history = [];
-  static final List<GetPage> routes = _rawRoutes.map((page) {
-  final isPublic = [AppRoutes.login, AppRoutes.signup].contains(page.name);
-  return GetPage(
-    name: page.name,
-    page: page.page,
-    binding: page.binding,
-    middlewares: isPublic ? [] : [AuthMiddleware(priority: 0)],
-  );
-}).toList();
+  static final List<GetPage> routes = _rawRoutes
+      .map((page) => GetPage(
+            name: page.name,
+            page: page.page,
+            binding: page.binding,
+            middlewares: [AuthMiddleware(priority: 0)],
+          ))
+      .toList();
+
   static final List<GetPage> _rawRoutes = [
-    GetPage(name: AppRoutes.initial, page: () => const LoginScreen(), binding: LoginBindings()),
-  GetPage(name: AppRoutes.loginScreen, page: () => const LoginScreen(), binding: LoginBindings()),
-  GetPage(name: AppPages.application, page: () => ApplicationScreen(), binding: ApplicationBindings()),
-  GetPage(name: AppRoutes.projectDashboard, page: () => ProjectDashboardScreen(), binding: ProjectDashboardBindings()),
-  GetPage(name: AppRoutes.createProject, page: () => CreateSitesScreen()),
-  GetPage(name: AppRoutes.usersDashboard, page: () => const UsersListScreen()),
-  GetPage(name: AppRoutes.createUser, page: () => const CreateUserScreen()),
-  GetPage(name: AppRoutes.userRoles, page: () => const UsersListScreen()),
-  GetPage(name: AppRoutes.userDepartment, page: () => AssignUserToGroupScreen()),
-  GetPage(name: AppRoutes.financeDashboard, page: () => const FinanceDashboardApp()),
-  GetPage(name: AppRoutes.financeInvoices, page: () => const InvoiceScreen()),
-  GetPage(name: AppRoutes.menuDepartments, page: () => const MenusScreen(), binding: MenusBinding()),
-];
+   // GetPage(name: AppRoutes.initial, page: () => const LoginScreen(), binding: LoginBindings()),
+    GetPage(
+      name: AppRoutes.initial,
+      page: () => const LoginScreen(),
+      binding: LoginBindings(),
+    ),
+    GetPage(
+      name: AppPages.application,
+      page: () => ApplicationScreen(),
+      binding: ApplicationBindings(),
+    ),
+    GetPage(
+        name: AppRoutes.userDepartment, page: () => AssignUserToGroupScreen()),
+    GetPage(
+      name: AppRoutes.projectDashboard,
+      page: () => ProjectDashboardScreen(),
+      binding: ProjectDashboardBindings(),
+    ),
+    GetPage(
+      name: AppRoutes.createProject,
+      page: () => CreateSitesScreen(),
+    ),
+    GetPage(
+      name: AppRoutes.usersDashboard,
+      page: () => const UsersListScreen(),
+    ),
+    GetPage(
+      name: AppRoutes.createUser,
+      page: () => const CreateUserScreen(),
+    ),
+    GetPage(
+      name: AppRoutes.userRoles,
+      page: () => const UsersListScreen(),
+    ),
+    GetPage(
+      name: AppRoutes.financeDashboard,
+      page: () => const FinanceDashboardApp(),
+    ),
+    GetPage(
+      name: AppRoutes.financeInvoices,
+      page: () => const InvoiceScreen(),
+    ),
+    GetPage(
+      name: AppRoutes.menuDepartments,
+      page: () => const MenusScreen(),
+       binding: MenusBinding(),
+    )
+  ];
 }
