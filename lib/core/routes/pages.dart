@@ -8,15 +8,12 @@ import 'package:graville_operations/screens/application/binding.dart';
 import 'package:graville_operations/screens/application/view.dart';
 import 'package:graville_operations/screens/auth/login/binding.dart';
 import 'package:graville_operations/screens/auth/login/view.dart';
-import 'package:graville_operations/screens/finance/finance_dashboard_screen.dart';
 import 'package:graville_operations/screens/invoice/invoice_screen.dart';
 import 'package:graville_operations/screens/menus/menus.dart';
 import 'package:graville_operations/screens/projects/dashboard/binding.dart';
 import 'package:graville_operations/screens/projects/dashboard/view.dart';
 import 'package:graville_operations/screens/sites/create/view.dart';
 import 'package:graville_operations/screens/finance_dashboard/finance_dashboard.dart';
-
-import '../../screens/application/widgets/splash_screen.dart';
 import 'routes.dart';
 
 class AppPages {
