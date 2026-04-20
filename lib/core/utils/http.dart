@@ -70,7 +70,6 @@ class HttpUtil {
         // Do something before request is sent
         if (Get.isRegistered<UserStore>() && UserStore.to.hasToken) {
           final token = UserStore.to.token;
-          print("Access tokens is $token");
           options.headers['Authorization'] = 'Bearer $token';
         }
         return handler.next(options); //continue
