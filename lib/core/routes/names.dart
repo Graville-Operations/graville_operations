@@ -1,6 +1,7 @@
 class AppRoutes {
   static const initial = '/';
   static const application = '/application';
+  static const drawer = '/drawer';
   static const loginScreen = '/login';
   static const signup = '/signup';
   static const projectDashboard = '/projects/dashboard';
