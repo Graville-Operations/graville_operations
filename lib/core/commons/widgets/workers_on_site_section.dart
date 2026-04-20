@@ -124,7 +124,6 @@ class _WorkersOnSiteSectionState extends State<WorkersOnSiteSection> {
                 )
               : Column(
                   children: [
-                    // Header row
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                       decoration: const BoxDecoration(
@@ -139,7 +138,6 @@ class _WorkersOnSiteSectionState extends State<WorkersOnSiteSection> {
                         ],
                       ),
                     ),
-                    // Worker rows (max 5 from backend)
                     ...day.workers.asMap().entries.map((e) => Column(
                       children: [
                         if (e.key > 0)
@@ -147,7 +145,6 @@ class _WorkersOnSiteSectionState extends State<WorkersOnSiteSection> {
                         WorkerPreviewCard(index: e.key, worker: e.value),
                       ],
                     )),
-                    // "See all" footer when more than 5 are present
                     if (day.presentCount > 5)
                       InkWell(
                         onTap: () => context.push(const PresentWorkersScreen()),
