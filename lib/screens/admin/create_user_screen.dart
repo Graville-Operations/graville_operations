@@ -23,10 +23,18 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
 
   final List<Map<String, dynamic>> _roles = [
     {'value': 'ADMIN', 'label': 'Admin', 'icon': Icons.admin_panel_settings},
-    {'value': 'FIELD OPERATOR', 'label': 'Field Operator', 'icon': Icons.engineering},
+    {
+      'value': 'FIELD OPERATOR',
+      'label': 'Field Operator',
+      'icon': Icons.engineering
+    },
     {'value': 'AUDITOR', 'label': 'Auditor', 'icon': Icons.fact_check},
     {'value': 'FOREMAN', 'label': 'Foreman', 'icon': Icons.construction},
-    {'value': 'FINANCE', 'label': 'Finance Department', 'icon': Icons.account_balance},
+    {
+      'value': 'FINANCE',
+      'label': 'Finance Department',
+      'icon': Icons.account_balance
+    },
   ];
 
   @override
@@ -165,7 +173,6 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-
               // Role Selector
               _SectionLabel(label: 'User Role'),
               const SizedBox(height: 8),
@@ -464,8 +471,7 @@ class _FormField extends StatelessWidget {
           helperText: helperText,
           hintStyle: const TextStyle(color: AppColor.secondaryText),
           labelStyle: const TextStyle(color: AppColor.secondaryText),
-          prefixIcon:
-              Icon(icon, color: AppColor.primaryBackground, size: 20),
+          prefixIcon: Icon(icon, color: AppColor.primaryBackground, size: 20),
           border: InputBorder.none,
           contentPadding:
               const EdgeInsets.symmetric(horizontal: 16, vertical: 14),

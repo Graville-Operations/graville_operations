@@ -8,17 +8,13 @@ class AppRoutes {
   static const createProject = '/projects/new';
   static const departmentMenus = '/departments/menus';
   static const subMenusScreens = '/departments/sub-menus';
+  static const userDepartment = "/departments/users";
   static const usersDashboard = '/users/dashboard';
   static const createUser = '/users/new';
   static const userRoles = '/users/roles';
   static const financeInvoices = '/finance/invoices';
 
   static const menuDepartments = "/departments/menus";
-  static const userDepartment = "/departments/users";
-
-  // Base
-  static const String baseUrl = 'http://192.168.1.73:8000/api/v1';
-
   // Auth
   static const String adminExists      = '/refactor/admin/exists';
   static const String adminSignup      = '/refactor/admin/signup';

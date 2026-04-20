@@ -28,9 +28,9 @@ class _MyAppState extends State<MyApp> {
         theme: AppTheme.light,
         initialRoute: AppRoutes.initial,
         getPages: AppPages.routes,
-        builder: (context, child) {
-          return FlutterEasyLoading(child: child!);
-        },
+        builder: EasyLoading.init(
+          builder: (context, child) => child!,
+        ),
     );
   }
 }
