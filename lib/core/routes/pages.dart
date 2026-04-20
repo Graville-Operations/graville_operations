@@ -73,7 +73,6 @@ class AppPages {
     ),
     GetPage(name: AppRoutes.userDepartment, page: ()=>AssignUserToGroupScreen(),),
 
-    // ─── Finance menu routes
     GetPage(
       name: AppRoutes.financeDashboard,
       page: () => const FinanceDashboardApp(),
