@@ -45,7 +45,7 @@ class AppPages {
       binding: ApplicationBindings(),
     ),
     GetPage(
-        name: AppRoutes.userDepartment, page: () => AssignUserToGroupScreen()),
+        name: AppRoutes.userDepartment, page: () => AssignUserToGroupScreen(),),
     GetPage(
       name: AppRoutes.projectDashboard,
       page: () => ProjectDashboardScreen(),

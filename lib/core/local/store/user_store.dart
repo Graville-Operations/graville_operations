@@ -9,7 +9,6 @@ import 'package:graville_operations/core/routes/names.dart';
 import 'package:graville_operations/models/auth/user.dart';
 
 class UserStore extends GetxController {
-  // int userId = 12;
   static UserStore get to => Get.find();
 
   // checking if user is logged in
@@ -52,7 +51,6 @@ class UserStore extends GetxController {
     if (token.isEmpty) return User.empty();
     final String userData = StorageService.to.getString(storageUserProfileKey);
     var decoded = jsonDecode(userData);
-    print("Get profile data returns this object : "+decoded.toString());
     return User.fromJson(decoded);
   }
 

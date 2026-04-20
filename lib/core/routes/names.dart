@@ -53,4 +53,6 @@ class AppRoutes {
   static const String checkInBulk         = '/workers/attendance/check-in/bulk';
   static const String todayAttendance     = '/workers/attendance/today';
   static const String verifyAttendance    = '/workers/attendance/verify';
+  static const String weekAttendance      = '/workers/attendance/week';
+
 }
