@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:graville_operations/screens/account_screen/account_screen.dart';
+import 'package:graville_operations/screens/account_screen/view.dart';
 import 'package:graville_operations/screens/home/home_screen.dart';
-import 'package:graville_operations/screens/inventory/inventory_screen.dart';
+import 'package:graville_operations/screens/store/inventory/view.dart';
 import 'package:graville_operations/screens/workers/workers_screen.dart';
 //import 'package:graville_operations/screens/admin/admin_dashboard.dart';
 import 'package:graville_operations/services/api_service.dart';
@@ -16,7 +16,7 @@ class ApplicationScreen extends StatefulWidget {
 
 class _ApplicationScreenState extends State<ApplicationScreen> {
   int _currentIndex = 0;
- // String _role = '';
+  // String _role = '';
   bool _isLoading = true;
 
   @override
@@ -75,7 +75,6 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
         label: "Account",
       ),
     ];
-
 
     return base;
   }

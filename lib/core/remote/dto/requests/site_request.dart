@@ -2,31 +2,27 @@
 
 class CreateProjectRequest {
   final String name;
-  final String projectStatus;
+  String? projectStatus;
   final String? siteStatus;
   final String? completionDate;
   final String location;
-  final double? longitude;
-  final double? latitude;
-  final int fieldOperatorId;
-  final String? description;
+  final int? fieldOperatorId;
+  final String description;
   final List<String>? tags;
-  final String? tenderName;
-  final String? inquiringEntity;
+  final String tendererName;
+  final String procuringEntity;
 
   CreateProjectRequest({
     required this.name,
-    required this.projectStatus,
+    required this.tendererName,
+    required this.description,
+    required this.procuringEntity,
+    this.projectStatus,
     this.siteStatus = "Active",
     this.completionDate,
     required this.location,
-    this.longitude,
-    this.latitude,
-    required this.fieldOperatorId,
-    this.description,
-    this.tags,
-    this.tenderName,
-    this.inquiringEntity,
+    this.fieldOperatorId,
+    this.tags
   });
 
   Map<String, dynamic> toJson() {
@@ -36,13 +32,11 @@ class CreateProjectRequest {
       'site_status': siteStatus,
       'completion_date': completionDate,
       'location': location,
-      'longitude': longitude,
-      'latitude': latitude,
       'field_operator_id': fieldOperatorId,
       'description': description,
       'tags': tags,
-      'tender_name': tenderName,
-      'inquiring_entity': inquiringEntity,
+      'tender_name': tendererName,
+      'inquiring_entity': procuringEntity,
     };
   }
 }
@@ -61,7 +55,7 @@ class ProjectResponse {
   final String? description;
   final String? tenderName;
   final String? inquiringEntity;
-  final int fieldOperatorId;
+  final int? fieldOperatorId;
   final double? latitude;
   final double? longitude;
 
@@ -79,7 +73,7 @@ class ProjectResponse {
     this.description,
     this.tenderName,
     this.inquiringEntity,
-    required this.fieldOperatorId,
+    this.fieldOperatorId,
     this.latitude,
     this.longitude,
   });

@@ -1,68 +1,66 @@
-
-import 'dart:convert';
-//import 'package:graville_operations/models/material/material_model.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/foundation.dart';
+import 'package:graville_operations/core/routes/names.dart';
 import 'package:graville_operations/core/utils/http.dart';
 import 'package:graville_operations/models/inventory/inventory%20_model.dart';
 
 class MaterialService {
-  static const String _path = '/materials';
-  static final _http = HttpUtil();
+  static final HttpUtil _http = HttpUtil();
 
 
   static Future<InventoryModel> createMaterial(InventoryModel material) async {
-    final data = await _http.post('$_path/',data: material.toUpdateJson());
+    final data = await _http.post(
+      AppRoutes.createMaterial,
+      data: material.toUpdateJson(),
+    );
     return InventoryModel.fromJson(data);
-
   }
 
 
   static Future<List<InventoryModel>> getMaterials() async {
-    final data =  await _http.get('$_path/materials');
-    //debugPrint('getMaterial raw: ${(data as List).first}');
+    final data = await _http.get(AppRoutes.getMaterials);
     return (data as List).map((json) => InventoryModel.fromJson(json)).toList();
-
   }
 
 
   static Future<InventoryModel> getMaterialById(int id) async {
-    final data = await _http.get('$_path/get_material_by_id/$id');
+    final data = await _http.get(AppRoutes.materialById(id));
     return InventoryModel.fromJson(data);
-
   }
 
 
   static Future<InventoryModel> updateMaterial(
       int id, InventoryModel material) async {
-    final data = await _http.put('$_path/update_materials/$id');
+    final data = await _http.put(
+      AppRoutes.updateMaterial(id),
+      data: material.toUpdateJson(),
+    );
     return InventoryModel.fromJson(data);
-
   }
 
 
   static Future<List<InventoryModel>> getAllInventory() async {
-    final data = await _http.get('$_path/get_all_inventory');
+    final data = await _http.get(AppRoutes.getAllInventory);
     debugPrint('getAllInventory raw: $data');
     return (data as List).map((json) => InventoryModel.fromJson(json)).toList();
-
   }
 
-  
+
   static Future<InventoryModel> getInventoryById(int id) async {
-    final data = await _http.get('$_path/get_inventory_by_id/$id');
+    final data = await _http.get(AppRoutes.inventoryById(id));
     return InventoryModel.fromJson(data);
-
   }
+
 
   static Future<InventoryModel> updateInventory(
       int id, InventoryModel inventory) async {
-        debugPrint('Update payload: ${jsonEncode(inventory.toUpdateJson())}');
-    final data = await _http.put('$_path/update_inventory/$id', data: inventory.toUpdateJson());
+    debugPrint('Update payload: ${inventory.toUpdateJson()}');
+    final data = await _http.put(
+      AppRoutes.updateInventory(id),
+      data: inventory.toUpdateJson(),
+    );
     debugPrint('Update response: $data');
     return InventoryModel.fromJson(data);
-
   }
-
 }
 
 class MaterialServiceException implements Exception {

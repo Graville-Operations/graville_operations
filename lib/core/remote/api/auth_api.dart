@@ -1,4 +1,5 @@
 
+import 'package:graville_operations/core/local/store/user_store.dart';
 import 'package:graville_operations/core/remote/dto/requests/create_user.dart';
 import 'package:graville_operations/core/remote/dto/requests/login.dart';
 import 'package:graville_operations/core/remote/dto/response/auth_response.dart';
@@ -46,8 +47,10 @@ class AuthApi{
     return BaseResponse.fromJson(response, null);
   }
 
-  static Future<MyAccountResponse> me()async{ // getting personal info
+  static Future<MyAccountResponse> me()async{
     var response = await HttpUtil().get(AuthRoute.myAccount);
-    return MyAccountResponse.fromJson(response);
+    MyAccountResponse res =MyAccountResponse.fromJson(response);
+    await UserStore.to.saveProfile(res.toUserData());
+    return res;
   }
 }

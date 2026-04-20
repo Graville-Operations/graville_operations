@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:graville_operations/screens/commons/widgets/custom_dropdown.dart';
-import 'package:graville_operations/screens/commons/widgets/custom_button.dart';
+import 'package:graville_operations/core/commons/widgets/custom_button.dart';
+import 'package:graville_operations/core/commons/widgets/custom_dropdown.dart';
 
 
 class CustomTextInput extends StatelessWidget {

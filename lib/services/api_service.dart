@@ -1,10 +1,12 @@
 import 'dart:convert';
 import 'package:dio/dio.dart';
+import 'package:graville_operations/core/routes/names.dart';
+import 'package:graville_operations/core/utils/constants.dart';
 import 'package:graville_operations/core/utils/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
-  static const String baseUrl = 'http://192.168.1.73:8000/api/v1';
+  static const String baseUrl = appBaseUrl;
 
   static dynamic _decodeResponse(dynamic response) {
     if (response is String) return jsonDecode(response);
@@ -23,7 +25,6 @@ class ApiService {
     });
   }
 
-  // ─── Token Management
   static Future<void> saveToken(String token) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('token', token);
@@ -61,11 +62,10 @@ class ApiService {
     await prefs.remove('user_id');
   }
 
-  //─── Check if admin exists
   static Future<bool> adminExists() async {
     try {
       final response = await HttpUtil().get(
-        '/refactor/admin/exists',
+        AppRoutes.adminExists,
         options: _jsonOptions(),
       );
       final data = _decodeResponse(response);
@@ -75,7 +75,6 @@ class ApiService {
     }
   }
 
-  // ─── Admin Signup
   static Future<Map<String, dynamic>> adminSignup({
     required String firstName,
     required String lastName,
@@ -84,7 +83,7 @@ class ApiService {
   }) async {
     try {
       final response = await HttpUtil().post(
-        '/refactor/admin/signup',
+        AppRoutes.adminSignup,
         options: _jsonOptions(),
         data: {
           'first_name': firstName,
@@ -106,21 +105,17 @@ class ApiService {
             'Something went wrong';
       }
 
-      return {
-        'success': data['message'] != null,
-        'message': message
-      };
+      return {'success': data['message'] != null, 'message': message};
     } catch (e) {
       return {'success': false, 'message': e.toString()};
     }
   }
 
-  // ─── Login 
   static Future<Map<String, dynamic>> login(
       String email, String password) async {
     try {
       final response = await HttpUtil().post(
-        '/refactor/login',  // ← updated endpoint
+        AppRoutes.login,
         options: _jsonOptions(),
         data: {'email': email, 'password': password},
       );
@@ -134,10 +129,9 @@ class ApiService {
         await saveToken(token);
         await saveRole(accountType);
 
-        // Fetch user profile from /me
         try {
           final me = await HttpUtil().get(
-            '/refactor/me',
+            AppRoutes.me,
             options: Options(headers: {
               'Content-Type': 'application/json',
               'Authorization': 'Bearer $token',
@@ -147,7 +141,6 @@ class ApiService {
           if (meData['id'] != null) {
             await saveUserId(meData['id']);
           }
-          // Return with user data merged
           return {
             'success': true,
             'data': {
@@ -164,7 +157,6 @@ class ApiService {
             }
           };
         } catch (e) {
-          // Even if /me fails return success with token
           return {
             'success': true,
             'data': {
@@ -197,49 +189,40 @@ class ApiService {
     }
   }
 
-  // ─── Forgot Password
   static Future<Map<String, dynamic>> forgotPassword(String email) async {
     try {
       final response = await HttpUtil().post(
-        '/refactor/forgot-password',
+        AppRoutes.forgotPassword,
         options: _jsonOptions(),
         data: {'email': email},
       );
       final data = _decodeResponse(response);
-      return {
-        'success': data['message'] != null,
-        'message': data['message']
-      };
+      return {'success': data['message'] != null, 'message': data['message']};
     } catch (e) {
       return {'success': false, 'message': e.toString()};
     }
   }
 
-  // ─── Verify OTP 
   static Future<Map<String, dynamic>> verifyOtp(
       String email, String code) async {
     try {
       final response = await HttpUtil().post(
-        '/refactor/verify-otp',
+        AppRoutes.verifyOtp,
         options: _jsonOptions(),
         data: {'email': email, 'code': code},
       );
       final data = _decodeResponse(response);
-      return {
-        'success': data['message'] != null,
-        'message': data['message']
-      };
+      return {'success': data['message'] != null, 'message': data['message']};
     } catch (e) {
       return {'success': false, 'message': e.toString()};
     }
   }
 
-  // ─── Reset Password 
   static Future<Map<String, dynamic>> resetPassword(
       String email, String code, String newPassword) async {
     try {
       final response = await HttpUtil().post(
-        '/refactor/reset-password',
+        AppRoutes.resetPassword,
         options: _jsonOptions(),
         data: {
           'email': email,
@@ -248,86 +231,79 @@ class ApiService {
         },
       );
       final data = _decodeResponse(response);
+      return {'success': data['message'] != null, 'message': data['message']};
+    } catch (e) {
+      return {'success': false, 'message': e.toString()};
+    }
+  }
+
+  static Future<Map<String, dynamic>> createMember({
+    required String firstName,
+    required String lastName,
+    required String email,
+    String? phone,
+    String? nationalId,
+    String? staffId,
+    required String accountType,
+  }) async {
+    try {
+      final response = await HttpUtil().post(
+        AppRoutes.createMember,
+        options: await _authJsonOptions(),
+        data: {
+          'first_name': firstName,
+          'last_name': lastName,
+          'email': email,
+          'phone_no': phone,
+          'national_id': nationalId,
+          'staff_id': staffId,
+          'account_type': accountType,
+        },
+      );
+      final data = _decodeResponse(response);
       return {
-        'success': data['message'] != null,
-        'message': data['message']
+        'success': data != null,
+        'message': data['message'] ?? 'User created successfully'
       };
     } catch (e) {
       return {'success': false, 'message': e.toString()};
     }
   }
 
-  // ─── Create member
-  static Future<Map<String, dynamic>> createMember({
-  required String firstName,
-  required String lastName,
-  required String email,
-  String? phone,
-  String? nationalId,
-  String? staffId,
-  required String accountType,
-}) async {
-  try {
-    final response = await HttpUtil().post(
-      '/refactor/create-member',
-      options: await _authJsonOptions(),
-      data: {
-        'first_name': firstName,
-        'last_name': lastName,
-        'email': email,
-        'phone_no': phone,
-        'national_id': nationalId,
-        'staff_id': staffId,
-        'account_type': accountType,
-      },
-    );
-    final data = _decodeResponse(response);
-    return {
-      'success': data != null,
-      'message': data['message'] ?? 'User created successfully'
-    };
-  } catch (e) {
-    return {'success': false, 'message': e.toString()};
-  }
-}
-
-  // ─── Get All Users (Admin only)
   static Future<Map<String, dynamic>> getAllUsers() async {
-  try {
-    final response = await HttpUtil().get(
-      '/refactor/users',  // ← updated endpoint
-      options: await _authJsonOptions(),
-    );
-    final data = _decodeResponse(response);
-    return {'success': data != null, 'data': data};
-  } catch (e) {
-    return {'success': false, 'data': [], 'message': e.toString()};
+    try {
+      final response = await HttpUtil().get(
+        AppRoutes.getAllUsers,
+        options: await _authJsonOptions(),
+      );
+      final data = _decodeResponse(response);
+      return {'success': data != null, 'data': data};
+    } catch (e) {
+      return {'success': false, 'data': [], 'message': e.toString()};
+    }
   }
-}
 
-  // ─── Delete User (Admin only) 
- static Future<Map<String, dynamic>> deleteUser(
-    int userId, String role) async {
-  try {
-    final response = await HttpUtil().delete(
-      '/refactor/users/$userId',  // ← updated endpoint
-      options: await _authJsonOptions(),
-    );
-    final data = _decodeResponse(response);
-    return {
-      'success': data != null,
-      'message': data['message'] ?? data['detail']
-    };
-  } catch (e) {
-    return {'success': false, 'message': e.toString()};
+  static Future<Map<String, dynamic>> deleteUser(
+      int userId, String role) async {
+    try {
+      final response = await HttpUtil().delete(
+        AppRoutes.deleteUser(userId),
+        options: await _authJsonOptions(),
+      );
+      final data = _decodeResponse(response);
+      return {
+        'success': data != null,
+        'message': data['message'] ?? data['detail']
+      };
+    } catch (e) {
+      return {'success': false, 'message': e.toString()};
+    }
   }
-}
 
-  // ─── Get Profile 
   static Future<Map<String, dynamic>> getProfile(int userId) async {
     try {
       final response = await HttpUtil().get(
-        '/profile/$userId',
+        AppRoutes.getProfile(userId),
         options: await _authJsonOptions(),
       );
       final data = _decodeResponse(response);
@@ -336,25 +312,25 @@ class ApiService {
       return {'success': false, 'data': null, 'message': e.toString()};
     }
   }
-// ─── Get Refactor Me 
-static Future<Map<String, dynamic>> getRefactorMe() async {
-  try {
-    final response = await HttpUtil().get(
-      '/refactor/me',
-      options: await _authJsonOptions(),
-    );
-    final data = _decodeResponse(response);
-    return {'success': data != null, 'data': data};
-  } catch (e) {
-    return {'success': false, 'data': null, 'message': e.toString()};
+
+  static Future<Map<String, dynamic>> getRefactorMe() async {
+    try {
+      final response = await HttpUtil().get(
+        AppRoutes.me,
+        options: await _authJsonOptions(),
+      );
+      final data = _decodeResponse(response);
+      return {'success': data != null, 'data': data};
+    } catch (e) {
+      return {'success': false, 'data': null, 'message': e.toString()};
+    }
   }
-}
-  // ─── Update Profile 
+
   static Future<Map<String, dynamic>> updateProfile(
       int userId, Map<String, dynamic> profileData) async {
     try {
       final response = await HttpUtil().put(
-        '/profile/$userId',
+        AppRoutes.updateProfile(userId),
         options: await _authJsonOptions(),
         data: profileData,
       );
@@ -369,27 +345,25 @@ static Future<Map<String, dynamic>> getRefactorMe() async {
     }
   }
 
-  // ─── Update Personal Settings
-  static Future<Map<String, dynamic>> updatePersonalSettings(
-      int userId, Map<String, dynamic> settings) async {
-    try {
-      final response = await HttpUtil().put(
-        '/profile/personal-settings/$userId',
-        options: await _authJsonOptions(),
-        data: settings,
-      );
-      final data = _decodeResponse(response);
-      return {
-        'success': data != null,
-        'data': data,
-        'message': data['detail'] ?? 'Settings updated successfully'
-      };
-    } catch (e) {
-      return {'success': false, 'message': e.toString()};
-    }
-  }
+  // static Future<Map<String, dynamic>> updatePersonalSettings(
+  //     int userId, Map<String, dynamic> settings) async {
+  //   try {
+  //     final response = await HttpUtil().put(
+  //       ApiEndpoints.personalSettings(userId),
+  //       options: await _authJsonOptions(),
+  //       data: settings,
+  //     );
+  //     final data = _decodeResponse(response);
+  //     return {
+  //       'success': data != null,
+  //       'data': data,
+  //       'message': data['detail'] ?? 'Settings updated successfully'
+  //     };
+  //   } catch (e) {
+  //     return {'success': false, 'message': e.toString()};
+  //   }
+  // }
 
-  // ─── Authenticated GET 
   static Future<Map<String, dynamic>> authenticatedGet(String endpoint) async {
     try {
       final response = await HttpUtil().get(
@@ -403,7 +377,6 @@ static Future<Map<String, dynamic>> getRefactorMe() async {
     }
   }
 
-  // ─── Authenticated POST 
   static Future<Map<String, dynamic>> authenticatedPost(
       String endpoint, Map<String, dynamic> body) async {
     try {
