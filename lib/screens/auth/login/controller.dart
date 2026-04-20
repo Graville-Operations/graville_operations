@@ -13,6 +13,8 @@ import 'package:graville_operations/screens/auth/login/state.dart';
 class LoginController extends GetxController {
   var state = LoginState();
 
+  Key? get formKey => null;
+
   void goToSignUp() {
     Get.toNamed(AppRoutes.signup);
   }

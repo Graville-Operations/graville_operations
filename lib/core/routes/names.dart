@@ -1,7 +1,7 @@
 class AppRoutes {
   static const initial = '/';
   static const application = '/application';
-  //static const login = '/login';
+  static const loginScreen = '/login';
   static const signup = '/signup';
   static const projectDashboard = '/projects/dashboard';
   static const financeDashboard = '/finance/dashboard';
@@ -15,7 +15,6 @@ class AppRoutes {
   static const financeInvoices = '/finance/invoices';
 
   static const menuDepartments = "/departments/menus";
-  static const userDepartment = "/departments/users";
 
   // Base
   static const String baseUrl = 'http://192.168.1.73:8000/api/v1';
