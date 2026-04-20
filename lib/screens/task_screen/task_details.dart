@@ -30,7 +30,6 @@ class TaskDetailScreen extends StatelessWidget {
       backgroundColor: const Color(0xfff5f6fa),
       body: CustomScrollView(
         slivers: [
-          // ── App bar ───────────────────────────────────────────────
           SliverAppBar(
             backgroundColor: Colors.black,
             foregroundColor: Colors.white,
@@ -60,23 +59,19 @@ class TaskDetailScreen extends StatelessWidget {
                   padding: const EdgeInsets.fromLTRB(20, 0, 20, 60),
                   child: Align(
                     alignment: Alignment.bottomLeft,
-                    child: _Badge(
-                      label: _statusLabel,
-                      color: _statusColor,
-                    ),
+                    child: _Badge(label: _statusLabel, color: _statusColor),
                   ),
                 ),
               ),
             ),
           ),
 
-          // ── Body ──────────────────────────────────────────────────
           SliverPadding(
             padding: const EdgeInsets.all(16),
             sliver: SliverList(
               delegate: SliverChildListDelegate([
 
-                // Completion card
+                // ── Completion card ──────────────────────────────
                 _DetailCard(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -88,14 +83,15 @@ class TaskDetailScreen extends StatelessWidget {
                             "Completion",
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
-                              fontSize: 15,
+                              fontSize: 16,
+                              letterSpacing: 0.3,
                             ),
                           ),
                           Text(
                             "${task.completion}%",
                             style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 26,
+                              fontWeight: FontWeight.w900,
+                              fontSize: 30,
                               color: _progressColor,
                             ),
                           ),
@@ -108,8 +104,8 @@ class TaskDetailScreen extends StatelessWidget {
                           value: task.completion / 100,
                           minHeight: 10,
                           backgroundColor: Colors.grey.shade200,
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                              _progressColor),
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(_progressColor),
                         ),
                       ),
                     ],
@@ -118,7 +114,7 @@ class TaskDetailScreen extends StatelessWidget {
 
                 const SizedBox(height: 12),
 
-                // Description
+                // ── Description ──────────────────────────────────
                 if (task.description != null &&
                     task.description!.isNotEmpty) ...[
                   _DetailCard(
@@ -129,7 +125,8 @@ class TaskDetailScreen extends StatelessWidget {
                           "Description",
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            fontSize: 15,
+                            fontSize: 16,
+                            letterSpacing: 0.3,
                           ),
                         ),
                         const SizedBox(height: 10),
@@ -147,7 +144,7 @@ class TaskDetailScreen extends StatelessWidget {
                   const SizedBox(height: 12),
                 ],
 
-                // Details
+                // ── Details card ─────────────────────────────────
                 _DetailCard(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -156,38 +153,137 @@ class TaskDetailScreen extends StatelessWidget {
                         "Details",
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          fontSize: 15,
+                          fontSize: 16,
+                          letterSpacing: 0.3,
                         ),
                       ),
                       const SizedBox(height: 12),
+
                       _InfoRow(
-                        icon: Icons.tag,
+                        icon: Icons.confirmation_number_outlined,
                         label: "Task ID",
-                        value: "#${task.id}",
+                        value: "${task.id}",
+                        boldValue: true,
                       ),
                       const Divider(height: 20),
-                      _InfoRow(
-                        icon: Icons.people_outline,
-                        label: "Assigned To",
-                        value: task.assignedTo.isEmpty
-                            ? "—"
-                            : "${task.assignedTo.length} worker${task.assignedTo.length == 1 ? '' : 's'}",
-                      ),
-                      if (task.fieldOperatorId != null) ...[
-                        const Divider(height: 20),
-                        _InfoRow(
-                          icon: Icons.engineering_outlined,
-                          label: "Field Operator",
-                          value: "ID ${task.fieldOperatorId}",
-                        ),
-                      ],
-                      const Divider(height: 20),
+
+                      // Created date
                       _InfoRow(
                         icon: Icons.access_time_outlined,
                         label: "Created",
                         value:
                             "${task.createdAt.day}/${task.createdAt.month}/${task.createdAt.year}",
+                        boldValue: true,
                       ),
+
+                      // Field Operator
+                      if (task.fieldOperator != null) ...[
+                        const Divider(height: 20),
+                        _InfoRow(
+                          icon: Icons.engineering_outlined,
+                          label: "Field Operator",
+                          value: task.fieldOperator!.fullName,
+                          boldValue: true,
+                        ),
+                      ],
+
+                      // Assigned Workers
+                      const Divider(height: 20),
+                      Row(
+                        children: [
+                          const Icon(Icons.people_outline,
+                              size: 18, color: Colors.grey),
+                          const SizedBox(width: 10),
+                          const Text(
+                            "Assigned To",
+                            style: TextStyle(
+                              color: Colors.grey,
+                              fontSize: 13,
+                            ),
+                          ),
+                          const Spacer(),
+                          Text(
+                            "${task.assignedTo.length} worker${task.assignedTo.length == 1 ? '' : 's'}",
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 13,
+                              color: Color(0xff5b7cfa),
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      if (task.assignedTo.isNotEmpty) ...[
+                        const SizedBox(height: 12),
+                        ...task.assignedTo.map(
+                          (w) => Padding(
+                            padding: const EdgeInsets.only(bottom: 10),
+                            child: Row(
+                              children: [
+                                CircleAvatar(
+                                  radius: 18,
+                                  backgroundColor: const Color(0xff5b7cfa)
+                                      .withOpacity(0.12),
+                                  child: Text(
+                                    w.firstName.isNotEmpty
+                                        ? w.firstName[0].toUpperCase()
+                                        : '?',
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                      color: Color(0xff5b7cfa),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        w.fullName,
+                                        style: const TextStyle(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.bold, // ← name bolded
+                                        ),
+                                      ),
+                                      const SizedBox(height: 2),
+                                      Text(
+                                        w.skillType,
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                          color: Colors.grey.shade500,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 10, vertical: 4),
+                                  decoration: BoxDecoration(
+                                    color: w.skillType.toLowerCase() == 'skilled'
+                                        ? const Color(0xff1db954).withOpacity(0.1)
+                                        : Colors.orange.withOpacity(0.1),
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Text(
+                                    w.skillType,
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w600, // ← skill badge bolded
+                                      color: w.skillType.toLowerCase() == 'skilled'
+                                          ? const Color(0xff1db954)
+                                          : Colors.orange,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
                     ],
                   ),
                 ),
@@ -202,7 +298,7 @@ class TaskDetailScreen extends StatelessWidget {
   }
 }
 
-// ── Shared sub-widgets ───────────────────────────────────────────────────────
+// ── Shared sub-widgets ──────────────────────────────────────────────────────
 
 class _Badge extends StatelessWidget {
   final String label;
@@ -259,10 +355,13 @@ class _InfoRow extends StatelessWidget {
   final IconData icon;
   final String label;
   final String value;
+  final bool boldValue;
+
   const _InfoRow({
     required this.icon,
     required this.label,
     required this.value,
+    this.boldValue = false,
   });
 
   @override
@@ -271,13 +370,15 @@ class _InfoRow extends StatelessWidget {
       children: [
         Icon(icon, size: 18, color: Colors.grey),
         const SizedBox(width: 10),
-        Text(label,
-            style: const TextStyle(color: Colors.grey, fontSize: 13)),
+        Text(
+          label,
+          style: const TextStyle(color: Colors.grey, fontSize: 13),
+        ),
         const Spacer(),
         Text(
           value,
-          style: const TextStyle(
-            fontWeight: FontWeight.w600,
+          style: TextStyle(
+            fontWeight: boldValue ? FontWeight.bold : FontWeight.w500,
             fontSize: 13,
           ),
         ),

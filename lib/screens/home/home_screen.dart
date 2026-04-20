@@ -41,9 +41,13 @@ String? _tasksError;
   bool _statsLoading = true;
   
   
-  get _homeTasks => null;
-  
-  get _overallCompletion => null;
+ List<TaskResponse> get _homeTasks => _recentTasks.take(5).toList();
+
+double get _overallCompletion {
+  if (_recentTasks.isEmpty) return 0.0;
+  final total = _recentTasks.fold<int>(0, (sum, t) => sum + t.completion);
+  return total / (_recentTasks.length * 100);
+}
 
   
 
@@ -595,6 +599,7 @@ void initState() {
   setState(() { _tasksLoading = true; _tasksError = null; });
   try {
     final tasks = await TaskApi.getAllTasks();
+    print('✅ Loaded ${tasks.length} tasks');
     tasks.sort((a, b) {
       int order(TaskResponse t) {
         if (t.completion > 0 && t.completion < 100) return 0;
@@ -606,6 +611,7 @@ void initState() {
     if (!mounted) return;
     setState(() { _recentTasks = tasks; _tasksLoading = false; });
   } catch (e) {
+    print('❌ Task error: $e');
     if (!mounted) return;
     setState(() { _tasksError = e.toString(); _tasksLoading = false; });
   }
