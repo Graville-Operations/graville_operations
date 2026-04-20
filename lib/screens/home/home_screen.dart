@@ -4,11 +4,15 @@ import 'package:graville_operations/core/commons/assets/images.dart';
 import 'package:graville_operations/core/commons/widgets/progress_bar.dart';
 import 'package:graville_operations/core/commons/widgets/section_card.dart';
 import 'package:graville_operations/core/commons/widgets/stat_card.dart';
+import 'package:graville_operations/core/remote/api/task_api.dart';
+import 'package:graville_operations/core/remote/dto/response/create_task.dart';
 import 'package:graville_operations/screens/material/receive_material.dart';
 import 'package:graville_operations/screens/material/transfer_material.dart';
 import 'package:graville_operations/screens/sites/site_list/sites_list.dart';
 import 'package:graville_operations/screens/store/add_material.dart';
 import 'package:graville_operations/screens/store/update_inventory.dart';
+import 'package:graville_operations/screens/task_screen/alltasks.dart';
+import 'package:graville_operations/screens/task_screen/task_details.dart';
 import 'package:graville_operations/screens/task_screen/task_screen.dart';
 import 'package:graville_operations/screens/workers/add_worker_screen.dart';
 import 'package:graville_operations/screens/workers/all_workers_screen.dart';
@@ -27,16 +31,28 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   bool _isFabOpen = false;
 
+List<TaskResponse> _recentTasks = [];
+bool _tasksLoading = true;
+String? _tasksError;
+
  
   int _totalWorkers = 0;
   int _presentToday = 0;
   bool _statsLoading = true;
+  
+  
+  get _homeTasks => null;
+  
+  get _overallCompletion => null;
+
+  
 
   @override
-  void initState() {
-    super.initState();
-    _loadStats();
-  }
+void initState() {
+  super.initState();
+  _loadStats();
+  _loadTasks(); // ← add this
+}
 
   Future<void> _loadStats() async {
     setState(() => _statsLoading = true);
@@ -329,39 +345,191 @@ class _HomeScreenState extends State<HomeScreen> {
 
                 // Task progress section
                 const SizedBox(height: 15),
-                SectionCard(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+               SectionCard(
+  child: Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      // Header
+      Row(
+        children: [
+          const Icon(Icons.task, size: 18),
+          const SizedBox(width: 8),
+          const Text("Task Progress",
+              style: TextStyle(fontWeight: FontWeight.bold)),
+          const Spacer(),
+          if (!_tasksLoading && _recentTasks.length > 5)
+            GestureDetector(
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const AllTasksScreen()),
+              ),
+              child: const Text("View All",
+                  style: TextStyle(
+                    color: Color(0xff5b7cfa),
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  )),
+            ),
+        ],
+      ),
+      const SizedBox(height: 15),
+ 
+      // Loading state
+      if (_tasksLoading)
+        ...List.generate(3, (_) => Padding(
+          padding: const EdgeInsets.only(bottom: 12),
+          child: Container(
+            height: 40,
+            decoration: BoxDecoration(
+              color: Colors.grey.shade200,
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+        ))
+ 
+      // Error state
+      else if (_tasksError != null)
+        Row(
+          children: [
+            const Text("Failed to load",
+                style: TextStyle(color: Colors.grey, fontSize: 12)),
+            TextButton(
+              onPressed: _loadTasks,
+              child: const Text("Retry",
+                  style: TextStyle(
+                      color: Color(0xff5b7cfa), fontSize: 12)),
+            ),
+          ],
+        )
+ 
+      // Empty state
+      else if (_recentTasks.isEmpty)
+        const Padding(
+          padding: EdgeInsets.symmetric(vertical: 12),
+          child: Center(
+            child: Text("No tasks yet",
+                style: TextStyle(color: Colors.grey)),
+          ),
+        )
+ 
+      // Tasks list (max 5 shown inline, tappable rows)
+      else ...[
+        // Overall completion bar
+        Row(
+          children: [
+            const Text("Overall",
+                style: TextStyle(fontSize: 12, color: Colors.grey)),
+            const Spacer(),
+            Text(
+              "${(_overallCompletion * 100).round()}%",
+              style: const TextStyle(
+                  fontSize: 12, fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
+        const SizedBox(height: 6),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(4),
+          child: LinearProgressIndicator(
+            value: _overallCompletion,
+            minHeight: 6,
+            backgroundColor: Colors.grey.shade200,
+            valueColor:
+                const AlwaysStoppedAnimation<Color>(Color(0xff5b7cfa)),
+          ),
+        ),
+        const SizedBox(height: 16),
+        const Divider(),
+        const SizedBox(height: 8),
+ 
+        // Individual task rows (compact, tappable)
+        ..._homeTasks.map((task) {
+          final color = task.completion >= 100
+              ? const Color(0xff1db954)
+              : task.completion >= 60
+                  ? Colors.orange
+                  : const Color(0xff5b7cfa);
+          return GestureDetector(
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => TaskDetailScreen(task: task),
+              ),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 14),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
                     children: [
-                      const Row(
-                        children: [
-                          Icon(Icons.task, size: 18),
-                          SizedBox(width: 8),
-                          Text(
-                            "Task Progress",
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                        ],
+                      Expanded(
+                        child: Text(
+                          task.title,
+                          style: const TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w500),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
-                      const SizedBox(height: 15),
-                      TaskProgress(
-                        title: "Foundation",
-                        percent: 1.0,
-                        color: Colors.green,
+                      const SizedBox(width: 8),
+                      Text(
+                        "${task.completion}%",
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: color,
+                        ),
                       ),
-                      TaskProgress(
-                        title: "Framing",
-                        percent: 0.75,
-                        color: Colors.orange,
-                      ),
-                      TaskProgress(
-                        title: "Electrical",
-                        percent: 0.45,
-                        color: Colors.blue,
-                      ),
+                      const Icon(Icons.chevron_right,
+                          size: 14, color: Colors.grey),
                     ],
                   ),
+                  const SizedBox(height: 6),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(4),
+                    child: LinearProgressIndicator(
+                      value: task.completion / 100,
+                      minHeight: 5,
+                      backgroundColor: Colors.grey.shade100,
+                      valueColor:
+                          AlwaysStoppedAnimation<Color>(color),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }),
+ 
+        // "View all" footer
+        if (_recentTasks.length > 5)
+          GestureDetector(
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute(
+                  builder: (_) => const AllTasksScreen()),
+            ),
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade50,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Text(
+                "View all ${_recentTasks.length} tasks →",
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: Color(0xff5b7cfa),
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
                 ),
+              ),
+            ),
+          ),
+      ],
+    ],
+  ),
+),
 
                 // Reviews
                 const SizedBox(height: 20),
@@ -422,6 +590,26 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
+  
+ Future<void> _loadTasks() async {
+  setState(() { _tasksLoading = true; _tasksError = null; });
+  try {
+    final tasks = await TaskApi.getAllTasks();
+    tasks.sort((a, b) {
+      int order(TaskResponse t) {
+        if (t.completion > 0 && t.completion < 100) return 0;
+        if (t.completion == 0) return 1;
+        return 2;
+      }
+      return order(a).compareTo(order(b));
+    });
+    if (!mounted) return;
+    setState(() { _recentTasks = tasks; _tasksLoading = false; });
+  } catch (e) {
+    if (!mounted) return;
+    setState(() { _tasksError = e.toString(); _tasksLoading = false; });
+  }
+}
 }
 
 class _StatShimmer extends StatelessWidget {
