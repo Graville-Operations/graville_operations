@@ -50,7 +50,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
     super.dispose();
   }
 
-  // ─── Data Methods ─────────────────────────────────────────────────────────
+  // ─── Data Methods 
 
   void _loadUserInfo() async {
     final userId = await ApiService.getUserId();
@@ -229,7 +229,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
     );
   }
 
-  // ─── Private Builder Methods ───────────────────────────────────────────────
+  // ─── Private Builder Methods 
 
   Widget _buildOperatorInfo() {
     return Container(
@@ -657,7 +657,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
     );
   }
 
-  // ─── Build ─────────────────────────────────────────────────────────────────
+  // ─── Build 
 
   @override
   Widget build(BuildContext context) {
@@ -815,7 +815,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
   }
 }
 
-// ─── Add Item Dialog ───────────────────────────────────────────────────────────
+// ─── Add Item Dialog 
 
 class _AddItemDialog extends StatefulWidget {
   final Map<String, dynamic>? existingItem;
@@ -1045,7 +1045,7 @@ class _AddItemDialogState extends State<_AddItemDialog> {
   }
 }
 
-// ─── Section Label ─────────────────────────────────────────────────────────────
+// ─── Section Label 
 
 class _SectionLabel extends StatelessWidget {
   final String label;
@@ -1077,7 +1077,7 @@ class _SectionLabel extends StatelessWidget {
   }
 }
 
-// ─── Form Field ────────────────────────────────────────────────────────────────
+// ─── Form Field
 
 class _FormField extends StatelessWidget {
   final TextEditingController controller;

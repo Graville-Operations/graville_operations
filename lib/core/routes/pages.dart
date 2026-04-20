@@ -14,6 +14,8 @@ import 'package:graville_operations/screens/projects/dashboard/assign_user_scree
 import 'package:graville_operations/screens/projects/dashboard/binding.dart';
 import 'package:graville_operations/screens/projects/dashboard/view.dart';
 import 'package:graville_operations/screens/sites/create/view.dart';
+import 'package:graville_operations/screens/menus/binding.dart';
+
 import 'routes.dart';
 
 class AppPages {
@@ -31,6 +33,7 @@ class AppPages {
       .toList();
 
   static final List<GetPage> _rawRoutes = [
+   // GetPage(name: AppRoutes.initial, page: () => const LoginScreen(), binding: LoginBindings()),
     GetPage(
       name: AppRoutes.initial,
       page: () => const LoginScreen(),
@@ -42,7 +45,7 @@ class AppPages {
       binding: ApplicationBindings(),
     ),
     GetPage(
-        name: AppRoutes.userDepartment, page: () => AssignUserToGroupScreen()),
+        name: AppRoutes.userDepartment, page: () => AssignUserToGroupScreen(),),
     GetPage(
       name: AppRoutes.projectDashboard,
       page: () => ProjectDashboardScreen(),
@@ -75,6 +78,7 @@ class AppPages {
     GetPage(
       name: AppRoutes.menuDepartments,
       page: () => const MenusScreen(),
+       binding: MenusBinding(),
     )
   ];
 }

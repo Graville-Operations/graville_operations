@@ -115,7 +115,7 @@ class ApiService {
       String email, String password) async {
     try {
       final response = await HttpUtil().post(
-        AppRoutes.login,
+        AppRoutes.loginScreen,
         options: _jsonOptions(),
         data: {'email': email, 'password': password},
       );
