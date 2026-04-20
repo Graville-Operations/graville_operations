@@ -28,7 +28,7 @@ class _SplashScreenState extends State<SplashScreen> {
   await StorageService.to.remove(userMenus);
   await StorageService.to.remove(menuTokenKey);
 
-  Get.offAllNamed(AppRoutes.login);
+  Get.offAllNamed(AppRoutes.loginScreen);
 }
 
   @override
