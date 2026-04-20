@@ -6,6 +6,7 @@ import 'package:graville_operations/core/local/entities/user_data.dart';
 import 'package:graville_operations/core/local/store/storage_service.dart';
 import 'package:graville_operations/core/local/store/values.dart';
 import 'package:graville_operations/core/routes/names.dart';
+import 'package:graville_operations/models/auth/user.dart';
 
 class UserStore extends GetxController {
   // int userId = 12;
@@ -33,7 +34,6 @@ class UserStore extends GetxController {
     super.onInit();
     token = StorageService.to.getString(storageUserTokenKey);
     var profileOffline = StorageService.to.getString(storageUserProfileKey);
-    print("profileOffline: $profileOffline");
     if (profileOffline.isNotEmpty) {
       _isLogin.value = true;
       _profile(UserData.fromJson(jsonDecode(profileOffline)));
@@ -48,9 +48,12 @@ class UserStore extends GetxController {
   }
 
   // get profile
-  Future<String> getProfile() async {
-    if (token.isEmpty) return "";
-    return StorageService.to.getString(storageUserProfileKey);
+  Future<User> getProfile() async {
+    if (token.isEmpty) return User.empty();
+    final String userData = StorageService.to.getString(storageUserProfileKey);
+    var decoded = jsonDecode(userData);
+    print("Get profile data returns this object : "+decoded.toString());
+    return User.fromJson(decoded);
   }
 
   // saving profile
@@ -66,13 +69,11 @@ class UserStore extends GetxController {
     await StorageService.to.remove(storageUserProfileKey);
     _isLogin.value = false;
     token = '';
-    print('... deleted the data from local storage');
-    Get.offAllNamed(AppRoutes.login);
+    Get.offAllNamed(AppRoutes.loginScreen);
   }
   Future<void> saveMenusIfNeeded(List<MenuItem> menus, String currentToken) async {
     final savedToken = StorageService.to.getString(menuTokenKey);
     if (savedToken == currentToken && getMenus().isNotEmpty) {
-      debugPrint("...... menus already up to date, skipping save");
       return;
     }
     await saveMenus(menus, currentToken);
@@ -81,15 +82,21 @@ class UserStore extends GetxController {
     final encoded = jsonEncode(menus.map((m) => m.toJson()).toList());
     await StorageService.to.setString(userMenus, encoded);
     await StorageService.to.setString(menuTokenKey, currentToken);
-    debugPrint("...... menus saved successfully");
   }
 
   List<MenuItem> getMenus() {
-    final raw = StorageService.to.getString(userMenus);
-    if (raw.isEmpty) return [];
+    final rawMenus = StorageService.to.getString(userMenus);
+    final storedMenuToken = StorageService.to.getString(menuTokenKey);
+    if (rawMenus.isEmpty || storedMenuToken.isEmpty) {
+      return [];
+    }
+    if (storedMenuToken != token) {
+      clearMenus();
+      return [];
+    }
 
     try {
-      final List<dynamic> decoded = jsonDecode(raw);
+      final List<dynamic> decoded = jsonDecode(rawMenus);
       return decoded.map((menus) => MenuItem.fromJson(menus)).toList();
     } catch (e) {
       debugPrint("...... error reading menus $e");
@@ -103,5 +110,13 @@ class UserStore extends GetxController {
 
   static Future<void> updateMenu()async{
 
+  }
+
+  Map<String, String>? getAuthorizationHeader() {
+    if (hasToken) {
+      final token = UserStore.to.token;
+      return {'Authorization': 'Bearer $token'};
+    }
+    return null;
   }
 }

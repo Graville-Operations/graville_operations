@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:graville_operations/core/commons/widgets/custom_button.dart';
+import 'package:graville_operations/core/commons/widgets/custom_image_picker.dart';
+import 'package:graville_operations/core/commons/widgets/custom_text_input.dart';
+import 'package:graville_operations/core/commons/widgets/sections/destination_info.dart';
+import 'package:graville_operations/core/commons/widgets/sections/form_section.dart';
+import 'package:graville_operations/core/commons/widgets/sections/material_info_section.dart';
+import 'package:graville_operations/core/commons/widgets/sections/transport_info.dart';
 import 'package:graville_operations/models/material/app_material.dart';
 import 'package:graville_operations/models/material/destination_site.dart';
 import 'package:graville_operations/models/material/transport_mode.dart';
-import 'package:graville_operations/screens/commons/widgets/custom_image_picker.dart';
-import 'package:graville_operations/screens/commons/widgets/sections/destination_info.dart';
-import 'package:graville_operations/screens/commons/widgets/sections/material_info_section.dart';
-import 'package:graville_operations/screens/commons/widgets/custom_button.dart';
-import 'package:graville_operations/screens/commons/widgets/custom_text_input.dart';
-import 'package:graville_operations/screens/commons/widgets/sections/form_section.dart';
-import 'package:graville_operations/screens/commons/widgets/sections/transport_info.dart';
 
 class TransferMaterialScreen extends StatefulWidget {
   const TransferMaterialScreen({super.key});

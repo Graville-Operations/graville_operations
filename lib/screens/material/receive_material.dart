@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:graville_operations/core/commons/widgets/custom_button.dart';
+import 'package:graville_operations/core/commons/widgets/custom_image_picker.dart';
+import 'package:graville_operations/core/commons/widgets/sections/material_info_section.dart';
+import 'package:graville_operations/core/commons/widgets/sections/material_payment_section.dart';
+import 'package:graville_operations/core/commons/widgets/sections/material_quantity_section.dart';
 import 'package:graville_operations/models/material/app_material.dart';
-import 'package:graville_operations/screens/commons/widgets/custom_image_picker.dart';
-import 'package:graville_operations/screens/commons/widgets/sections/material_info_section.dart';
-import 'package:graville_operations/screens/commons/widgets/sections/material_quantity_section.dart';
-import 'package:graville_operations/screens/commons/widgets/sections/material_payment_section.dart';
-import 'package:graville_operations/screens/commons/widgets/custom_button.dart';
 
 class ReceiveMaterialScreen extends StatefulWidget {
   const ReceiveMaterialScreen({super.key});

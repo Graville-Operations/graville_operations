@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:graville_operations/core/commons/widgets/custom_image_picker.dart';
+import 'package:graville_operations/core/commons/widgets/custom_text_input.dart';
 import 'package:graville_operations/models/worker_model.dart';
-import 'package:graville_operations/screens/commons/widgets/custom_image_picker.dart';
-import 'package:graville_operations/screens/commons/widgets/custom_text_input.dart';
 import 'package:graville_operations/services/worker_service.dart';
 
 class AddWorkerScreen extends StatefulWidget {
