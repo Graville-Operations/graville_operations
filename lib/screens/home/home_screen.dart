@@ -154,7 +154,9 @@ void initState() {
               message: "Create task",
               child: miniFab(
                 Icons.add,
-                () => context.push(const CreateTaskScreen()),
+                () => Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const CreateTaskScreen()),
+                ).then((_) => _loadTasks()),
               ),
             ),
             const SizedBox(height: 12),
@@ -326,16 +328,36 @@ void initState() {
                                 child: Stack(
                                   alignment: Alignment.center,
                                   children: [
+                                    Builder(builder: (_) {
+                             final avg = _tasksLoading || _recentTasks.isEmpty  ? 0.0
+                                  : _recentTasks.fold<int>(0, (sum, t) => sum + t.completion) /
+                                     _recentTasks.length;
+                              final display = avg.round();
+                                 return Stack(
+                                  alignment: Alignment.center,
+                                  children: [
                                     CircularProgressIndicator(
-                                      value: 0.68,
+                                      value: avg / 100,
                                       strokeWidth: 8,
-                                      color: Colors.orange,
+                                      color: avg >= 100
+                                          ? const Color(0xff1db954)
+                                          : avg >= 60
+                                              ? Colors.orange
+                                              : const Color(0xff5b7cfa),
                                       backgroundColor: Colors.grey.shade300,
                                     ),
-                                    const Text(
-                                      "68%",
-                                      style: TextStyle(fontWeight: FontWeight.bold),
-                                    ),
+                                    _tasksLoading
+                                        ? const SizedBox(
+                                            width: 16, height: 16,
+                                            child: CircularProgressIndicator(strokeWidth: 2),
+                                          )
+                                        : Text(
+                                            "$display%",
+                                            style: const TextStyle(fontWeight: FontWeight.bold),
+                                          ),
+                                  ],
+                                );
+                              }),
                                   ],
                                 ),
                               ),
@@ -350,190 +372,190 @@ void initState() {
                 // Task progress section
                 const SizedBox(height: 15),
                SectionCard(
-  child: Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      // Header
-      Row(
-        children: [
-          const Icon(Icons.task, size: 18),
-          const SizedBox(width: 8),
-          const Text("Task Progress",
-              style: TextStyle(fontWeight: FontWeight.bold)),
-          const Spacer(),
-          if (!_tasksLoading && _recentTasks.length > 5)
-            GestureDetector(
-              onTap: () => Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => const AllTasksScreen()),
-              ),
-              child: const Text("View All",
-                  style: TextStyle(
-                    color: Color(0xff5b7cfa),
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                  )),
-            ),
-        ],
-      ),
-      const SizedBox(height: 15),
- 
-      // Loading state
-      if (_tasksLoading)
-        ...List.generate(3, (_) => Padding(
-          padding: const EdgeInsets.only(bottom: 12),
-          child: Container(
-            height: 40,
-            decoration: BoxDecoration(
-              color: Colors.grey.shade200,
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
-        ))
- 
-      // Error state
-      else if (_tasksError != null)
-        Row(
-          children: [
-            const Text("Failed to load",
-                style: TextStyle(color: Colors.grey, fontSize: 12)),
-            TextButton(
-              onPressed: _loadTasks,
-              child: const Text("Retry",
-                  style: TextStyle(
-                      color: Color(0xff5b7cfa), fontSize: 12)),
-            ),
-          ],
-        )
- 
-      // Empty state
-      else if (_recentTasks.isEmpty)
-        const Padding(
-          padding: EdgeInsets.symmetric(vertical: 12),
-          child: Center(
-            child: Text("No tasks yet",
-                style: TextStyle(color: Colors.grey)),
-          ),
-        )
- 
-      // Tasks list (max 5 shown inline, tappable rows)
-      else ...[
-        // Overall completion bar
-        Row(
-          children: [
-            const Text("Overall",
-                style: TextStyle(fontSize: 12, color: Colors.grey)),
-            const Spacer(),
-            Text(
-              "${(_overallCompletion * 100).round()}%",
-              style: const TextStyle(
-                  fontSize: 12, fontWeight: FontWeight.bold),
-            ),
-          ],
-        ),
-        const SizedBox(height: 6),
-        ClipRRect(
-          borderRadius: BorderRadius.circular(4),
-          child: LinearProgressIndicator(
-            value: _overallCompletion,
-            minHeight: 6,
-            backgroundColor: Colors.grey.shade200,
-            valueColor:
-                const AlwaysStoppedAnimation<Color>(Color(0xff5b7cfa)),
-          ),
-        ),
-        const SizedBox(height: 16),
-        const Divider(),
-        const SizedBox(height: 8),
- 
-        // Individual task rows (compact, tappable)
-        ..._homeTasks.map((task) {
-          final color = task.completion >= 100
-              ? const Color(0xff1db954)
-              : task.completion >= 60
-                  ? Colors.orange
-                  : const Color(0xff5b7cfa);
-          return GestureDetector(
-            onTap: () => Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (_) => TaskDetailScreen(task: task),
-              ),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.only(bottom: 14),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          task.title,
-                          style: const TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w500),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        "${task.completion}%",
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                          color: color,
-                        ),
-                      ),
-                      const Icon(Icons.chevron_right,
-                          size: 14, color: Colors.grey),
-                    ],
-                  ),
-                  const SizedBox(height: 6),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(4),
-                    child: LinearProgressIndicator(
-                      value: task.completion / 100,
-                      minHeight: 5,
-                      backgroundColor: Colors.grey.shade100,
-                      valueColor:
-                          AlwaysStoppedAnimation<Color>(color),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Header
+                    Row(
+                      children: [
+                        const Icon(Icons.task, size: 18),
+                        const SizedBox(width: 8),
+                        const Text("Task Progress",
+                            style: TextStyle(fontWeight: FontWeight.bold)),
+                        const Spacer(),
+                        if (!_tasksLoading && _recentTasks.length > 5)
+                          GestureDetector(
+                            onTap: () => Navigator.of(context).push(
+                                MaterialPageRoute(builder: (_) => const AllTasksScreen()),
+                              ).then((_) => _loadTasks()),
+                            child: const Text("View All",
+                                style: TextStyle(
+                                  color: Color(0xff5b7cfa),
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                )),
+                          ),
+                      ],
                     ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        }),
- 
-        // "View all" footer
-        if (_recentTasks.length > 5)
-          GestureDetector(
-            onTap: () => Navigator.of(context).push(
-              MaterialPageRoute(
-                  builder: (_) => const AllTasksScreen()),
-            ),
-            child: Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(vertical: 10),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade50,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Text(
-                "View all ${_recentTasks.length} tasks →",
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  color: Color(0xff5b7cfa),
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
+                    const SizedBox(height: 15),
+              
+                    // Loading state
+                    if (_tasksLoading)
+                      ...List.generate(3, (_) => Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: Container(
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade200,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      ))
+              
+                    // Error state
+                    else if (_tasksError != null)
+                      Row(
+                        children: [
+                          const Text("Failed to load",
+                              style: TextStyle(color: Colors.grey, fontSize: 12)),
+                          TextButton(
+                            onPressed: _loadTasks,
+                            child: const Text("Retry",
+                                style: TextStyle(
+                                    color: Color(0xff5b7cfa), fontSize: 12)),
+                          ),
+                        ],
+                      )
+              
+                    // Empty state
+                    else if (_recentTasks.isEmpty)
+                      const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 12),
+                        child: Center(
+                          child: Text("No tasks yet",
+                              style: TextStyle(color: Colors.grey)),
+                        ),
+                      )
+              
+                    // Tasks list (max 5 shown inline, tappable rows)
+                    else ...[
+                      // Overall completion bar
+                      Row(
+                        children: [
+                          const Text("Overall",
+                              style: TextStyle(fontSize: 12, color: Colors.grey)),
+                          const Spacer(),
+                          Text(
+                            "${(_overallCompletion * 100).round()}%",
+                            style: const TextStyle(
+                                fontSize: 12, fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 6),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(4),
+                        child: LinearProgressIndicator(
+                          value: _overallCompletion,
+                          minHeight: 6,
+                          backgroundColor: Colors.grey.shade200,
+                          valueColor:
+                              const AlwaysStoppedAnimation<Color>(Color(0xff5b7cfa)),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      const Divider(),
+                      const SizedBox(height: 8),
+              
+                      // Individual task rows (compact, tappable)
+                      ..._homeTasks.map((task) {
+                        final color = task.completion >= 100
+                            ? const Color(0xff1db954)
+                            : task.completion >= 60
+                                ? Colors.orange
+                                : const Color(0xff5b7cfa);
+                        return GestureDetector(
+                          onTap: () => Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => TaskDetailScreen(task: task),
+                            ),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.only(bottom: 14),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        task.title,
+                                        style: const TextStyle(
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.w500),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      "${task.completion}%",
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold,
+                                        color: color,
+                                      ),
+                                    ),
+                                    const Icon(Icons.chevron_right,
+                                        size: 14, color: Colors.grey),
+                                  ],
+                                ),
+                                const SizedBox(height: 6),
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(4),
+                                  child: LinearProgressIndicator(
+                                    value: task.completion / 100,
+                                    minHeight: 5,
+                                    backgroundColor: Colors.grey.shade100,
+                                    valueColor:
+                                        AlwaysStoppedAnimation<Color>(color),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      }),
+              
+                      // "View all" footer
+                      if (_recentTasks.length > 5)
+                        GestureDetector(
+                          onTap: () => Navigator.of(context).push(
+                            MaterialPageRoute(
+                                builder: (_) => const AllTasksScreen()),
+                          ),
+                          child: Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade50,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Text(
+                              "View all ${_recentTasks.length} tasks →",
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                color: Color(0xff5b7cfa),
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
+                  ],
                 ),
               ),
-            ),
-          ),
-      ],
-    ],
-  ),
-),
 
                 // Reviews
                 const SizedBox(height: 20),
@@ -611,7 +633,7 @@ void initState() {
     if (!mounted) return;
     setState(() { _recentTasks = tasks; _tasksLoading = false; });
   } catch (e) {
-    print('❌ Task error: $e');
+    print('❌ Load error: $e');
     if (!mounted) return;
     setState(() { _tasksError = e.toString(); _tasksLoading = false; });
   }
