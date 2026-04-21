@@ -1,49 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:graville_operations/models/dashboard/dashboard_model.dart';
+import 'package:graville_operations/models/site/site_model.dart';
+import 'package:graville_operations/screens/material/hired_materials.dart';
+import 'package:graville_operations/screens/projects/dashboard/controller.dart';
 import 'package:graville_operations/screens/projects/dashboard/details/dashboard_details_screen.dart';
 
-class ProjectDashboardScreen extends StatefulWidget {
+class ProjectDashboardScreen extends GetView<ProjectDashboardController> {
   const ProjectDashboardScreen({super.key});
 
   @override
-  State<ProjectDashboardScreen> createState() => _ProjectDashboardScreenState();
-}
-
-class _ProjectDashboardScreenState extends State<ProjectDashboardScreen> {
-  String _filter = 'All';
-  String _search = '';
-  final TextEditingController _searchController = TextEditingController();
-
-  final List<String> _filters = ['All', 'Ongoing', 'Completed', 'Paused'];
-
-  List<DashboardModel> get _filtered {
-    return sampleDashboards.where((s) {
-      final matchFilter =
-          _filter == 'All' || s.status.toLowerCase() == _filter.toLowerCase();
-      final q = _search.toLowerCase();
-      final matchSearch = q.isEmpty ||
-          s.name.toLowerCase().contains(q) ||
-          s.location.toLowerCase().contains(q) ||
-          s.procuringEntity.toLowerCase().contains(q);
-      return matchFilter && matchSearch;
-    }).toList();
-  }
-
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final sites = _filtered;
-    final total = sampleDashboards.length;
-    final ongoing = sampleDashboards.where((s) => s.status == 'Ongoing').length;
-    final completed =
-        sampleDashboards.where((s) => s.status == 'Completed').length;
-    final paused = sampleDashboards.where((s) => s.status == 'Paused').length;
-
     return Scaffold(
       backgroundColor: const Color(0xFFF4F3EF),
       appBar: AppBar(
@@ -65,174 +32,183 @@ class _ProjectDashboardScreenState extends State<ProjectDashboardScreen> {
           ),
         ),
       ),
-      body: CustomScrollView(
-        slivers: [
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Construction Sites',
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w700,
-                      color: Color(0xFF0F1117),
-                      letterSpacing: -0.4,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  const Text(
-                    'Overview of all active and completed projects',
-                    style: TextStyle(fontSize: 13, color: Color(0xFF7A7E8E)),
-                  ),
-                  const SizedBox(height: 16),
-                  SizedBox(
-                    height: 82,
-                    child: ListView(
-                      scrollDirection: Axis.horizontal,
+      body: Obx((){
+        if (controller.state.fetchingProjects.value) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        final projects = controller.filteredProjects;
+          return CustomScrollView(
+              slivers: [
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _MetricCard(
-                            label: 'Total Sites',
-                            value: '$total',
-                            color: const Color(0xFF0F1117)),
-                        const SizedBox(width: 10),
-                        _MetricCard(
-                            label: 'Ongoing',
-                            value: '$ongoing',
-                            color: const Color(0xFFD97706)),
-                        const SizedBox(width: 10),
-                        _MetricCard(
-                            label: 'Completed',
-                            value: '$completed',
-                            color: const Color(0xFF1A9E5C)),
-                        const SizedBox(width: 10),
-                        _MetricCard(
-                            label: 'Paused',
-                            value: '$paused',
-                            color: const Color(0xFFDC2626)),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 14),
-                  Container(
-                    height: 42,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: Colors.black.withOpacity(0.1)),
-                    ),
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.search,
-                            size: 18, color: Color(0xFF7A7E8E)),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: TextField(
-                            controller: _searchController,
-                            onChanged: (v) => setState(() => _search = v),
-                            style: const TextStyle(
-                                fontSize: 13, color: Color(0xFF0F1117)),
-                            decoration: const InputDecoration(
-                              hintText: 'Search sites or entities…',
-                              hintStyle: TextStyle(
-                                  fontSize: 13, color: Color(0xFF7A7E8E)),
-                              border: InputBorder.none,
-                              isDense: true,
-                              contentPadding: EdgeInsets.zero,
-                            ),
+                        const Text(
+                          'Construction Sites',
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.w700,
+                            color: Color(0xFF0F1117),
+                            letterSpacing: -0.4,
                           ),
                         ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  SizedBox(
-                    height: 34,
-                    child: ListView.separated(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: _filters.length,
-                      separatorBuilder: (_, __) => const SizedBox(width: 8),
-                      itemBuilder: (context, i) {
-                        final f = _filters[i];
-                        final active = _filter == f;
-                        return GestureDetector(
-                          onTap: () => setState(() => _filter = f),
-                          child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 180),
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 16, vertical: 7),
-                            decoration: BoxDecoration(
-                              color: active
-                                  ? const Color(0xFF0F1117)
-                                  : Colors.white,
-                              borderRadius: BorderRadius.circular(20),
-                              border: Border.all(
-                                color: active
-                                    ? const Color(0xFF0F1117)
-                                    : Colors.black.withOpacity(0.12),
-                              ),
-                            ),
-                            child: Text(
-                              f,
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                                color: active
-                                    ? Colors.white
-                                    : const Color(0xFF7A7E8E),
-                              ),
-                            ),
+                        const SizedBox(height: 2),
+                        const Text(
+                          'Overview of all active and completed projects',
+                          style:
+                              TextStyle(fontSize: 13, color: Color(0xFF7A7E8E)),
+                        ),
+                        const SizedBox(height: 16),
+                        SizedBox(
+                          height: 82,
+                          child: ListView(
+                            scrollDirection: Axis.horizontal,
+                            children: [
+                              _MetricCard(
+                                  label: 'Total Sites',
+                                  value: controller.state.totalProjects.value
+                                      .toString(),
+                                  color: const Color(0xFF0F1117)),
+                              const SizedBox(width: 10),
+                              _MetricCard(
+                                  label: 'Ongoing',
+                                  value: controller
+                                      .state.totalOngoingProjects.value
+                                      .toString(),
+                                  color: const Color(0xFFD97706)),
+                              const SizedBox(width: 10),
+                              _MetricCard(
+                                  label: 'Completed',
+                                  value: controller
+                                      .state.totalCompletedProjects.value
+                                      .toString(),
+                                  color: const Color(0xFF1A9E5C)),
+                              const SizedBox(width: 10),
+                              _MetricCard(
+                                  label: 'Paused',
+                                  value: controller
+                                      .state.totalPausedProjects.value
+                                      .toString(),
+                                  color: const Color(0xFFDC2626)),
+                            ],
                           ),
-                        );
-                      },
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                ],
-              ),
-            ),
-          ),
-          sites.isEmpty
-              ? const SliverFillRemaining(
-                  child: Center(
-                    child: Text(
-                      'No sites match your search.',
-                      style: TextStyle(color: Color(0xFF7A7E8E), fontSize: 14),
-                    ),
-                  ),
-                )
-              : SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 32),
-                  sliver: SliverGrid(
-                    delegate: SliverChildBuilderDelegate(
-                      (context, i) => _SiteCard(
-                        site: sites[i],
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) =>
-                                  DashboardDetailsScreen(site: sites[i]),
-                            ),
-                          );
-                        },
-                      ),
-                      childCount: sites.length,
-                    ),
-                    gridDelegate:
-                        const SliverGridDelegateWithMaxCrossAxisExtent(
-                      maxCrossAxisExtent: 400,
-                      mainAxisExtent: 270,
-                      crossAxisSpacing: 14,
-                      mainAxisSpacing: 14,
+                        ),
+                        const SizedBox(height: 14),
+                        Container(
+                          height: 42,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(
+                                color: Colors.black.withOpacity(0.1)),
+                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          child: Row(
+                            children: [
+                              const Icon(Icons.search,
+                                  size: 18, color: Color(0xFF7A7E8E)),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: CustomTextInput(
+                                  controller: controller.state.searchController,
+                                  onChanged: (v) => controller.updateSerach(v),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        SizedBox(
+                          height: 34,
+                          child:ListView.separated(
+                            scrollDirection: Axis.horizontal,
+                            itemCount: controller.state.filters.length,
+                            separatorBuilder: (_, __) =>
+                                const SizedBox(width: 8),
+                            itemBuilder: (context, i) {
+                              final f = controller.state.filters[i];
+                              final active = controller.state.filter.value == f;
+                              return GestureDetector(
+                                onTap: () => controller.onFilterChange(f),
+                                child: AnimatedContainer(
+                                  duration: const Duration(milliseconds: 180),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 16, vertical: 7),
+                                  decoration: BoxDecoration(
+                                    color: active
+                                        ? const Color(0xFF0F1117)
+                                        : Colors.white,
+                                    borderRadius: BorderRadius.circular(20),
+                                    border: Border.all(
+                                      color: active
+                                          ? const Color(0xFF0F1117)
+                                          : Colors.black.withOpacity(0.12),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    f,
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
+                                      color: active
+                                          ? Colors.white
+                                          : const Color(0xFF7A7E8E),
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                      ],
                     ),
                   ),
                 ),
-        ],
-      ),
+                projects.isEmpty
+                    ? const SliverFillRemaining(
+                        child: Center(
+                          child: Text(
+                            'No sites match your search.',
+                            style: TextStyle(
+                                color: Color(0xFF7A7E8E), fontSize: 14),
+                          ),
+                        ),
+                      )
+                    : SliverPadding(
+                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 32),
+                        sliver: SliverGrid(
+                          delegate: SliverChildBuilderDelegate(
+                            (context, i) => _SiteCard(
+                              site: projects[i],
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => DashboardDetailsScreen(
+                                        site: projects[i]),
+                                  ),
+                                );
+                              },
+                            ),
+                            childCount: projects.length,
+                          ),
+                          gridDelegate:
+                              const SliverGridDelegateWithMaxCrossAxisExtent(
+                            maxCrossAxisExtent: 400,
+                            mainAxisExtent: 270,
+                            crossAxisSpacing: 14,
+                            mainAxisSpacing: 14,
+                          ),
+                        ),
+                      ),
+              ],
+            );
+      }
+      )
+
     );
   }
 }
@@ -286,16 +262,16 @@ class _MetricCard extends StatelessWidget {
 }
 
 class _SiteCard extends StatelessWidget {
-  final DashboardModel site;
+  final SiteModel site;
   final VoidCallback onTap;
 
   const _SiteCard({required this.site, required this.onTap});
 
   Color get _statusColor {
-    switch (site.status) {
+    switch (site.projectStatus) {
       case 'Completed':
         return const Color(0xFF1A9E5C);
-      case 'Paused':
+      case 'Delayed':
         return const Color(0xFFDC2626);
       default:
         return const Color(0xFFD97706);
@@ -303,10 +279,10 @@ class _SiteCard extends StatelessWidget {
   }
 
   Color get _statusBg {
-    switch (site.status) {
+    switch (site.projectStatus) {
       case 'Completed':
         return const Color(0xFFE3F7ED);
-      case 'Paused':
+      case 'Delayed':
         return const Color(0xFFFEE2E2);
       default:
         return const Color(0xFFFEF3C7);
@@ -360,7 +336,7 @@ class _SiteCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
-                    site.status,
+                    site.projectStatus,
                     style: TextStyle(
                       fontSize: 10,
                       fontWeight: FontWeight.w700,
@@ -375,15 +351,15 @@ class _SiteCard extends StatelessWidget {
             // Meta rows
             _MetaRow(icon: Icons.location_on_outlined, text: site.location),
             const SizedBox(height: 5),
-            _MetaRow(icon: Icons.apartment_outlined, text: site.type),
+            _MetaRow(icon: Icons.apartment_outlined, text:site.tags.isNotEmpty ? site.tags[0] : 'No category'),
             const SizedBox(height: 5),
             _MetaRow(
                 icon: Icons.calendar_today_outlined,
-                text: 'Deadline: ${site.deadline}'),
+                text: 'Deadline: ${site.createdAt}'),
             const SizedBox(height: 5),
             _MetaRow(
                 icon: Icons.business_outlined,
-                text: site.procuringEntity,
+                text: site.inquiringEntity ?? "None",
                 isEntity: true),
 
             const Spacer(),
@@ -398,7 +374,8 @@ class _SiteCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Progress — ${site.progress}%',
+                        'Progress — 17%',
+                        // 'Progress — ${site.progress}%',
                         style: const TextStyle(
                             fontSize: 10, color: Color(0xFF7A7E8E)),
                       ),
@@ -406,7 +383,7 @@ class _SiteCard extends StatelessWidget {
                       ClipRRect(
                         borderRadius: BorderRadius.circular(3),
                         child: LinearProgressIndicator(
-                          value: site.progress / 100,
+                          value: 17 / 100,
                           minHeight: 5,
                           backgroundColor: Colors.black.withOpacity(0.07),
                           valueColor:

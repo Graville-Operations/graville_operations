@@ -22,9 +22,6 @@ class ApplicationController extends GetxController{
     state.bottomMenus.assignAll(
       saved.where((m) => _bottomNavNames.contains(m.name)).toList(),
     );
-    state.drawerMenus.assignAll(
-      saved.where((m) => !_bottomNavNames.contains(m.name)).toList(),
-    );
   }
 
 }
