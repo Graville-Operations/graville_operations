@@ -10,8 +10,11 @@ import 'package:graville_operations/screens/home/controller.dart';
 import 'package:graville_operations/screens/home/widgets/app_drawer.dart';
 import 'package:graville_operations/screens/material/receive_material.dart';
 import 'package:graville_operations/screens/material/transfer_material.dart';
+import 'package:graville_operations/screens/sites/site_list/sites_list.dart';
 import 'package:graville_operations/screens/store/add_material.dart';
 import 'package:graville_operations/screens/store/update_inventory.dart';
+import 'package:graville_operations/screens/task_screen/alltasks.dart';
+import 'package:graville_operations/screens/task_screen/task_details.dart';
 import 'package:graville_operations/screens/task_screen/task_screen.dart';
 import 'package:graville_operations/screens/workers/add_worker_screen.dart';
 import 'package:graville_operations/screens/workers/all_workers_screen.dart';
@@ -40,17 +43,17 @@ class HomeScreen extends GetView<HomeScreenController> {
                     onPressed: () => context.push(const AddWorkerScreen()),
                   ),
                 ),
-                // const SizedBox(height: 12),
-                // Tooltip(
-                //   message: "View sites",
-                //   child: CustomCircleButton(
-                //     icon: Icons.map_outlined,
-                //     onPressed: () => Navigator.of(context).push(
-                //       MaterialPageRoute(
-                //           builder: (_) => const SitesListScreen()),
-                //     ),
-                //   ),
-                // ),
+                const SizedBox(height: 12),
+                Tooltip(
+                  message: "View sites",
+                  child: CustomCircleButton(
+                    icon: Icons.map_outlined,
+                    onPressed: () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                          builder: (_) => const SitesListScreen()),
+                    ),
+                  ),
+                ),
                 const SizedBox(height: 12),
                 Tooltip(
                   message: "Hired equipment",
@@ -296,42 +299,182 @@ class HomeScreen extends GetView<HomeScreenController> {
                       ),
                     ),
 
-                    // Task progress section
                     const SizedBox(height: 15),
                     SectionCard(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Row(
+                          Row(
                             children: [
-                              Icon(Icons.task, size: 18),
-                              SizedBox(width: 8),
-                              Text(
-                                "Task Progress",
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
+                              const Icon(Icons.task, size: 18),
+                              const SizedBox(width: 8),
+                              const Text("Task Progress",
+                                  style: TextStyle(fontWeight: FontWeight.bold)),
+                              const Spacer(),
+                              if (!controller.state.tasksLoading.value && controller.state.recentTasks.length > 5)
+                                GestureDetector(
+                                  onTap: () => Navigator.of(context).push(
+                                    MaterialPageRoute(builder: (_) => const AllTasksScreen()),
+                                  ),
+                                  child: const Text("View All",
+                                      style: TextStyle(
+                                        color: Color(0xff5b7cfa),
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w600,
+                                      )),
+                                ),
                             ],
                           ),
                           const SizedBox(height: 15),
-                          TaskProgress(
-                            title: "Foundation",
-                            percent: 1.0,
-                            color: Colors.green,
-                          ),
-                          TaskProgress(
-                            title: "Framing",
-                            percent: 0.75,
-                            color: Colors.orange,
-                          ),
-                          TaskProgress(
-                            title: "Electrical",
-                            percent: 0.45,
-                            color: Colors.blue,
-                          ),
+
+                          if (controller.state.tasksLoading.value)
+                            ...List.generate(3, (_) => Padding(
+                              padding: const EdgeInsets.only(bottom: 12),
+                              child: Container(
+                                height: 40,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey.shade200,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                            ))
+
+                          else if (controller.state.taskFetchError.value.isNotEmpty)
+                            Row(
+                              children: [
+                                const Text("Failed to load",
+                                    style: TextStyle(color: Colors.grey, fontSize: 12)),
+                                TextButton(
+                                  onPressed: controller.loadStats,
+                                  child: const Text("Retry",
+                                      style: TextStyle(
+                                          color: Color(0xff5b7cfa), fontSize: 12)),
+                                ),
+                              ],
+                            )
+
+                          else if (controller.state.recentTasks.isEmpty)
+                              const Padding(
+                                padding: EdgeInsets.symmetric(vertical: 12),
+                                child: Center(
+                                  child: Text("No tasks yet",
+                                      style: TextStyle(color: Colors.grey)),
+                                ),
+                              )
+
+                            else ...[
+                                Row(
+                                  children: [
+                                    const Text("Overall",
+                                        style: TextStyle(fontSize: 12, color: Colors.grey)),
+                                    const Spacer(),
+                                    Text(
+                                      "${(controller.state.overallCompletion * 100).round()}%",
+                                      style: const TextStyle(
+                                          fontSize: 12, fontWeight: FontWeight.bold),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 6),
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(4),
+                                  child: LinearProgressIndicator(
+                                    value: controller.state.overallCompletion.value,
+                                    minHeight: 6,
+                                    backgroundColor: Colors.grey.shade200,
+                                    valueColor:
+                                    const AlwaysStoppedAnimation<Color>(Color(0xff5b7cfa)),
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
+                                const Divider(),
+                                const SizedBox(height: 8),
+                                ...controller.state.homeTasks.map((task) {
+                                  final color = task.completion >= 100
+                                      ? const Color(0xff1db954)
+                                      : task.completion >= 60
+                                      ? Colors.orange
+                                      : const Color(0xff5b7cfa);
+                                  return GestureDetector(
+                                    onTap: () => Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                        builder: (_) => TaskDetailScreen(task: task),
+                                      ),
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(bottom: 14),
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            children: [
+                                              Expanded(
+                                                child: Text(
+                                                  task.title,
+                                                  style: const TextStyle(
+                                                      fontSize: 13,
+                                                      fontWeight: FontWeight.w500),
+                                                  maxLines: 1,
+                                                  overflow: TextOverflow.ellipsis,
+                                                ),
+                                              ),
+                                              const SizedBox(width: 8),
+                                              Text(
+                                                "${task.completion}%",
+                                                style: TextStyle(
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: color,
+                                                ),
+                                              ),
+                                              const Icon(Icons.chevron_right,
+                                                  size: 14, color: Colors.grey),
+                                            ],
+                                          ),
+                                          const SizedBox(height: 6),
+                                          ClipRRect(
+                                            borderRadius: BorderRadius.circular(4),
+                                            child: LinearProgressIndicator(
+                                              value: task.completion / 100,
+                                              minHeight: 5,
+                                              backgroundColor: Colors.grey.shade100,
+                                              valueColor:
+                                              AlwaysStoppedAnimation<Color>(color),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                }),
+                                if (controller.state.recentTasks.length > 5)
+                                  GestureDetector(
+                                    onTap: () => Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                          builder: (_) => const AllTasksScreen()),
+                                    ),
+                                    child: Container(
+                                      width: double.infinity,
+                                      padding: const EdgeInsets.symmetric(vertical: 10),
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey.shade50,
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      child: Text(
+                                        "View all ${controller.state.recentTasks.length} tasks →",
+                                        textAlign: TextAlign.center,
+                                        style: const TextStyle(
+                                          color: Color(0xff5b7cfa),
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                              ],
                         ],
                       ),
                     ),
-
                     // Reviews
                     const SizedBox(height: 20),
                     const Text(
