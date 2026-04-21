@@ -24,7 +24,7 @@ class CreateTaskRequest {
       "assigned_to": assignedTo,
       "field_operator_id": fieldOperatorId,
       "completion": completion,
-      "site_id": siteId,
+      "site_id": siteId?? 0,
     };
   }
 }
