@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:graville_operations/core/commons/widgets/workers_on_site_section.dart';
 import 'package:graville_operations/models/dashboard/dashboard_model.dart';
+import 'package:graville_operations/models/site/site_model.dart';
 import 'package:graville_operations/services/attendance_service.dart';
 import 'package:graville_operations/services/worker_service.dart';
 import 'dart:math' as math;
 
 class DashboardDetailsScreen extends StatefulWidget {
-  final DashboardModel site;
+  final SiteModel site;
   const DashboardDetailsScreen({super.key, required this.site});
 
   @override
@@ -22,7 +23,7 @@ class _DashboardDetailScreenState extends State<DashboardDetailsScreen> {
   @override
   void initState() {
     super.initState();
-    _activeDay = widget.site.dayLabels.first;
+    // _activeDay = widget.site.dayLabels.first;
     _loadLiveStats();
   }
 
@@ -47,21 +48,21 @@ class _DashboardDetailScreenState extends State<DashboardDetailsScreen> {
     }
   }
 
-  DashboardModel get s => widget.site;
+  SiteModel get s => widget.site;
 
-  GalleryDay? get _galleryDay => s.gallery.firstWhere(
-      (g) => g.dayLabel == _activeDay,
-      orElse: () => const GalleryDay(dayLabel: '', photoLabels: []));
+  // GalleryDay? get _galleryDay => s.gallery.firstWhere(
+  //     (g) => g.dayLabel == _activeDay,
+  //     orElse: () => const GalleryDay(dayLabel: '', photoLabels: []));
 
-  Color get _statusColor => switch (s.status) {
+  Color get _statusColor => switch (s.projectStatus) {
     'Completed' => const Color(0xFF1A9E5C),
-    'Paused'    => const Color(0xFFDC2626),
+    'Delayed'    => const Color(0xFFDC2626),
     _           => const Color(0xFFD97706),
   };
 
   @override
   Widget build(BuildContext context) {
-    final taskRate = s.taskCompletionRate;
+    // final taskRate = s.taskCompletionRate;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF4F3EF),
@@ -97,7 +98,7 @@ class _DashboardDetailScreenState extends State<DashboardDetailsScreen> {
                       decoration: BoxDecoration(
                           border: Border.all(color: Colors.black.withOpacity(0.1)),
                           borderRadius: BorderRadius.circular(20)),
-                      child: Text(s.status,
+                      child: Text(s.projectStatus,
                           style: TextStyle(color: _statusColor, fontSize: 11, fontWeight: FontWeight.w700)),
                     ),
                   ],
@@ -105,10 +106,10 @@ class _DashboardDetailScreenState extends State<DashboardDetailsScreen> {
                 const SizedBox(height: 12),
                 _HeroMeta(icon: Icons.location_on_outlined,   text: s.location),
                 const SizedBox(height: 4),
-                _HeroMeta(icon: Icons.business_outlined,      text: s.procuringEntity),
+                _HeroMeta(icon: Icons.business_outlined,      text: s.inquiringEntity??"None"),
                 const SizedBox(height: 4),
                 _HeroMeta(icon: Icons.calendar_today_outlined,
-                    text: 'Started ${s.startDate}  ·  Deadline ${s.deadline}'),
+                    text: 'Started ${s.createdAt}  ·  Deadline ${s.completionDate}'),
                 const SizedBox(height: 16),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -117,16 +118,18 @@ class _DashboardDetailScreenState extends State<DashboardDetailsScreen> {
                       const Text('Total Contract Value',
                           style: TextStyle(color: Color(0xFF7A7E8E), fontSize: 10, letterSpacing: 0.5)),
                       const SizedBox(height: 4),
-                      Text('KES ${_fmt(s.totalAmount)}',
+                      // Text('KES ${_fmt(s.totalAmount)}',
+                      Text('KES N/A',
                           style: const TextStyle(color: Color(0xFF0F1117), fontSize: 20,
                               fontWeight: FontWeight.w700, letterSpacing: -0.5)),
                     ]),
+                    if (s.tags.isNotEmpty)
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
                           border: Border.all(color: Colors.black.withOpacity(0.1)),
                           borderRadius: BorderRadius.circular(20)),
-                      child: Text(s.type,
+                      child: Text(s.tags[0],
                           style: const TextStyle(color: Color(0xFF7A7E8E), fontSize: 11)),
                     ),
                   ],
@@ -150,16 +153,22 @@ class _DashboardDetailScreenState extends State<DashboardDetailsScreen> {
                   sub: 'Overall headcount',
                   valueColor: const Color(0xFF1A5CFF)),
               _StatCard(
-                  label: 'Completion Rate', value: '${s.progress}%',
+                  // label: 'Completion Rate', value: '${s.progress}%',
+                  label: 'Completion Rate', value: '65%',
                   sub: 'Overall progress',
-                  valueColor: s.progress >= 80 ? const Color(0xFF1A9E5C)
-                      : s.progress >= 40 ? const Color(0xFFD97706) : const Color(0xFFDC2626)),
+                  valueColor: const Color(0xFFDC2626),
+                  // valueColor: s.progress >= 80 ? const Color(0xFF1A9E5C)
+                  //     : s.progress >= 40 ? const Color(0xFFD97706) : const Color(0xFFDC2626)
+              ),
               _StatCard(
-                  label: 'Tasks Completed', value: '$taskRate%',
-                  sub: '${s.completedTasks} of ${s.tasks.length} tasks',
+                  label: 'Tasks Completed', value: '17%',
+                  // label: 'Tasks Completed', value: '$taskRatde%',
+                  sub: '1 of 6 tasks',
+                  // sub: '${s.completedTasks} of ${s.tasks.length} tasks',
                   valueColor: const Color(0xFF0F1117)),
               _StatCard(
-                  label: 'Contract Value', value: 'KES ${_fmtShort(s.totalAmount)}',
+                  // label: 'Contract Value', value: 'KES ${_fmtShort(s.totalAmount)}',
+                  label: 'Contract Value', value: 'KES 26M',
                   sub: 'Total budget', valueColor: const Color(0xFF0F1117)),
             ],
           ),
@@ -170,11 +179,14 @@ class _DashboardDetailScreenState extends State<DashboardDetailsScreen> {
           Row(
             children: [
               Expanded(child: _RingCard(label: 'Overall',    sub: 'Completion',
-                  percent: s.progress, color: const Color(0xFF1A5CFF))),
+                  percent: 65, color: const Color(0xFF1A5CFF))),
+                  // percent: s.progress, color: const Color(0xFF1A5CFF))),
               const SizedBox(width: 12),
               Expanded(child: _RingCard(label: 'Tasks',
-                  sub: '${s.completedTasks}/${s.tasks.length} done',
-                  percent: taskRate, color: const Color(0xFF1A9E5C))),
+                  // sub: '${s.completedTasks}/${s.tasks.length} done',
+                  sub: '1/6 done',
+                  // percent: taskRate, color: const Color(0xFF1A9E5C))),
+                  percent: 13, color: const Color(0xFF1A9E5C))),
               const SizedBox(width: 12),
               Expanded(child: _RingCard(
                   label: 'Attendance',
@@ -187,35 +199,35 @@ class _DashboardDetailScreenState extends State<DashboardDetailsScreen> {
           const SizedBox(height: 24),
           _SectionHeader(title: 'Task Breakdown'),
           const SizedBox(height: 10),
-          Container(
-            decoration: BoxDecoration(color: Colors.white,
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: Colors.black.withOpacity(0.07))),
-            padding: const EdgeInsets.all(14),
-            child: Column(
-              children: s.tasks.asMap().entries.map((e) {
-                final i = e.key; final t = e.value;
-                final barColor = t.percent == 100 ? const Color(0xFF1A9E5C)
-                    : t.percent < 40 ? const Color(0xFFD97706) : const Color(0xFF1A5CFF);
-                return Column(children: [
-                  if (i != 0) const Divider(height: 16, color: Color(0x0A000000)),
-                  Row(children: [
-                    Expanded(child: Text(t.name, style: const TextStyle(fontSize: 13,
-                        fontWeight: FontWeight.w500, color: Color(0xFF0F1117)))),
-                    const SizedBox(width: 8),
-                    Text('${t.percent}%', style: const TextStyle(fontSize: 12,
-                        fontWeight: FontWeight.w600, color: Color(0xFF7A7E8E))),
-                  ]),
-                  const SizedBox(height: 6),
-                  ClipRRect(borderRadius: BorderRadius.circular(3),
-                    child: LinearProgressIndicator(value: t.percent / 100, minHeight: 5,
-                      backgroundColor: Colors.black.withOpacity(0.06),
-                      valueColor: AlwaysStoppedAnimation<Color>(barColor)),
-                  ),
-                ]);
-              }).toList(),
-            ),
-          ),
+          // Container(
+          //   decoration: BoxDecoration(color: Colors.white,
+          //       borderRadius: BorderRadius.circular(14),
+          //       border: Border.all(color: Colors.black.withOpacity(0.07))),
+          //   padding: const EdgeInsets.all(14),
+          //   child: Column(
+          //     children: s.tasks.asMap().entries.map((e) {
+          //       final i = e.key; final t = e.value;
+          //       final barColor = t.percent == 100 ? const Color(0xFF1A9E5C)
+          //           : t.percent < 40 ? const Color(0xFFD97706) : const Color(0xFF1A5CFF);
+          //       return Column(children: [
+          //         if (i != 0) const Divider(height: 16, color: Color(0x0A000000)),
+          //         Row(children: [
+          //           Expanded(child: Text(t.name, style: const TextStyle(fontSize: 13,
+          //               fontWeight: FontWeight.w500, color: Color(0xFF0F1117)))),
+          //           const SizedBox(width: 8),
+          //           Text('${t.percent}%', style: const TextStyle(fontSize: 12,
+          //               fontWeight: FontWeight.w600, color: Color(0xFF7A7E8E))),
+          //         ]),
+          //         const SizedBox(height: 6),
+          //         ClipRRect(borderRadius: BorderRadius.circular(3),
+          //           child: LinearProgressIndicator(value: t.percent / 100, minHeight: 5,
+          //             backgroundColor: Colors.black.withOpacity(0.06),
+          //             valueColor: AlwaysStoppedAnimation<Color>(barColor)),
+          //         ),
+          //       ]);
+          //     }).toList(),
+          //   ),
+          // ),
 
           const SizedBox(height: 24),
 
@@ -226,80 +238,80 @@ class _DashboardDetailScreenState extends State<DashboardDetailsScreen> {
           const SizedBox(height: 24),
 
           _SectionHeader(title: 'Reports'),
-          const SizedBox(height: 10),
-          ...s.reports.map((r) => Padding(
-            padding: const EdgeInsets.only(bottom: 10),
-            child: _ReportItem(report: r),
-          )),
+          // const SizedBox(height: 10),
+          // ...s.reports.map((r) => Padding(
+          //   padding: const EdgeInsets.only(bottom: 10),
+          //   child: _ReportItem(report: r),
+          // )),
 
           const SizedBox(height: 24),
 
-          _SectionHeader(title: 'Photo Gallery', sub: 'Site photos by day'),
-          const SizedBox(height: 10),
-          SizedBox(
-            height: 56,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              itemCount: s.dayLabels.length,
-              separatorBuilder: (_, __) => const SizedBox(width: 8),
-              itemBuilder: (context, i) {
-                final day    = s.dayLabels[i];
-                final active = day == _activeDay;
-                final parts  = day.split(' ');
-                return GestureDetector(
-                  onTap: () => setState(() => _activeDay = day),
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 180),
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: active ? const Color(0xFF1A5CFF) : Colors.white,
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: active
-                          ? const Color(0xFF1A5CFF) : Colors.black.withOpacity(0.1)),
-                    ),
-                    child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                      Text(parts[0], style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600,
-                          color: active ? Colors.white : const Color(0xFF0F1117))),
-                      Text(parts.length > 1 ? parts[1] : '', style: TextStyle(fontSize: 10,
-                          color: active ? Colors.white60 : const Color(0xFF7A7E8E))),
-                    ]),
-                  ),
-                );
-              },
-            ),
-          ),
-          const SizedBox(height: 12),
-          Builder(builder: (_) {
-            final gallery = _galleryDay;
-            if (gallery == null || gallery.photoLabels.isEmpty) {
-              return const Center(child: Padding(padding: EdgeInsets.all(24),
-                  child: Text('No photos for this day.',
-                      style: TextStyle(color: Color(0xFF7A7E8E), fontSize: 13))));
-            }
-            return GridView.builder(
-              shrinkWrap: true, physics: const NeverScrollableScrollPhysics(),
-              itemCount: gallery.photoLabels.length,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3, crossAxisSpacing: 10, mainAxisSpacing: 10, childAspectRatio: 1.2),
-              itemBuilder: (context, i) {
-                const emojis = ['🏗️','🔩','🧱','⚙️','🪜','🏛️','🔧','📐'];
-                return Container(
-                  decoration: BoxDecoration(color: Colors.white,
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: Colors.black.withOpacity(0.07))),
-                  child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                    Text(emojis[i % emojis.length], style: const TextStyle(fontSize: 24)),
-                    const SizedBox(height: 4),
-                    Padding(padding: const EdgeInsets.symmetric(horizontal: 6),
-                      child: Text(gallery.photoLabels[i],
-                          style: const TextStyle(fontSize: 10, color: Color(0xFF7A7E8E),
-                              fontWeight: FontWeight.w500),
-                          textAlign: TextAlign.center, maxLines: 2, overflow: TextOverflow.ellipsis)),
-                  ]),
-                );
-              },
-            );
-          }),
+          // _SectionHeader(title: 'Photo Gallery', sub: 'Site photos by day'),
+          // const SizedBox(height: 10),
+          // SizedBox(
+          //   height: 56,
+          //   child: ListView.separated(
+          //     scrollDirection: Axis.horizontal,
+          //     itemCount: s.dayLabels.length,
+          //     separatorBuilder: (_, __) => const SizedBox(width: 8),
+          //     itemBuilder: (context, i) {
+          //       final day    = s.dayLabels[i];
+          //       final active = day == _activeDay;
+          //       final parts  = day.split(' ');
+          //       return GestureDetector(
+          //         onTap: () => setState(() => _activeDay = day),
+          //         child: AnimatedContainer(
+          //           duration: const Duration(milliseconds: 180),
+          //           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          //           decoration: BoxDecoration(
+          //             color: active ? const Color(0xFF1A5CFF) : Colors.white,
+          //             borderRadius: BorderRadius.circular(20),
+          //             border: Border.all(color: active
+          //                 ? const Color(0xFF1A5CFF) : Colors.black.withOpacity(0.1)),
+          //           ),
+          //           child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+          //             Text(parts[0], style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600,
+          //                 color: active ? Colors.white : const Color(0xFF0F1117))),
+          //             Text(parts.length > 1 ? parts[1] : '', style: TextStyle(fontSize: 10,
+          //                 color: active ? Colors.white60 : const Color(0xFF7A7E8E))),
+          //           ]),
+          //         ),
+          //       );
+          //     },
+          //   ),
+          // ),
+          // const SizedBox(height: 12),
+          // Builder(builder: (_) {
+          //   final gallery = _galleryDay;
+          //   if (gallery == null || gallery.photoLabels.isEmpty) {
+          //     return const Center(child: Padding(padding: EdgeInsets.all(24),
+          //         child: Text('No photos for this day.',
+          //             style: TextStyle(color: Color(0xFF7A7E8E), fontSize: 13))));
+          //   }
+          //   return GridView.builder(
+          //     shrinkWrap: true, physics: const NeverScrollableScrollPhysics(),
+          //     itemCount: gallery.photoLabels.length,
+          //     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          //         crossAxisCount: 3, crossAxisSpacing: 10, mainAxisSpacing: 10, childAspectRatio: 1.2),
+          //     itemBuilder: (context, i) {
+          //       const emojis = ['🏗️','🔩','🧱','⚙️','🪜','🏛️','🔧','📐'];
+          //       return Container(
+          //         decoration: BoxDecoration(color: Colors.white,
+          //             borderRadius: BorderRadius.circular(10),
+          //             border: Border.all(color: Colors.black.withOpacity(0.07))),
+          //         child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+          //           Text(emojis[i % emojis.length], style: const TextStyle(fontSize: 24)),
+          //           const SizedBox(height: 4),
+          //           Padding(padding: const EdgeInsets.symmetric(horizontal: 6),
+          //             child: Text(gallery.photoLabels[i],
+          //                 style: const TextStyle(fontSize: 10, color: Color(0xFF7A7E8E),
+          //                     fontWeight: FontWeight.w500),
+          //                 textAlign: TextAlign.center, maxLines: 2, overflow: TextOverflow.ellipsis)),
+          //         ]),
+          //       );
+          //     },
+          //   );
+          // }),
         ],
       ),
     );

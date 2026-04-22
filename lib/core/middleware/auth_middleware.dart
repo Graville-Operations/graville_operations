@@ -13,13 +13,13 @@ class AuthMiddleware extends GetMiddleware {
   RouteSettings? redirect(String? route) {
     final isLoggedIn = UserStore.to.isLogin;
     if (isLoggedIn &&
-        (route == AppRoutes.loginScreen || route == AppRoutes.initial)) {
+        (route == AppRoutes.login || route == AppRoutes.initial)) {
       return const RouteSettings(name: AppRoutes.application);
     }
     if (!isLoggedIn &&
-        route != AppRoutes.loginScreen &&
+        route != AppRoutes.login &&
         route != AppRoutes.initial) {
-      return const RouteSettings(name: AppRoutes.loginScreen);
+      return const RouteSettings(name: AppRoutes.login);
     }
 
     return null;
