@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:graville_operations/core/local/entities/menu_data.dart';
+import 'package:graville_operations/core/remote/api/menus.dart';
 import 'package:graville_operations/models/auth/groups.dart';
 import 'package:graville_operations/services/api_service.dart';
 
@@ -22,7 +24,6 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
     _group = widget.group;
   }
 
-  // ─── Assign Menu Bottom Sheet ─────────────────────────────────────────────
   void _showAssignMenuSheet() {
     showModalBottomSheet(
       context: context,
@@ -46,51 +47,6 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         margin: const EdgeInsets.all(16),
       ),
-    );
-  }
-
-  Widget _buildInputField({
-    required TextEditingController controller,
-    required String label,
-    required String hint,
-    int maxLines = 1,
-    String? Function(String?)? validator,
-    TextInputType? keyboardType,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(label,
-            style: const TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                color: Color(0xFF1A1A3E))),
-        const SizedBox(height: 6),
-        TextFormField(
-          controller: controller,
-          maxLines: maxLines,
-          keyboardType: keyboardType,
-          validator: validator,
-          decoration: InputDecoration(
-            hintText: hint,
-            hintStyle: const TextStyle(color: Colors.grey, fontSize: 13),
-            filled: true,
-            fillColor: const Color(0xFFF5F6FA),
-            border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: BorderSide.none),
-            enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide:
-                    const BorderSide(color: Color(0xFFE0E4F0), width: 0.8)),
-            focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: const BorderSide(color: _primaryBlue, width: 1.5)),
-            contentPadding:
-                const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-          ),
-        ),
-      ],
     );
   }
 
@@ -153,13 +109,11 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                           fontSize: 22,
                           fontWeight: FontWeight.w700)),
                   const SizedBox(height: 4),
-                  Text(
-                    'ref: ${_group.refId}',
-                    style: TextStyle(
-                        color: Colors.white.withOpacity(0.6),
-                        fontSize: 12,
-                        fontFamily: 'monospace'),
-                  ),
+                  Text('ref: ${_group.refId}',
+                      style: TextStyle(
+                          color: Colors.white.withOpacity(0.6),
+                          fontSize: 12,
+                          fontFamily: 'monospace')),
                   if (_group.description.isNotEmpty) ...[
                     const SizedBox(height: 6),
                     Text(_group.description,
@@ -183,7 +137,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Single Assign Menu action button
+          // Assign Menu button
           GestureDetector(
             onTap: _showAssignMenuSheet,
             child: Container(
@@ -282,7 +236,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
   }
 }
 
-// ─── Assign Menu Sheet (stateful, fetches menus) ───────────────────────────
+// ─── Assign Menu Sheet ─────────────────────────────────────────────────────
 
 class _AssignMenuSheet extends StatefulWidget {
   final Group group;
@@ -295,8 +249,10 @@ class _AssignMenuSheet extends StatefulWidget {
 }
 
 class _AssignMenuSheetState extends State<_AssignMenuSheet> {
-  List<Menu> _allMenus = [];
-  final Set<int> _selectedIds = {};
+  // Using MenuItem from menu_data.dart (the existing app model)
+  List<MenuItem> _allMenus = [];
+  final Set<String> _selectedRefIds = {}; // use ref_id for assignment
+  final Set<int> _expandedMenuIds = {};
   bool _isLoadingMenus = true;
   bool _isSubmitting = false;
   String? _loadError;
@@ -307,18 +263,27 @@ class _AssignMenuSheetState extends State<_AssignMenuSheet> {
   void initState() {
     super.initState();
     _loadMenus();
-    // Pre-select already assigned menus
+    // Pre-select already assigned menus by matching title (best effort)
     for (final m in widget.group.assignedMenus) {
-      _selectedIds.add(m.id);
+      // We'll re-match by id after load; store titles for now
     }
   }
 
   Future<void> _loadMenus() async {
+    setState(() {
+      _isLoadingMenus = true;
+      _loadError = null;
+    });
     try {
-      final menus = await ApiService.getAllMenus();
+      final menus = await MenuApi.getAllMenus();
       setState(() {
         _allMenus = menus;
         _isLoadingMenus = false;
+        // Pre-select menus already assigned to this group
+        for (final m in widget.group.assignedMenus) {
+          final match = menus.where((menu) => menu.id == m.id);
+          if (match.isNotEmpty) _selectedRefIds.add(match.first.refId);
+        }
       });
     } catch (e) {
       setState(() {
@@ -329,7 +294,7 @@ class _AssignMenuSheetState extends State<_AssignMenuSheet> {
   }
 
   Future<void> _submit() async {
-    if (_selectedIds.isEmpty) {
+    if (_selectedRefIds.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Text('Please select at least one menu'),
         behavior: SnackBarBehavior.floating,
@@ -340,10 +305,35 @@ class _AssignMenuSheetState extends State<_AssignMenuSheet> {
     try {
       await ApiService.assignMenuToGroup(
         groupId: widget.group.id,
-        menuIds: _selectedIds.map((id) => id.toString()).toList(),
+        menuIds: _selectedRefIds.toList(),
       );
-      final assignedMenus =
-          _allMenus.where((m) => _selectedIds.contains(m.id)).toList();
+
+      // Build the assigned Menu list from selected items to update parent
+      final selectedMenuItems =
+          _allMenus.where((m) => _selectedRefIds.contains(m.refId)).toList();
+
+      // Convert MenuItem → Menu (our groups model) for the callback
+      final assignedMenus = selectedMenuItems
+          .map((m) => Menu(
+                id: m.id,
+                name: m.name,
+                title: m.title,
+                link: m.link,
+                icon: m.icon,
+                priority: m.priority,
+                subMenus: m.subMenus
+                    .map((s) => SubMenu(
+                          id: s.id,
+                          name: s.name,
+                          title: s.title,
+                          link: s.link,
+                          icon: s.icon,
+                          priority: s.priority,
+                        ))
+                    .toList(),
+              ))
+          .toList();
+
       widget.onAssigned(assignedMenus);
       if (mounted) Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -368,9 +358,9 @@ class _AssignMenuSheetState extends State<_AssignMenuSheet> {
   @override
   Widget build(BuildContext context) {
     return DraggableScrollableSheet(
-      initialChildSize: 0.65,
+      initialChildSize: 0.7,
       minChildSize: 0.4,
-      maxChildSize: 0.92,
+      maxChildSize: 0.95,
       builder: (ctx, scrollController) => Container(
         decoration: const BoxDecoration(
           color: Colors.white,
@@ -378,7 +368,7 @@ class _AssignMenuSheetState extends State<_AssignMenuSheet> {
         ),
         child: Column(
           children: [
-            // Handle + header
+            // ── Header ──
             Padding(
               padding: const EdgeInsets.fromLTRB(24, 12, 24, 0),
               child: Column(
@@ -420,14 +410,14 @@ class _AssignMenuSheetState extends State<_AssignMenuSheet> {
                           ],
                         ),
                       ),
-                      if (_selectedIds.isNotEmpty)
+                      if (_selectedRefIds.isNotEmpty)
                         Container(
                           padding: const EdgeInsets.symmetric(
                               horizontal: 10, vertical: 4),
                           decoration: BoxDecoration(
                               color: const Color(0xFFE8F0FE),
                               borderRadius: BorderRadius.circular(20)),
-                          child: Text('${_selectedIds.length} selected',
+                          child: Text('${_selectedRefIds.length} selected',
                               style: const TextStyle(
                                   color: _blue,
                                   fontSize: 12,
@@ -441,7 +431,7 @@ class _AssignMenuSheetState extends State<_AssignMenuSheet> {
               ),
             ),
 
-            // Menu list
+            // ── Menu list ──
             Expanded(
               child: _isLoadingMenus
                   ? const Center(child: CircularProgressIndicator(color: _blue))
@@ -455,6 +445,7 @@ class _AssignMenuSheetState extends State<_AssignMenuSheet> {
                               const SizedBox(height: 8),
                               Text('Failed to load menus',
                                   style: TextStyle(color: Colors.grey[600])),
+                              const SizedBox(height: 4),
                               TextButton(
                                   onPressed: _loadMenus,
                                   child: const Text('Retry')),
@@ -467,94 +458,206 @@ class _AssignMenuSheetState extends State<_AssignMenuSheet> {
                                   style: TextStyle(color: Colors.grey)))
                           : ListView.builder(
                               controller: scrollController,
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 16, vertical: 8),
+                              padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
                               itemCount: _allMenus.length,
                               itemBuilder: (_, i) {
                                 final menu = _allMenus[i];
-                                final selected = _selectedIds.contains(menu.id);
-                                return GestureDetector(
-                                  onTap: () => setState(() {
-                                    if (selected) {
-                                      _selectedIds.remove(menu.id);
-                                    } else {
-                                      _selectedIds.add(menu.id);
-                                    }
-                                  }),
-                                  child: Container(
-                                    margin: const EdgeInsets.only(bottom: 8),
-                                    padding: const EdgeInsets.all(12),
-                                    decoration: BoxDecoration(
-                                      color: selected
-                                          ? const Color(0xFFE8F0FE)
-                                          : const Color(0xFFF5F6FA),
-                                      borderRadius: BorderRadius.circular(12),
-                                      border: Border.all(
-                                        color: selected
-                                            ? _blue
-                                            : const Color(0xFFE0E4F0),
-                                        width: selected ? 1.5 : 0.8,
-                                      ),
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        Container(
-                                          width: 36,
-                                          height: 36,
-                                          decoration: BoxDecoration(
-                                            color:
-                                                selected ? _blue : Colors.white,
-                                            borderRadius:
-                                                BorderRadius.circular(8),
-                                            border: Border.all(
+                                final selected =
+                                    _selectedRefIds.contains(menu.refId);
+                                final expanded =
+                                    _expandedMenuIds.contains(menu.id);
+                                final hasSubMenus = menu.subMenus.isNotEmpty;
+
+                                return Column(
+                                  children: [
+                                    // ── Menu row ──
+                                    GestureDetector(
+                                      onTap: () => setState(() {
+                                        if (selected) {
+                                          _selectedRefIds.remove(menu.refId);
+                                        } else {
+                                          _selectedRefIds.add(menu.refId);
+                                        }
+                                      }),
+                                      child: Container(
+                                        margin:
+                                            const EdgeInsets.only(bottom: 4),
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 12, vertical: 10),
+                                        decoration: BoxDecoration(
+                                          color: selected
+                                              ? const Color(0xFFE8F0FE)
+                                              : const Color(0xFFF5F6FA),
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                          border: Border.all(
+                                            color: selected
+                                                ? _blue
+                                                : const Color(0xFFE0E4F0),
+                                            width: selected ? 1.5 : 0.8,
+                                          ),
+                                        ),
+                                        child: Row(
+                                          children: [
+                                            // Checkbox indicator
+                                            Container(
+                                              width: 32,
+                                              height: 32,
+                                              decoration: BoxDecoration(
                                                 color: selected
                                                     ? _blue
-                                                    : const Color(0xFFE0E4F0),
-                                                width: 0.8),
-                                          ),
-                                          child: Icon(
-                                            selected
-                                                ? Icons.check_rounded
-                                                : Icons.menu_rounded,
-                                            color: selected
-                                                ? Colors.white
-                                                : Colors.grey,
-                                            size: 18,
-                                          ),
+                                                    : Colors.white,
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
+                                                border: Border.all(
+                                                    color: selected
+                                                        ? _blue
+                                                        : const Color(
+                                                            0xFFE0E4F0),
+                                                    width: 0.8),
+                                              ),
+                                              child: Icon(
+                                                selected
+                                                    ? Icons.check_rounded
+                                                    : Icons.menu_rounded,
+                                                color: selected
+                                                    ? Colors.white
+                                                    : Colors.grey,
+                                                size: 16,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 10),
+                                            // Title + sub-menu count
+                                            Expanded(
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(menu.title,
+                                                      style: TextStyle(
+                                                          fontSize: 14,
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                          color: selected
+                                                              ? _blue
+                                                              : const Color(
+                                                                  0xFF1A1A3E))),
+                                                  if (hasSubMenus)
+                                                    Text(
+                                                        '${menu.subMenus.length} sub-menu${menu.subMenus.length == 1 ? '' : 's'}',
+                                                        style: const TextStyle(
+                                                            color: Colors.grey,
+                                                            fontSize: 11)),
+                                                ],
+                                              ),
+                                            ),
+                                            // Expand/collapse toggle for sub-menus
+                                            if (hasSubMenus)
+                                              GestureDetector(
+                                                onTap: () => setState(() {
+                                                  if (expanded) {
+                                                    _expandedMenuIds
+                                                        .remove(menu.id);
+                                                  } else {
+                                                    _expandedMenuIds
+                                                        .add(menu.id);
+                                                  }
+                                                }),
+                                                child: Container(
+                                                  padding:
+                                                      const EdgeInsets.all(4),
+                                                  child: Icon(
+                                                    expanded
+                                                        ? Icons
+                                                            .keyboard_arrow_up_rounded
+                                                        : Icons
+                                                            .keyboard_arrow_down_rounded,
+                                                    color: Colors.grey,
+                                                    size: 20,
+                                                  ),
+                                                ),
+                                              ),
+                                          ],
                                         ),
-                                        const SizedBox(width: 12),
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(menu.title,
-                                                  style: TextStyle(
-                                                      fontSize: 14,
-                                                      fontWeight:
-                                                          FontWeight.w600,
-                                                      color: selected
-                                                          ? _blue
-                                                          : const Color(
-                                                              0xFF1A1A3E))),
-                                              if (menu.subMenus.isNotEmpty)
-                                                Text(
-                                                    '${menu.subMenus.length} sub-menu(s)',
-                                                    style: const TextStyle(
-                                                        color: Colors.grey,
-                                                        fontSize: 11)),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
+                                      ),
                                     ),
-                                  ),
+
+                                    // ── Sub-menus (expandable) ──
+                                    if (hasSubMenus && expanded)
+                                      Padding(
+                                        padding: const EdgeInsets.only(
+                                            left: 20, bottom: 4),
+                                        child: Column(
+                                          children: menu.subMenus.map((sub) {
+                                            return Container(
+                                              margin: const EdgeInsets.only(
+                                                  bottom: 4),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 12,
+                                                      vertical: 8),
+                                              decoration: BoxDecoration(
+                                                color: Colors.white,
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
+                                                border: Border.all(
+                                                    color:
+                                                        const Color(0xFFE0E4F0),
+                                                    width: 0.5),
+                                              ),
+                                              child: Row(
+                                                children: [
+                                                  Container(
+                                                    width: 6,
+                                                    height: 6,
+                                                    decoration:
+                                                        const BoxDecoration(
+                                                      color: Color(0xFFB0BEC5),
+                                                      shape: BoxShape.circle,
+                                                    ),
+                                                  ),
+                                                  const SizedBox(width: 10),
+                                                  Expanded(
+                                                    child: Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Text(sub.title,
+                                                            style: const TextStyle(
+                                                                fontSize: 13,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w500,
+                                                                color: Color(
+                                                                    0xFF1A1A3E))),
+                                                        if (sub.link != null &&
+                                                            sub.link!
+                                                                .isNotEmpty)
+                                                          Text(sub.link!,
+                                                              style: const TextStyle(
+                                                                  color: Colors
+                                                                      .grey,
+                                                                  fontSize:
+                                                                      10)),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            );
+                                          }).toList(),
+                                        ),
+                                      ),
+
+                                    const SizedBox(height: 4),
+                                  ],
                                 );
                               },
                             ),
             ),
 
-            // Submit button
+            // ── Submit button ──
             Padding(
               padding: EdgeInsets.fromLTRB(
                   16, 8, 16, MediaQuery.of(context).padding.bottom + 16),
@@ -576,9 +679,9 @@ class _AssignMenuSheetState extends State<_AssignMenuSheet> {
                           child: CircularProgressIndicator(
                               color: Colors.white, strokeWidth: 2))
                       : Text(
-                          _selectedIds.isEmpty
+                          _selectedRefIds.isEmpty
                               ? 'Select menus to assign'
-                              : 'Assign ${_selectedIds.length} Menu(s)',
+                              : 'Assign ${_selectedRefIds.length} Menu(s)',
                           style: const TextStyle(
                               fontSize: 15, fontWeight: FontWeight.w600)),
                 ),

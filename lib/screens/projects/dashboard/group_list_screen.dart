@@ -233,8 +233,6 @@ class _GroupsListScreenState extends State<GroupsListScreen> {
                   keyboardType: TextInputType.number,
                 ),
                 const SizedBox(height: 16),
-
-                // Result preview
                 if (fetchedGroup != null)
                   Container(
                     padding: const EdgeInsets.all(12),
@@ -279,7 +277,6 @@ class _GroupsListScreenState extends State<GroupsListScreen> {
                       ],
                     ),
                   ),
-
                 const SizedBox(height: 16),
                 SizedBox(
                   width: double.infinity,
@@ -394,6 +391,13 @@ class _GroupsListScreenState extends State<GroupsListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF0F2F8),
+      // FAB at bottom right for creating a group
+      floatingActionButton: FloatingActionButton(
+        onPressed: _showCreateGroupSheet,
+        backgroundColor: _primaryBlue,
+        shape: const CircleBorder(),
+        child: const Icon(Icons.add_rounded, color: Colors.white, size: 28),
+      ),
       body: Column(
         children: [
           _buildHeader(context),
@@ -434,7 +438,7 @@ class _GroupsListScreenState extends State<GroupsListScreen> {
                         fontSize: 20,
                         fontWeight: FontWeight.w600)),
               ),
-              // Get by ID button
+              // Get by ID button only — + moved to FAB
               GestureDetector(
                 onTap: _showGetByIdSheet,
                 child: Container(
@@ -446,21 +450,6 @@ class _GroupsListScreenState extends State<GroupsListScreen> {
                   ),
                   child: const Icon(Icons.manage_search_rounded,
                       color: Colors.white, size: 20),
-                ),
-              ),
-              const SizedBox(width: 8),
-              // Create group button
-              GestureDetector(
-                onTap: _showCreateGroupSheet,
-                child: Container(
-                  width: 36,
-                  height: 36,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(Icons.add_rounded,
-                      color: Colors.white, size: 22),
                 ),
               ),
             ],
@@ -547,12 +536,13 @@ class _GroupsListScreenState extends State<GroupsListScreen> {
       onRefresh: _loadGroups,
       color: _primaryBlue,
       child: GridView.builder(
-        padding: const EdgeInsets.all(16),
+        padding:
+            const EdgeInsets.fromLTRB(16, 16, 16, 88), // bottom padding for FAB
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
           crossAxisSpacing: 12,
           mainAxisSpacing: 12,
-          childAspectRatio: 1.0, // square cards
+          childAspectRatio: 1.0,
         ),
         itemCount: _filteredGroups.length,
         itemBuilder: (context, index) => _GroupCard(
@@ -570,7 +560,6 @@ class _GroupsListScreenState extends State<GroupsListScreen> {
           onMenusUpdated: (menus) {
             setState(() {
               _filteredGroups[index].assignedMenus = menus;
-              // also update in _allGroups
               final allIdx = _allGroups
                   .indexWhere((g) => g.id == _filteredGroups[index].id);
               if (allIdx != -1) _allGroups[allIdx].assignedMenus = menus;
@@ -609,7 +598,6 @@ class _GroupCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Icon
             Container(
               width: 40,
               height: 40,
@@ -620,8 +608,6 @@ class _GroupCard extends StatelessWidget {
               child: const Icon(Icons.group_rounded, color: _blue, size: 22),
             ),
             const SizedBox(height: 10),
-
-            // Group title
             Text(
               group.readableTitle,
               style: const TextStyle(
@@ -633,14 +619,12 @@ class _GroupCard extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
             ),
             const SizedBox(height: 6),
-
-            // Roles
             if (group.roles.isNotEmpty)
               Wrap(
                 spacing: 4,
                 runSpacing: 3,
                 children: group.roles
-                    .take(2) // show max 2 role chips to keep card tidy
+                    .take(2)
                     .map((r) =>
                         _chip(r.readableTitle, const Color(0xFFE8F0FE), _blue))
                     .toList(),
@@ -648,8 +632,6 @@ class _GroupCard extends StatelessWidget {
             else
               Text('No roles',
                   style: TextStyle(color: Colors.grey[400], fontSize: 11)),
-
-            // Assigned menus
             if (group.assignedMenus.isNotEmpty) ...[
               const SizedBox(height: 6),
               const Divider(

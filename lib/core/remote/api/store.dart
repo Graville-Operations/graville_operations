@@ -18,7 +18,6 @@ class StoreApi{
     var response = await HttpUtil().get(
       StoreRoute.getTools,
     );
-    debugPrint("Store api fetching tools: $response");
     return (response as List<dynamic>).map((tool)=>StoreTool.fromJson(tool)).toList();
   }
 }

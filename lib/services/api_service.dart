@@ -116,7 +116,7 @@ class ApiService {
       String email, String password) async {
     try {
       final response = await HttpUtil().post(
-        AppRoutes.login,
+        AppRoutes.loginScreen,
         options: _jsonOptions(),
         data: {'email': email, 'password': password},
       );
@@ -470,17 +470,17 @@ class ApiService {
     }
   }
 
-  /// GET /api/v1/menu/me/menus — Get all menus
-  static Future<List<Menu>> getAllMenus() async {
-    try {
-      final response = await HttpUtil().get(
-        AppRoutes.getAllMenus,
-        options: await _authJsonOptions(),
-      );
-      final data = _decodeResponse(response);
-      return (data as List<dynamic>).map((m) => Menu.fromJson(m)).toList();
-    } catch (e) {
-      throw Exception('Failed to load menus: $e');
-    }
-  }
+  // /// GET /api/v1/menu/me/menus — Get all menus
+  // static Future<List<Menu>> getAllMenus() async {
+  //   try {
+  //     final response = await HttpUtil().get(
+  //       AppRoutes.getAllMenus,
+  //       options: await _authJsonOptions(),
+  //     );
+  //     final data = _decodeResponse(response);
+  //     return (data as List<dynamic>).map((m) => Menu.fromJson(m)).toList();
+  //   } catch (e) {
+  //     throw Exception('Failed to load menus: $e');
+  //   }
+  // }
 }

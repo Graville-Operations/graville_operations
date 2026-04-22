@@ -1,7 +1,7 @@
 class AppRoutes {
   static const initial = '/';
   static const application = '/application';
-  //static const login = '/login';
+  static const login = '/login';
   static const signup = '/signup';
   static const projectDashboard = '/projects/dashboard';
   static const financeDashboard = '/finance/dashboard';
@@ -21,7 +21,7 @@ class AppRoutes {
   // Auth
   static const String adminExists = '/refactor/admin/exists';
   static const String adminSignup = '/refactor/admin/signup';
-  static const String login = '/refactor/login';
+  static const String loginScreen = '/refactor/login';
   static const String me = '/refactor/me';
   static const String forgotPassword = '/refactor/forgot-password';
   static const String verifyOtp = '/refactor/verify-otp';
@@ -57,6 +57,7 @@ class AppRoutes {
   static const String checkInBulk = '/workers/attendance/check-in/bulk';
   static const String todayAttendance = '/workers/attendance/today';
   static const String verifyAttendance = '/workers/attendance/verify';
+  static const String weekAttendance = '/workers/attendance/week';
 
   // Groups
   static const String getAllGroups = '/group';
@@ -67,5 +68,4 @@ class AppRoutes {
       '/group$groupId/users/$userId';
 
   // Menus
-  static const String getAllMenus = '/menu/me/menus';
 }
