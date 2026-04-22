@@ -4,6 +4,6 @@ class MenuRoute {
   static const String allMenus = "$_prefix/all";
   static const String createMenu = "$_prefix/create-menu";
 
-  static String createSubMenu(String menuId) => "$_prefix/$menuId/create-sub-menu";
+  static String createSubMenu(int menuId) => "$_prefix/$menuId/create-sub-menu";
   static String revokeMenu(String groupId, String menuId) => "$_prefix/$groupId/menus/$menuId";
 }
