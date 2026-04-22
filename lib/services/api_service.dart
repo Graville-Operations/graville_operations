@@ -393,7 +393,7 @@ class ApiService {
     }
   }
 
-  /// GET /api/v1/group — Get all groups
+  // GET /api/v1/group — Get all groups
   static Future<List<Group>> getAllGroups() async {
     try {
       final response = await HttpUtil().get(
@@ -407,7 +407,7 @@ class ApiService {
     }
   }
 
-  /// GET /api/v1/group/{group_id} — Get group by ID
+  // GET /api/v1/group/{group_id} — Get group by ID
   static Future<Group> getGroupById(int groupId) async {
     try {
       final response = await HttpUtil().get(
@@ -469,18 +469,4 @@ class ApiService {
       throw Exception('Failed to assign user: $e');
     }
   }
-
-  // /// GET /api/v1/menu/me/menus — Get all menus
-  // static Future<List<Menu>> getAllMenus() async {
-  //   try {
-  //     final response = await HttpUtil().get(
-  //       AppRoutes.getAllMenus,
-  //       options: await _authJsonOptions(),
-  //     );
-  //     final data = _decodeResponse(response);
-  //     return (data as List<dynamic>).map((m) => Menu.fromJson(m)).toList();
-  //   } catch (e) {
-  //     throw Exception('Failed to load menus: $e');
-  //   }
-  // }
 }

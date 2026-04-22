@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:graville_operations/core/local/entities/menu_data.dart';
+import 'package:graville_operations/core/local/entities/menu_data.dart'
+    as menu_data;
 import 'package:graville_operations/core/remote/api/menus.dart';
 import 'package:graville_operations/models/auth/groups.dart';
 import 'package:graville_operations/services/api_service.dart';
@@ -34,18 +35,6 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
         onAssigned: (assignedMenus) {
           setState(() => _group.assignedMenus = assignedMenus);
         },
-      ),
-    );
-  }
-
-  void _showSnack(String message, {bool isSuccess = false}) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: isSuccess ? Colors.green[700] : Colors.red[700],
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        margin: const EdgeInsets.all(16),
       ),
     );
   }
@@ -137,7 +126,6 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Assign Menu button
           GestureDetector(
             onTap: _showAssignMenuSheet,
             child: Container(
@@ -163,8 +151,6 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
             ),
           ),
           const SizedBox(height: 20),
-
-          // Assigned Menus card
           if (_group.assignedMenus.isNotEmpty) ...[
             _SectionCard(
               title: 'Assigned Menus (${_group.assignedMenus.length})',
@@ -191,8 +177,6 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
             ),
             const SizedBox(height: 14),
           ],
-
-          // Group Info card
           _SectionCard(
             title: 'Group Info',
             icon: Icons.info_outline_rounded,
@@ -211,8 +195,6 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
             ),
           ),
           const SizedBox(height: 14),
-
-          // Roles card
           _SectionCard(
             title: 'Roles (${_group.roles.length})',
             icon: Icons.shield_rounded,
@@ -249,9 +231,9 @@ class _AssignMenuSheet extends StatefulWidget {
 }
 
 class _AssignMenuSheetState extends State<_AssignMenuSheet> {
-  // Using MenuItem from menu_data.dart (the existing app model)
-  List<MenuItem> _allMenus = [];
-  final Set<String> _selectedRefIds = {}; // use ref_id for assignment
+  // Use the aliased type to avoid SubMenu name clash
+  List<menu_data.MenuItem> _allMenus = [];
+  final Set<String> _selectedRefIds = {};
   final Set<int> _expandedMenuIds = {};
   bool _isLoadingMenus = true;
   bool _isSubmitting = false;
@@ -263,10 +245,6 @@ class _AssignMenuSheetState extends State<_AssignMenuSheet> {
   void initState() {
     super.initState();
     _loadMenus();
-    // Pre-select already assigned menus by matching title (best effort)
-    for (final m in widget.group.assignedMenus) {
-      // We'll re-match by id after load; store titles for now
-    }
   }
 
   Future<void> _loadMenus() async {
@@ -280,9 +258,14 @@ class _AssignMenuSheetState extends State<_AssignMenuSheet> {
         _allMenus = menus;
         _isLoadingMenus = false;
         // Pre-select menus already assigned to this group
-        for (final m in widget.group.assignedMenus) {
-          final match = menus.where((menu) => menu.id == m.id);
-          if (match.isNotEmpty) _selectedRefIds.add(match.first.refId);
+        for (final assigned in widget.group.assignedMenus) {
+          final matches = menus.where((m) => m.id == assigned.id);
+          if (matches.isNotEmpty) {
+            final refId = matches.first.refId;
+            if (refId != null && refId.isNotEmpty) {
+              _selectedRefIds.add(refId);
+            }
+          }
         }
       });
     } catch (e) {
@@ -308,27 +291,24 @@ class _AssignMenuSheetState extends State<_AssignMenuSheet> {
         menuIds: _selectedRefIds.toList(),
       );
 
-      // Build the assigned Menu list from selected items to update parent
-      final selectedMenuItems =
-          _allMenus.where((m) => _selectedRefIds.contains(m.refId)).toList();
-
-      // Convert MenuItem → Menu (our groups model) for the callback
-      final assignedMenus = selectedMenuItems
+      // Convert selected menu_data.MenuItem → groups.Menu for parent callback
+      final assignedMenus = _allMenus
+          .where((m) => m.refId != null && _selectedRefIds.contains(m.refId))
           .map((m) => Menu(
-                id: m.id,
-                name: m.name,
-                title: m.title,
+                id: m.id ?? 0,
+                name: m.name ?? '',
+                title: m.title ?? '',
                 link: m.link,
                 icon: m.icon,
-                priority: m.priority,
+                priority: m.priority ?? 0,
                 subMenus: m.subMenus
                     .map((s) => SubMenu(
-                          id: s.id,
-                          name: s.name,
-                          title: s.title,
+                          id: s.id ?? 0,
+                          name: s.name ?? '',
+                          title: s.title ?? '',
                           link: s.link,
                           icon: s.icon,
-                          priority: s.priority,
+                          priority: s.priority ?? 0,
                         ))
                     .toList(),
               ))
@@ -462,21 +442,24 @@ class _AssignMenuSheetState extends State<_AssignMenuSheet> {
                               itemCount: _allMenus.length,
                               itemBuilder: (_, i) {
                                 final menu = _allMenus[i];
+                                final refId = menu.refId ?? '';
                                 final selected =
-                                    _selectedRefIds.contains(menu.refId);
+                                    _selectedRefIds.contains(refId);
+                                final menuId = menu.id ?? i;
                                 final expanded =
-                                    _expandedMenuIds.contains(menu.id);
+                                    _expandedMenuIds.contains(menuId);
                                 final hasSubMenus = menu.subMenus.isNotEmpty;
 
                                 return Column(
                                   children: [
-                                    // ── Menu row ──
+                                    // Menu row
                                     GestureDetector(
                                       onTap: () => setState(() {
+                                        if (refId.isEmpty) return;
                                         if (selected) {
-                                          _selectedRefIds.remove(menu.refId);
+                                          _selectedRefIds.remove(refId);
                                         } else {
-                                          _selectedRefIds.add(menu.refId);
+                                          _selectedRefIds.add(refId);
                                         }
                                       }),
                                       child: Container(
@@ -527,21 +510,24 @@ class _AssignMenuSheetState extends State<_AssignMenuSheet> {
                                               ),
                                             ),
                                             const SizedBox(width: 10),
-                                            // Title + sub-menu count
                                             Expanded(
                                               child: Column(
                                                 crossAxisAlignment:
                                                     CrossAxisAlignment.start,
                                                 children: [
-                                                  Text(menu.title,
-                                                      style: TextStyle(
-                                                          fontSize: 14,
-                                                          fontWeight:
-                                                              FontWeight.w600,
-                                                          color: selected
-                                                              ? _blue
-                                                              : const Color(
-                                                                  0xFF1A1A3E))),
+                                                  Text(
+                                                    menu.title ??
+                                                        menu.name ??
+                                                        '',
+                                                    style: TextStyle(
+                                                        fontSize: 14,
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                        color: selected
+                                                            ? _blue
+                                                            : const Color(
+                                                                0xFF1A1A3E)),
+                                                  ),
                                                   if (hasSubMenus)
                                                     Text(
                                                         '${menu.subMenus.length} sub-menu${menu.subMenus.length == 1 ? '' : 's'}',
@@ -551,19 +537,19 @@ class _AssignMenuSheetState extends State<_AssignMenuSheet> {
                                                 ],
                                               ),
                                             ),
-                                            // Expand/collapse toggle for sub-menus
+                                            // Expand/collapse toggle
                                             if (hasSubMenus)
                                               GestureDetector(
                                                 onTap: () => setState(() {
                                                   if (expanded) {
                                                     _expandedMenuIds
-                                                        .remove(menu.id);
+                                                        .remove(menuId);
                                                   } else {
                                                     _expandedMenuIds
-                                                        .add(menu.id);
+                                                        .add(menuId);
                                                   }
                                                 }),
-                                                child: Container(
+                                                child: Padding(
                                                   padding:
                                                       const EdgeInsets.all(4),
                                                   child: Icon(
@@ -582,7 +568,7 @@ class _AssignMenuSheetState extends State<_AssignMenuSheet> {
                                       ),
                                     ),
 
-                                    // ── Sub-menus (expandable) ──
+                                    // Sub-menus (expandable)
                                     if (hasSubMenus && expanded)
                                       Padding(
                                         padding: const EdgeInsets.only(
@@ -623,14 +609,18 @@ class _AssignMenuSheetState extends State<_AssignMenuSheet> {
                                                           CrossAxisAlignment
                                                               .start,
                                                       children: [
-                                                        Text(sub.title,
-                                                            style: const TextStyle(
-                                                                fontSize: 13,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w500,
-                                                                color: Color(
-                                                                    0xFF1A1A3E))),
+                                                        Text(
+                                                          sub.title ??
+                                                              sub.name ??
+                                                              '',
+                                                          style: const TextStyle(
+                                                              fontSize: 13,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w500,
+                                                              color: Color(
+                                                                  0xFF1A1A3E)),
+                                                        ),
                                                         if (sub.link != null &&
                                                             sub.link!
                                                                 .isNotEmpty)

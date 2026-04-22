@@ -64,7 +64,6 @@ class _GroupsListScreenState extends State<GroupsListScreen> {
     });
   }
 
-  // ─── Create Group Bottom Sheet ────────────────────────────────────────────
   void _showCreateGroupSheet() {
     final titleController = TextEditingController();
     final descController = TextEditingController();
@@ -173,7 +172,6 @@ class _GroupsListScreenState extends State<GroupsListScreen> {
     );
   }
 
-  // ─── Get by ID Bottom Sheet ───────────────────────────────────────────────
   void _showGetByIdSheet() {
     final idController = TextEditingController();
     bool isLoading = false;
