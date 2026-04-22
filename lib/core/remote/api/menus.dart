@@ -5,7 +5,7 @@ import 'package:graville_operations/core/remote/routes/menu_route.dart';
 import 'package:graville_operations/core/utils/http.dart';
 
 class MenuApi {
-  // ─── GET /me/menus (cached) ───────────────────────────
+  // GET  /me/menus (cached)
   static Future<List<MenuItem>> getMyMenu() async {
     final currentToken = UserStore.to.token;
     final cachedMenus = UserStore.to.getMenus();
@@ -23,7 +23,7 @@ class MenuApi {
     }
   }
 
-  // ─── GET /all ─────────────────────────────────────────
+  // GET /all 
   static Future<List<MenuItem>> getAllMenus() async {
     try {
       final result = await HttpUtil().get(MenuRoute.allMenus);
@@ -36,7 +36,7 @@ class MenuApi {
     }
   }
 
-  // ─── POST /create-menu ────────────────────────────────
+  // POST /create-menu 
   static Future<MenuItem> createMenu({
     required String name,
     required String title,
@@ -59,18 +59,19 @@ class MenuApi {
     }
   }
 
-  // ─── POST /{menu_id}/create-sub-menu ──────────────────
+  // POST /{menu_id}/create-sub-menu 
   static Future<SubMenu> createSubMenu({
-    required String menuRefId,
+    required int menuId,
     required String name,
     required String title,
     String? link,
     String? icon,
     int? priority,
   }) async {
+    print("Creating sub-menu under menuRefId: $menuId with name: $name, title: $title");
     try {
       final result = await HttpUtil().post(
-        MenuRoute.createSubMenu(menuRefId),
+        MenuRoute.createSubMenu(menuId),
         data: {
           'name': name,
           'title': title,
@@ -86,7 +87,7 @@ class MenuApi {
     }
   }
 
-  // ─── DELETE /{group_id}/menus/{menu_id} ───────────────
+  // DELETE /{group_id}/menus/{menu_id} 
   static Future<void> revokeMenu({
     required String groupId,
     required String menuRefId,

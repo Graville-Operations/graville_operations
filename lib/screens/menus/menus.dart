@@ -103,7 +103,7 @@ class MenusScreen extends StatelessWidget {
   }
 }
 
-// ─── Add Menu ─────────────────────────────────────────────────────────────────
+// Add Menu
 void _showAddMenuDialog(BuildContext context, MenusController ctrl) {
   final nameCtrl = TextEditingController();
   final titleCtrl = TextEditingController();
@@ -148,8 +148,7 @@ void _showAddMenuDialog(BuildContext context, MenusController ctrl) {
   );
 }
 
-// ─── Edit Menu ────────────────────────────────────────────────────────────────
-// Note: edit is local-only until your backend adds a PATCH /menus/{id} endpoint
+// Edit Menu
 void _showEditMenuDialog(BuildContext context, MenusController ctrl, MenuItem menu) {
   showDialog(
     context: context,
@@ -164,7 +163,7 @@ void _showEditMenuDialog(BuildContext context, MenusController ctrl, MenuItem me
   );
 }
 
-// ─── Delete Menu ──────────────────────────────────────────────────────────────
+// Delete Menu 
 void _confirmDelete(BuildContext context, MenusController ctrl, MenuItem menu) {
   showDialog(
     context: context,
@@ -187,7 +186,7 @@ void _confirmDelete(BuildContext context, MenusController ctrl, MenuItem menu) {
   );
 }
 
-// ─── Add Sub-menu ─────────────────────────────────────────────────────────────
+//  Add Sub-menu
 void _showAddSubMenuDialog(BuildContext context, MenusController ctrl, MenuItem menu) {
   final nameCtrl = TextEditingController();
   final titleCtrl = TextEditingController();
@@ -216,7 +215,7 @@ void _showAddSubMenuDialog(BuildContext context, MenusController ctrl, MenuItem 
           onPressed: () {
             if (titleCtrl.text.isNotEmpty) {
               ctrl.createSubMenu(
-                menuRefId: menu.refId ?? '',
+                menuRefId: menu.id ??0, 
                 name: nameCtrl.text.isEmpty
                     ? titleCtrl.text.toLowerCase().replaceAll(' ', '_')
                     : nameCtrl.text,
@@ -233,7 +232,7 @@ void _showAddSubMenuDialog(BuildContext context, MenusController ctrl, MenuItem 
   );
 }
 
-// ─── Delete Sub-menu ──────────────────────────────────────────────────────────
+// Delete Sub-menu
 void _confirmDeleteSubMenu(BuildContext context, MenusController ctrl,
     MenuItem menu, String subMenuTitle) {
   showDialog(
@@ -256,7 +255,7 @@ void _confirmDeleteSubMenu(BuildContext context, MenusController ctrl,
   );
 }
 
-// ─── Sub-menu Detail ──────────────────────────────────────────────────────────
+// Sub-menu Detail
 void _showSubMenuDetail(BuildContext context, MenuItem menu, String subMenuTitle) {
   final subMenu = menu.subMenus.firstWhere(
     (s) => s.title == subMenuTitle,
