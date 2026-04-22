@@ -9,6 +9,7 @@ import 'package:graville_operations/screens/application/widgets/splash_screen.da
 import 'package:graville_operations/screens/auth/login/binding.dart';
 import 'package:graville_operations/screens/auth/login/view.dart';
 import 'package:graville_operations/screens/finance_dashboard/finance_dashboard.dart';
+import 'package:graville_operations/screens/invoice/invoice_list_screen.dart';
 import 'package:graville_operations/screens/invoice/invoice_screen.dart';
 import 'package:graville_operations/screens/menus/menus.dart';
 import 'package:graville_operations/screens/projects/dashboard/assign_user_screen.dart';
@@ -73,27 +74,28 @@ class AppPages {
       name: AppRoutes.userRoles,
       page: () => const UsersListScreen(),
     ),
-<<<<<<< HEAD
     GetPage(
       name: AppRoutes.userDepartment,
       page: () => AssignUserToGroupScreen(),
     ),
 
     // ─── Finance menu routes
-=======
->>>>>>> b830182c79bb567f0cd7c85652cbb66a958f15cf
     GetPage(
       name: AppRoutes.financeDashboard,
       page: () => const FinanceDashboardApp(),
     ),
     GetPage(
       name: AppRoutes.financeInvoices,
-      page: () => const InvoiceScreen(),
+      page: () => const InvoiceListScreen(),
     ),
     GetPage(
       name: AppRoutes.menuDepartments,
       page: () => const MenusScreen(),
       binding: MenusBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.createInvoice,
+      page: () => const InvoiceScreen(),
     )
   ];
 }
