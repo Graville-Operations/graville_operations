@@ -13,6 +13,8 @@ class AppRoutes {
   static const createUser = '/users/new';
   static const userRoles = '/users/roles';
   static const financeInvoices = '/finance/invoices';
+  static const createInvoice = '/finance/templates';
+
   static const menuDepartments = "/departments/menus";
 
   // Base
@@ -68,4 +70,8 @@ class AppRoutes {
       '/group$groupId/users/$userId';
 
   // Menus
+  static const String getInvoices = '/invoices/';
+  static const String createInvoices = '/invoices/create';
+  static String updateInvoiceStatus(int id) => '/invoices/$id/status';
+  static String updateInvoicePayment(int id) => '/invoices/$id/payment';
 }

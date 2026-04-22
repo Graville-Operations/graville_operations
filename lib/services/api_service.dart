@@ -345,7 +345,80 @@ class ApiService {
       return {'success': false, 'message': e.toString()};
     }
   }
+   static Future<Map<String, dynamic>> getAllInvoices() async {
+  try {
+    final response = await HttpUtil().get(
+      AppRoutes.getInvoices,
+      options: await _authJsonOptions(),
+    );
 
+    final data = _decodeResponse(response);
+
+    return {
+      'success': true,
+      'data': data,
+    };
+  } catch (e) {
+    print('getAllInvoices error: $e');
+    return {
+      'success': false,
+      'message': 'Failed to load invoices',
+    };
+  }
+}
+static Future<Map<String, dynamic>> createInvoice(
+    Map<String, dynamic> payload) async {
+  try {
+    final response = await HttpUtil().post(
+      AppRoutes.createInvoices, 
+      options: await _authJsonOptions(),
+      data: payload,
+    );
+
+    final data = _decodeResponse(response);
+
+    return {
+      'success': true,
+      'data': data,
+    };
+  } catch (e) {
+    print('createInvoice error: $e');
+    return {
+      'success': false,
+      'message': 'Failed to create invoice',
+    };
+  }
+}
+// ✅ Correct — uses AppRoutes
+static Future<Map<String, dynamic>> updateInvoiceStatus(
+    int invoiceId, String status) async {
+  try {
+    final response = await HttpUtil().put(  
+      AppRoutes.updateInvoiceStatus(invoiceId),
+      options: await _authJsonOptions(),
+      data: {'status': status},
+    );
+    final data = _decodeResponse(response);
+    return {'success': true, 'data': data};
+  } catch (e) {
+    return {'success': false, 'message': e.toString()};
+  }
+}
+
+static Future<Map<String, dynamic>> recordInvoicePayment(
+    int invoiceId, double amount) async {
+  try {
+    final response = await HttpUtil().put( 
+      AppRoutes.updateInvoicePayment(invoiceId),
+      options: await _authJsonOptions(),
+      data: {'amount_paid': amount},
+    );
+    final data = _decodeResponse(response);
+    return {'success': true, 'data': data};
+  } catch (e) {
+    return {'success': false, 'message': e.toString()};
+  }
+}
   // static Future<Map<String, dynamic>> updatePersonalSettings(
   //     int userId, Map<String, dynamic> settings) async {
   //   try {

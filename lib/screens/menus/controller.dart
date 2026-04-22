@@ -56,7 +56,7 @@ class MenusController extends GetxController {
   }
 
   Future<void> createSubMenu({
-    required String menuRefId,
+    required int menuRefId,
     required String name,
     required String title,
     String? link,
@@ -64,7 +64,7 @@ class MenusController extends GetxController {
     try {
       EasyLoading.show(status: 'Adding sub-menu...');
       final newSub = await MenuApi.createSubMenu(
-        menuRefId: menuRefId, name: name, title: title, link: link,
+        menuId: menuRefId, name: name, title: title, link: link,
       );
       final index = menus.indexWhere((m) => m.refId == menuRefId);
       if (index != -1) {
