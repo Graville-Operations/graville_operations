@@ -18,13 +18,6 @@ class AppRoutes {
   // Auth
   static const String adminExists = '/refactor/admin/exists';
   static const String adminSignup = '/refactor/admin/signup';
-  static const String login = '/refactor/login';
-  static const String me = '/refactor/me';
-  static const String forgotPassword = '/refactor/forgot-password';
-  static const String verifyOtp = '/refactor/verify-otp';
-  static const String resetPassword = '/refactor/reset-password';
-  static const String adminExists = '/refactor/admin/exists';
-  static const String adminSignup = '/refactor/admin/signup';
   static const String loginScreen = '/refactor/login';
   static const String me = '/refactor/me';
   static const String forgotPassword = '/refactor/forgot-password';
@@ -57,10 +50,6 @@ class AppRoutes {
   static String updateInventory(int id) => '/materials/update_inventory/$id';
 
   // Attendance
-  static const String checkIn = '/workers/attendance/check-in';
-  static const String checkInBulk = '/workers/attendance/check-in/bulk';
-  static const String todayAttendance = '/workers/attendance/today';
-  static const String verifyAttendance = '/workers/attendance/verify';
   static const String checkIn = '/workers/attendance/check-in';
   static const String checkInBulk = '/workers/attendance/check-in/bulk';
   static const String todayAttendance = '/workers/attendance/today';
