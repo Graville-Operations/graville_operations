@@ -6,6 +6,7 @@ import 'package:graville_operations/core/commons/widgets/section_card.dart';
 import 'package:graville_operations/core/commons/widgets/stat_card.dart';
 import 'package:graville_operations/screens/material/receive_material.dart';
 import 'package:graville_operations/screens/material/transfer_material.dart';
+import 'package:graville_operations/screens/material/transfers_list_screen.dart';
 import 'package:graville_operations/screens/sites/site_list/sites_list.dart';
 import 'package:graville_operations/screens/store/add_material.dart';
 import 'package:graville_operations/screens/store/update_inventory.dart';
@@ -127,6 +128,14 @@ class _HomeScreenState extends State<HomeScreen> {
               child: miniFab(
                 Icons.local_shipping,
                 () => context.push(const TransferMaterialScreen()),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Tooltip(
+              message: "Transfer material list",
+              child: miniFab(
+                Icons.local_shipping,
+                () => context.push(const TransfersListScreen()),
               ),
             ),
             const SizedBox(height: 12),
