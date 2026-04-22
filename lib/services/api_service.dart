@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:graville_operations/core/routes/names.dart';
 import 'package:graville_operations/core/utils/constants.dart';
 import 'package:graville_operations/core/utils/http.dart';
+import 'package:graville_operations/models/auth/groups.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
@@ -389,6 +390,97 @@ class ApiService {
       return {'success': data != null, 'data': data};
     } catch (e) {
       return {'success': false, 'data': null, 'message': e.toString()};
+    }
+  }
+
+  /// GET /api/v1/group — Get all groups
+  static Future<List<Group>> getAllGroups() async {
+    try {
+      final response = await HttpUtil().get(
+        AppRoutes.getAllGroups,
+        options: await _authJsonOptions(),
+      );
+      final data = _decodeResponse(response);
+      return (data as List<dynamic>).map((g) => Group.fromJson(g)).toList();
+    } catch (e) {
+      throw Exception('Failed to load groups: $e');
+    }
+  }
+
+  /// GET /api/v1/group/{group_id} — Get group by ID
+  static Future<Group> getGroupById(int groupId) async {
+    try {
+      final response = await HttpUtil().get(
+        AppRoutes.getGroupById(groupId),
+        options: await _authJsonOptions(),
+      );
+      final data = _decodeResponse(response);
+      return Group.fromJson(data);
+    } catch (e) {
+      throw Exception('Group not found: $e');
+    }
+  }
+
+  /// POST /api/v1/group/create — Create a new group
+  static Future<Group> createGroup({
+    required String title,
+    required String description,
+  }) async {
+    try {
+      final response = await HttpUtil().post(
+        AppRoutes.createGroup,
+        options: await _authJsonOptions(),
+        data: {'title': title, 'description': description},
+      );
+      final data = _decodeResponse(response);
+      return Group.fromJson(data);
+    } catch (e) {
+      throw Exception('Failed to create group: $e');
+    }
+  }
+
+  /// POST /api/v1/group/{group_id}/menus — Assign menus to group
+  static Future<void> assignMenuToGroup({
+    required int groupId,
+    required List<String> menuIds,
+  }) async {
+    try {
+      await HttpUtil().post(
+        AppRoutes.assignGroupMenus(groupId),
+        options: await _authJsonOptions(),
+        data: {'menu_ids': menuIds},
+      );
+    } catch (e) {
+      throw Exception('Failed to assign menus: $e');
+    }
+  }
+
+  /// POST /api/v1/group{group_id}/users/{user_id} — Assign user to group
+  static Future<void> assignUserToGroup({
+    required int groupId,
+    required String userId,
+  }) async {
+    try {
+      await HttpUtil().post(
+        AppRoutes.assignUserToGroup(groupId, userId),
+        options: await _authJsonOptions(),
+      );
+    } catch (e) {
+      throw Exception('Failed to assign user: $e');
+    }
+  }
+
+  /// GET /api/v1/menu/me/menus — Get all menus
+  static Future<List<Menu>> getAllMenus() async {
+    try {
+      final response = await HttpUtil().get(
+        AppRoutes.getAllMenus,
+        options: await _authJsonOptions(),
+      );
+      final data = _decodeResponse(response);
+      return (data as List<dynamic>).map((m) => Menu.fromJson(m)).toList();
+    } catch (e) {
+      throw Exception('Failed to load menus: $e');
     }
   }
 }

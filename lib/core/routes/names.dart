@@ -13,7 +13,6 @@ class AppRoutes {
   static const createUser = '/users/new';
   static const userRoles = '/users/roles';
   static const financeInvoices = '/finance/invoices';
-
   static const menuDepartments = "/departments/menus";
 
   // Base
@@ -58,4 +57,15 @@ class AppRoutes {
   static const String checkInBulk = '/workers/attendance/check-in/bulk';
   static const String todayAttendance = '/workers/attendance/today';
   static const String verifyAttendance = '/workers/attendance/verify';
+
+  // Groups
+  static const String getAllGroups = '/group';
+  static const String createGroup = '/group/create';
+  static String getGroupById(int id) => '/group/$id';
+  static String assignGroupMenus(int id) => '/group/$id/menus';
+  static String assignUserToGroup(int groupId, String userId) =>
+      '/group$groupId/users/$userId';
+
+  // Menus
+  static const String getAllMenus = '/menu/me/menus';
 }

@@ -12,6 +12,7 @@ import 'package:graville_operations/screens/invoice/invoice_screen.dart';
 import 'package:graville_operations/screens/menus/menus.dart';
 import 'package:graville_operations/screens/projects/dashboard/assign_user_screen.dart';
 import 'package:graville_operations/screens/projects/dashboard/binding.dart';
+import 'package:graville_operations/screens/projects/dashboard/group_list_screen.dart';
 import 'package:graville_operations/screens/projects/dashboard/view.dart';
 import 'package:graville_operations/screens/sites/create/view.dart';
 import 'routes.dart';
@@ -81,6 +82,10 @@ class AppPages {
     GetPage(
       name: AppRoutes.menuDepartments,
       page: () => const MenusScreen(),
+    ),
+    GetPage(
+      name: AppRoutes.subMenusScreens,
+      page: () => const GroupsListScreen(),
     )
   ];
 }
