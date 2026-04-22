@@ -34,14 +34,13 @@ class AppPages {
       .toList();
 
   static final List<GetPage> _rawRoutes = [
-   // GetPage(name: AppRoutes.initial, page: () => const LoginScreen(), binding: LoginBindings()),
     GetPage(
-      name: AppRoutes.initial,
+      name: AppRoutes.login,
       page: () => const LoginScreen(),
       binding: LoginBindings(),
     ),
     GetPage(
-      name: AppPages.application,
+      name: AppPages.initial,
       page: () => ApplicationScreen(),
       binding: ApplicationBindings(),
     ),

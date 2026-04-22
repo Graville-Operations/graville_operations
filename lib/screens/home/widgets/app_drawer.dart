@@ -1,23 +1,21 @@
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:graville_operations/core/local/entities/menu_data.dart';
-import 'package:graville_operations/screens/application/widgets/drawer_item.dart';
+import 'package:graville_operations/screens/home/widgets/drawer_item.dart';
 
 class AppDrawer extends StatelessWidget {
   final List<MenuItem> drawerMenus;
   const AppDrawer({super.key, required this.drawerMenus});
-
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      // backgroundColor: Colors.white,
       child: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Drawer header
             Container(
-              width: double.infinity,
+              // width: double.infinity,
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
               // color: AppTheme.,
               child: Column(
@@ -39,7 +37,6 @@ class AppDrawer extends StatelessWidget {
 
             const SizedBox(height: 8),
 
-            // Drawer menu items
             Expanded(
               child: ListView(
                 padding: EdgeInsets.zero,
@@ -51,7 +48,6 @@ class AppDrawer extends StatelessWidget {
 
             const Divider(),
 
-            // Bottom: logout
             ListTile(
               leading: Icon(Icons.logout, color: Colors.red.shade400),
               title: Text(
