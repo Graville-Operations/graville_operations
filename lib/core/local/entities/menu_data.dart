@@ -1,5 +1,5 @@
-
-class MenuItem{
+class MenuItem {
+  final String? refId;   // ← ADD
   final int? id;
   final String? name;
   final String? title;
@@ -9,6 +9,7 @@ class MenuItem{
   final List<SubMenu> subMenus;
 
   const MenuItem({
+    this.refId,           // ← ADD
     this.id,
     this.name,
     this.title,
@@ -17,8 +18,10 @@ class MenuItem{
     required this.priority,
     this.subMenus = const [],
   });
+
   factory MenuItem.fromJson(json) {
     return MenuItem(
+      refId: json['ref_id'] as String?,   // ← ADD
       id: json['id'] as int?,
       name: json['name'] as String?,
       title: json['title'] as String?,
@@ -27,13 +30,13 @@ class MenuItem{
       priority: json['priority'] as int?,
       subMenus: (json['sub_menus'] as List<dynamic>?)
           ?.map((e) => SubMenu.fromJson(e as Map<String, dynamic>))
-          .toList() ??
-          [],
+          .toList() ?? [],
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
+      'ref_id': refId,    // ← ADD
       'id': id,
       'name': name,
       'title': title,
@@ -45,8 +48,8 @@ class MenuItem{
   }
 }
 
-
 class SubMenu {
+  final String? refId;   // ← ADD
   final int? id;
   final String? name;
   final String? title;
@@ -55,6 +58,7 @@ class SubMenu {
   final int? priority;
 
   const SubMenu({
+    this.refId,           // ← ADD
     this.id,
     this.name,
     this.title,
@@ -62,8 +66,10 @@ class SubMenu {
     this.icon,
     this.priority,
   });
+
   factory SubMenu.fromJson(Map<String, dynamic> json) {
     return SubMenu(
+      refId: json['ref_id'] as String?,   // ← ADD
       id: json['id'] as int?,
       name: json['name'] as String?,
       title: json['title'] as String?,
@@ -75,6 +81,7 @@ class SubMenu {
 
   Map<String, dynamic> toJson() {
     return {
+      'ref_id': refId,    // ← ADD
       'id': id,
       'name': name,
       'title': title,

@@ -33,7 +33,6 @@ class InventoryScreenController extends GetxController{
     state.toolsErrorMessage.value = '';
     try{
       var response = await StoreApi.fetchStoreTools();
-      debugPrint("Fetched tools: $response");
       state.tools.assignAll(response);
     }catch(e){
       state.toolsErrorMessage.value = "Failed to load materials";
