@@ -475,11 +475,11 @@ void initState() {
                                 ? Colors.orange
                                 : const Color(0xff5b7cfa);
                         return GestureDetector(
-                          onTap: () => Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (_) => TaskDetailScreen(task: task),
-                            ),
-                          ),
+                         onTap: () => Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) => TaskDetailScreen(task: task),
+                              ),
+                            ).then((_) => _loadTasks()),  // ✅ correct — .then() is on push()
                           child: Padding(
                             padding: const EdgeInsets.only(bottom: 14),
                             child: Column(
