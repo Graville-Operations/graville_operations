@@ -3,11 +3,12 @@ import 'package:graville_operations/core/commons/widgets/custom_dropdown.dart';
 import 'package:graville_operations/core/commons/widgets/custom_text_input.dart';
 import 'package:graville_operations/core/commons/widgets/sections/form_section.dart';
 import 'package:graville_operations/models/material/app_material.dart';
+import 'package:graville_operations/services/transfer_material_service.dart';
 
-
-class MaterialInfoSection extends StatelessWidget {
+class MaterialInfoSection extends StatefulWidget {
   final AppMaterial? selectedMaterial;
   final ValueChanged<AppMaterial?> onChanged;
+
   const MaterialInfoSection({
     super.key,
     required this.selectedMaterial,
@@ -15,69 +16,84 @@ class MaterialInfoSection extends StatelessWidget {
   });
 
   @override
+  State<MaterialInfoSection> createState() => _MaterialInfoSectionState();
+}
+
+class _MaterialInfoSectionState extends State<MaterialInfoSection> {
+  List<AppMaterial> _materials = [];
+  bool _loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadMaterials();
+  }
+
+  Future<void> _loadMaterials() async {
+    final result = await TransferMaterialService.fetchMaterials();
+    if (mounted) {
+      setState(() {
+        _materials = result;
+        _loading = false;
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final List<AppMaterial> materials = const [
-      AppMaterial(
-        id: "1",
-        name: "Cement",
-        unit: "Bags",
-        category: "Structural",
-      ),
-      AppMaterial(
-        id: "2",
-        name: "Sand",
-        unit: "Tonnes",
-        category: "Structural",
-      ),
-      AppMaterial(
-        id: "3",
-        name: "Balast",
-        unit: "Tonnes",
-        category: "Structural",
-      ),
-      AppMaterial(
-        id: "4",
-        name: "Steel",
-        unit: "Pieces",
-        category: "Structural",
-      ),
-      AppMaterial(
-        id: "5",
-        name: "Paint",
-        unit: "Litres",
-        category: "Finishing",
-      ),
-    ];
+    final categoryController = TextEditingController(
+      text: widget.selectedMaterial?.category ?? '',
+    );
 
     return Column(
       children: [
         FormSection(
-          title: "Material Name",
+          title: 'Material Name',
           icon: Icons.inventory,
           required: true,
-          child: CustomDropdown<AppMaterial>(
-            hint: "Select material",
-            value: selectedMaterial,
-            items: materials,
-            displayMapper: (item) => item.name,
-            onChanged: onChanged,
-          ),
+          child: _loading
+              ? const _LoadingField()
+              : CustomDropdown<AppMaterial>(
+                  hint: 'Select material',
+                  value: widget.selectedMaterial,
+                  items: _materials,
+                  displayMapper: (item) => item.name,
+                  onChanged: widget.onChanged,
+                ),
         ),
-
-        //const SizedBox(height: 16),
         FormSection(
-          title: "Material Category",
+          title: 'Material Category',
           icon: Icons.category,
           required: false,
           child: CustomTextInput(
-            controller: TextEditingController(
-              text: selectedMaterial?.category ?? "",
-            ),
-            hintText: "",
+            controller: categoryController,
+            hintText: '',
             readOnly: true,
           ),
         ),
       ],
+    );
+  }
+}
+
+class _LoadingField extends StatelessWidget {
+  const _LoadingField();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 52,
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey.shade400),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: const Center(
+        child: SizedBox(
+          width: 20,
+          height: 20,
+          child: CircularProgressIndicator(strokeWidth: 2),
+        ),
+      ),
     );
   }
 }
