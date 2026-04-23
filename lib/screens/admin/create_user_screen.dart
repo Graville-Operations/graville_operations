@@ -161,7 +161,7 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F6F8),
       appBar: AppBar(
-        title: const Text('Add New User'),
+        title: const Text('Creating a New User'),
         backgroundColor: AppColor.primaryBackground,
         foregroundColor: Colors.white,
         elevation: 0,
