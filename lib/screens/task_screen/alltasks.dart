@@ -5,8 +5,7 @@ import 'package:graville_operations/screens/commons/widgets/task_card.dart';
 import 'package:graville_operations/screens/task_screen/task_details.dart';
 
 class AllTasksScreen extends StatefulWidget {
-  /// Pass a siteId to filter tasks for a specific site (used from site detail).
-  /// Leave null to show all tasks.
+ 
   final int? siteId;
   final String? siteTitle;
 
@@ -22,7 +21,6 @@ class _AllTasksScreenState extends State<AllTasksScreen> {
   bool _loading = true;
   String? _error;
 
-  /// 'all' | 'pending' | 'in_progress' | 'completed'
   String _filter = 'all';
 
   @override
@@ -37,16 +35,13 @@ class _AllTasksScreenState extends State<AllTasksScreen> {
       _error = null;
     });
     try {
-      // TaskApi.getAllTasks() returns all tasks.
-      // If your backend supports filtering by siteId, add that here.
+     
       final tasks = await TaskApi.getAllTasks();
 
-      // Client-side filter by siteId if provided
+     
       final relevant = widget.siteId != null
           ? tasks // filter by siteId once TaskResponse exposes it
           : tasks;
-
-      // Sort: in-progress first → pending → completed
       relevant.sort((a, b) => _statusOrder(a).compareTo(_statusOrder(b)));
 
       if (!mounted) return;
@@ -94,6 +89,73 @@ class _AllTasksScreenState extends State<AllTasksScreen> {
 
   int get _inProgressCount =>
       _tasks.where((t) => t.completion > 0 && t.completion < 100).length;
+      Future<void> _deleteTask(TaskResponse task) async {
+  final confirmed = await showDialog<bool>(
+    context: context,
+    builder: (ctx) => AlertDialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      title: const Row(
+        children: [
+          Icon(Icons.delete_outline, color: Colors.red),
+          SizedBox(width: 8),
+          Text("Delete Task",
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+        ],
+      ),
+      content: RichText(
+        text: TextSpan(
+          style: const TextStyle(color: Colors.black87, fontSize: 14),
+          children: [
+            const TextSpan(text: "Are you sure you want to delete "),
+            TextSpan(
+              text: '"${task.title}"',
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+            const TextSpan(text: "? This action cannot be undone."),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(ctx, false),
+          child: const Text("Cancel",
+              style: TextStyle(color: Colors.grey)),
+        ),
+        ElevatedButton(
+          onPressed: () => Navigator.pop(ctx, true),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.red,
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8)),
+          ),
+          child: const Text("Delete",
+              style: TextStyle(color: Colors.white)),
+        ),
+      ],
+    ),
+  );
+
+  if (confirmed != true) return;
+
+  try {
+    await deleteTask(task.id);
+    if (!mounted) return;
+    setState(() {
+      _tasks.removeWhere((t) => t.id == task.id);
+      _applyFilter();
+    });
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text('"${task.title}" deleted successfully'),
+      backgroundColor: const Color(0xff1db954),
+    ));
+  } catch (e) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text('Failed to delete: ${e.toString()}'),
+      backgroundColor: Colors.red,
+    ));
+  }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -112,7 +174,6 @@ class _AllTasksScreenState extends State<AllTasksScreen> {
       ),
       body: Column(
         children: [
-          // ── Summary bar ─────────────────────────────────────────
           if (!_loading && _error == null && _tasks.isNotEmpty)
             _SummaryBar(
               total: _tasks.length,
@@ -121,7 +182,6 @@ class _AllTasksScreenState extends State<AllTasksScreen> {
               overallCompletion: _overallCompletion,
             ),
 
-          // ── Filter chips ────────────────────────────────────────
           if (!_loading && _error == null)
             _FilterBar(
               current: _filter,
@@ -131,7 +191,6 @@ class _AllTasksScreenState extends State<AllTasksScreen> {
               },
             ),
 
-          // ── List ────────────────────────────────────────────────
           Expanded(
             child: _loading
                 ? const Center(
@@ -149,28 +208,27 @@ class _AllTasksScreenState extends State<AllTasksScreen> {
                               itemCount: _filtered.length,
                               separatorBuilder: (_, __) =>
                                   const SizedBox(height: 10),
-                              itemBuilder: (context, i) {
+                             itemBuilder: (context, i) {
                                 final task = _filtered[i];
                                 return TaskCardWidget(
                                   task: task,
                                   onTap: () => Navigator.of(context).push(
                                     MaterialPageRoute(
-                                      builder: (_) =>
-                                          TaskDetailScreen(task: task),
+                                      builder: (_) => TaskDetailScreen(task: task),
                                     ),
                                   ),
+                                  onDelete: () => _deleteTask(task), // ← pass delete callback
                                 );
                               },
                             ),
                           ),
-          ),
-        ],
-      ),
-    );
-  }
-}
+                        ),
+                      ],
+                    ),
+                  );
+                }
+              }
 
-// ── Summary bar ──────────────────────────────────────────────────────────────
 
 class _SummaryBar extends StatelessWidget {
   final int total;
@@ -259,7 +317,6 @@ class _Chip extends StatelessWidget {
   }
 }
 
-// ── Filter bar ────────────────────────────────────────────────────────────────
 
 class _FilterBar extends StatelessWidget {
   final String current;
@@ -309,7 +366,6 @@ class _FilterBar extends StatelessWidget {
   }
 }
 
-// ── Empty / error states ──────────────────────────────────────────────────────
 
 class _EmptyState extends StatelessWidget {
   const _EmptyState();

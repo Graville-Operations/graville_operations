@@ -277,17 +277,37 @@ class HomeScreen extends GetView<HomeScreenController> {
                                     child: Stack(
                                       alignment: Alignment.center,
                                       children: [
-                                        CircularProgressIndicator(
-                                          value: 0.68,
-                                          strokeWidth: 8,
-                                          color: Colors.orange,
-                                          backgroundColor: Colors.grey.shade300,
-                                        ),
-                                        const Text(
-                                          "68%",
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.bold),
-                                        ),
+                                        Builder(builder: (_) {
+                                          final avg = controller.state.tasksLoading.value || controller.state.recentTasks.isEmpty
+                                              ? 0.0
+                                              : controller.state.recentTasks.fold<int>(0, (sum, t) => sum + t.completion) /
+                                                controller.state.recentTasks.length;
+                                          final display = avg.round();
+                                          return Stack(
+                                            alignment: Alignment.center,
+                                            children: [
+                                              CircularProgressIndicator(
+                                                value: avg / 100,
+                                                strokeWidth: 8,
+                                                color: avg >= 100
+                                                    ? const Color(0xff1db954)
+                                                    : avg >= 60
+                                                        ? Colors.orange
+                                                        : const Color(0xff5b7cfa),
+                                                backgroundColor: Colors.grey.shade300,
+                                              ),
+                                             controller.state.tasksLoading.value
+                                                ? const SizedBox(
+                                                    width: 16, height: 16,
+                                                    child: CircularProgressIndicator(strokeWidth: 2),
+                                                  )
+                                                : Text(
+                                                    "$display%",
+                                                    style: const TextStyle(fontWeight: FontWeight.bold),
+                                                  ),
+                                            ],
+                                          );
+                                        }),
                                       ],
                                     ),
                                   ),
@@ -369,7 +389,7 @@ class HomeScreen extends GetView<HomeScreenController> {
                                         style: TextStyle(fontSize: 12, color: Colors.grey)),
                                     const Spacer(),
                                     Text(
-                                      "${(controller.state.overallCompletion * 100).round()}%",
+                                    "${(controller.state.overallCompletion.value * 100).round()}%",
                                       style: const TextStyle(
                                           fontSize: 12, fontWeight: FontWeight.bold),
                                     ),
