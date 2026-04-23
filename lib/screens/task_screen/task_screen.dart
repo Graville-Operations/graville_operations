@@ -168,39 +168,55 @@ class CreateTaskScreenState extends State<CreateTaskScreen> {
   }
 
   void submitTask() async {
-    if (!formKey.currentState!.validate()) return;
-    if (selectedWorkerIds.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please select at least one worker")),
-      );
-      return;
-    }
-
-    try {
-      final request = CreateTaskRequest(
-        title: titleController.text.trim(),
-        description: descriptionController.text.trim(),
-        assignedTo: selectedWorkerIds,
-        // siteId: selectedSiteId,
-        siteId: 5,
-        fieldOperatorId: fieldOperatorId ?? 1,
-        completion: 0,
-        createdAt: DateTime.now(),
-      );
-      await TaskApi.createTask(request);
-
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text('Task created successfully'),
-        backgroundColor: Colors.green,
-      ));
-      Navigator.pop(context, true);
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Error: ${e.toString()}'),
-        backgroundColor: Colors.red,
-      ));
-    }
+  if (!formKey.currentState!.validate()) return;
+  if (selectedWorkerIds.isEmpty) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Please select at least one worker")),
+    );
+    return;
   }
+
+  try {
+    final request = CreateTaskRequest(
+      title: titleController.text.trim(),
+      description: descriptionController.text.trim(),
+      assignedTo: selectedWorkerIds,
+      siteId: 3,
+      fieldOperatorId: fieldOperatorId ?? 1,
+      completion: 0,
+      createdAt: DateTime.now(),
+    );
+    await TaskApi.createTask(request);
+
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+      content: Text('Task created successfully'),
+      backgroundColor: Colors.green,
+    ));
+    Navigator.pop(context, true);
+
+  } on DuplicateTaskException catch (e) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Row(
+        children: [
+          const Icon(Icons.warning_amber_rounded, color: Colors.white, size: 18),
+          const SizedBox(width: 8),
+          Expanded(child: Text(e.message)),
+        ],
+      ),
+      backgroundColor: Colors.orange,
+      duration: const Duration(seconds: 4),
+    ));
+
+  } catch (e) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text('Error: ${e.toString()}'),
+      backgroundColor: Colors.red,
+    ));
+  }
+}
 
   Widget _buildActiveFilters() {
     final chips = <Widget>[];

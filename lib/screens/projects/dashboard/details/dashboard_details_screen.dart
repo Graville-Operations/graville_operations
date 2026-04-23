@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:graville_operations/core/commons/widgets/workers_on_site_section.dart';
+import 'package:graville_operations/core/remote/api/task_api.dart';
+import 'package:graville_operations/core/remote/dto/response/create_task.dart';
 import 'package:graville_operations/models/dashboard/dashboard_model.dart';
 import 'package:graville_operations/models/site/site_model.dart';
+import 'package:graville_operations/screens/task_screen/alltasks.dart';
+import 'package:graville_operations/screens/task_screen/task_details.dart';
 import 'package:graville_operations/services/attendance_service.dart';
 import 'package:graville_operations/services/worker_service.dart';
 import 'dart:math' as math;
@@ -20,12 +24,16 @@ class _DashboardDetailScreenState extends State<DashboardDetailsScreen> {
   int _attendancePct = 0;
   bool _liveLoading  = true;
 
+  List<TaskResponse> _tasks = [];
+bool _tasksLoading = true;
+
   @override
-  void initState() {
-    super.initState();
-    // _activeDay = widget.site.dayLabels.first;
-    _loadLiveStats();
-  }
+void initState() {
+  super.initState();
+  _loadLiveStats();
+  _loadTasks(); // ← add
+}
+
 
   Future<void> _loadLiveStats() async {
     try {
@@ -47,6 +55,24 @@ class _DashboardDetailScreenState extends State<DashboardDetailsScreen> {
       if (mounted) setState(() => _liveLoading = false);
     }
   }
+
+  Future<void> _loadTasks() async {
+  try {
+    final tasks = await TaskApi.getAllTasks();
+    if (!mounted) return;
+    setState(() { _tasks = tasks; _tasksLoading = false; });
+  } catch (_) {
+    if (mounted) setState(() => _tasksLoading = false);
+  }
+}
+
+double get _taskCompletionRate {
+  if (_tasks.isEmpty) return 0;
+  return _tasks.fold<int>(0, (sum, t) => sum + t.completion) / _tasks.length;
+}
+
+int get _completedTasksCount =>
+    _tasks.where((t) => t.completion >= 100).length;
 
   SiteModel get s => widget.site;
 
@@ -153,19 +179,16 @@ class _DashboardDetailScreenState extends State<DashboardDetailsScreen> {
                   sub: 'Overall headcount',
                   valueColor: const Color(0xFF1A5CFF)),
               _StatCard(
-                  // label: 'Completion Rate', value: '${s.progress}%',
-                  label: 'Completion Rate', value: '65%',
-                  sub: 'Overall progress',
-                  valueColor: const Color(0xFFDC2626),
-                  // valueColor: s.progress >= 80 ? const Color(0xFF1A9E5C)
-                  //     : s.progress >= 40 ? const Color(0xFFD97706) : const Color(0xFFDC2626)
-              ),
-              _StatCard(
-                  label: 'Tasks Completed', value: '17%',
-                  // label: 'Tasks Completed', value: '$taskRatde%',
-                  sub: '1 of 6 tasks',
-                  // sub: '${s.completedTasks} of ${s.tasks.length} tasks',
-                  valueColor: const Color(0xFF0F1117)),
+                      label: 'Completion Rate',
+                      value: _tasksLoading ? '…' : '${_taskCompletionRate.round()}%',
+                      sub: 'Overall progress',
+                      valueColor: const Color(0xFFDC2626),
+                  ),
+               _StatCard(
+                      label: 'Tasks Completed',
+                      value: _tasksLoading ? '…' : '$_completedTasksCount',
+                      sub: _tasksLoading ? '…' : '$_completedTasksCount of ${_tasks.length} tasks',
+                      valueColor: const Color(0xFF0F1117)),
               _StatCard(
                   // label: 'Contract Value', value: 'KES ${_fmtShort(s.totalAmount)}',
                   label: 'Contract Value', value: 'KES 26M',
@@ -178,15 +201,17 @@ class _DashboardDetailScreenState extends State<DashboardDetailsScreen> {
           const SizedBox(height: 10),
           Row(
             children: [
-              Expanded(child: _RingCard(label: 'Overall',    sub: 'Completion',
-                  percent: 65, color: const Color(0xFF1A5CFF))),
+              Expanded(child: _RingCard(
+                label: 'Overall', sub: 'Completion',
+                percent: _tasksLoading ? 0 : _taskCompletionRate.round(),
+                color: const Color(0xFF1A5CFF))),
                   // percent: s.progress, color: const Color(0xFF1A5CFF))),
               const SizedBox(width: 12),
-              Expanded(child: _RingCard(label: 'Tasks',
-                  // sub: '${s.completedTasks}/${s.tasks.length} done',
-                  sub: '1/6 done',
-                  // percent: taskRate, color: const Color(0xFF1A9E5C))),
-                  percent: 13, color: const Color(0xFF1A9E5C))),
+              Expanded(child: _RingCard(
+                label: 'Tasks',
+                sub: _tasksLoading ? '…' : '$_completedTasksCount/${_tasks.length} done',
+                percent: _tasksLoading ? 0 : _taskCompletionRate.round(),
+                color: const Color(0xFF1A9E5C))),
               const SizedBox(width: 12),
               Expanded(child: _RingCard(
                   label: 'Attendance',
@@ -197,37 +222,85 @@ class _DashboardDetailScreenState extends State<DashboardDetailsScreen> {
           ),
 
           const SizedBox(height: 24),
-          _SectionHeader(title: 'Task Breakdown'),
-          const SizedBox(height: 10),
-          // Container(
-          //   decoration: BoxDecoration(color: Colors.white,
-          //       borderRadius: BorderRadius.circular(14),
-          //       border: Border.all(color: Colors.black.withOpacity(0.07))),
-          //   padding: const EdgeInsets.all(14),
-          //   child: Column(
-          //     children: s.tasks.asMap().entries.map((e) {
-          //       final i = e.key; final t = e.value;
-          //       final barColor = t.percent == 100 ? const Color(0xFF1A9E5C)
-          //           : t.percent < 40 ? const Color(0xFFD97706) : const Color(0xFF1A5CFF);
-          //       return Column(children: [
-          //         if (i != 0) const Divider(height: 16, color: Color(0x0A000000)),
-          //         Row(children: [
-          //           Expanded(child: Text(t.name, style: const TextStyle(fontSize: 13,
-          //               fontWeight: FontWeight.w500, color: Color(0xFF0F1117)))),
-          //           const SizedBox(width: 8),
-          //           Text('${t.percent}%', style: const TextStyle(fontSize: 12,
-          //               fontWeight: FontWeight.w600, color: Color(0xFF7A7E8E))),
-          //         ]),
-          //         const SizedBox(height: 6),
-          //         ClipRRect(borderRadius: BorderRadius.circular(3),
-          //           child: LinearProgressIndicator(value: t.percent / 100, minHeight: 5,
-          //             backgroundColor: Colors.black.withOpacity(0.06),
-          //             valueColor: AlwaysStoppedAnimation<Color>(barColor)),
-          //         ),
-          //       ]);
-          //     }).toList(),
-          //   ),
-          // ),
+                    Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      _SectionHeader(title: 'Task Breakdown'),
+                      if (!_tasksLoading && _tasks.length > 5)
+                        GestureDetector(
+                          onTap: () => Navigator.of(context).push(
+                            MaterialPageRoute(builder: (_) => const AllTasksScreen()),
+                          ).then((_) => _loadTasks()),
+                          child: const Text("View All",
+                              style: TextStyle(color: Color(0xFF1A5CFF),
+                                  fontSize: 12, fontWeight: FontWeight.w600)),
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  if (_tasksLoading)
+                    const Center(child: Padding(
+                      padding: EdgeInsets.all(20),
+                      child: CircularProgressIndicator(color: Color(0xFF1A5CFF)),
+                    ))
+                  else if (_tasks.isEmpty)
+                    const Center(child: Padding(
+                      padding: EdgeInsets.all(20),
+                      child: Text('No tasks yet',
+                          style: TextStyle(color: Color(0xFF7A7E8E))),
+                    ))
+                  else
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: Colors.black.withOpacity(0.07)),
+                      ),
+                      padding: const EdgeInsets.all(14),
+                      child: Column(
+                        children: _tasks.take(5).toList().asMap().entries.map((e) {
+                          final i = e.key;
+                          final t = e.value;
+                          final barColor = t.completion >= 100
+                              ? const Color(0xFF1A9E5C)
+                              : t.completion >= 60
+                                  ? const Color(0xFFD97706)
+                                  : const Color(0xFF1A5CFF);
+                          return Column(children: [
+                            if (i != 0)
+                              const Divider(height: 16, color: Color(0x0A000000)),
+                            GestureDetector(
+                              onTap: () => Navigator.of(context).push(
+                                MaterialPageRoute(
+                                    builder: (_) => TaskDetailScreen(task: t)),
+                              ),
+                              child: Row(children: [
+                                Expanded(child: Text(t.title,
+                                    style: const TextStyle(fontSize: 13,
+                                        fontWeight: FontWeight.w500,
+                                        color: Color(0xFF0F1117)))),
+                                const SizedBox(width: 8),
+                                Text('${t.completion}%',
+                                    style: TextStyle(fontSize: 12,
+                                        fontWeight: FontWeight.w600, color: barColor)),
+                                const Icon(Icons.chevron_right,
+                                    size: 14, color: Color(0xFF7A7E8E)),
+                              ]),
+                            ),
+                            const SizedBox(height: 6),
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(3),
+                              child: LinearProgressIndicator(
+                                value: t.completion / 100,
+                                minHeight: 5,
+                                backgroundColor: Colors.black.withOpacity(0.06),
+                                valueColor: AlwaysStoppedAnimation<Color>(barColor),
+                              ),
+                            ),
+                          ]);
+                        }).toList(),
+                      ),
+                    ),
 
           const SizedBox(height: 24),
 
