@@ -37,7 +37,7 @@ class _InvoiceListScreenState extends State<InvoiceListScreen> {
   };
 
   static const _statusColors = {
-    'ALL': AppColor.primaryBackground,
+    'ALL': AppColor.primary,
     'PENDING': Color(0xFF7C3AED),
     'APPROVED': Color(0xFF2563EB),
     'PARTIALLY_PAID': Color(0xFFD97706),
@@ -119,7 +119,7 @@ class _InvoiceListScreenState extends State<InvoiceListScreen> {
       backgroundColor: const Color(0xFFF5F6F8),
       appBar: AppBar(
         title: const Text('Invoices'),
-        backgroundColor: AppColor.primaryBackground,
+        // backgroundColor: AppColor.primaryBackground,
         foregroundColor: Colors.white,
         elevation: 0,
         actions: [
@@ -158,7 +158,7 @@ class _InvoiceListScreenState extends State<InvoiceListScreen> {
             hintStyle: const TextStyle(color: Color(0xFF9CA3AF), fontSize: 13),
             prefixIcon: const Icon(
               Icons.search_rounded,
-              color: AppColor.primaryBackground,
+              // color: AppColor.primaryBackground,
               size: 20,
             ),
             suffixIcon: _searchController.text.isNotEmpty
@@ -191,16 +191,16 @@ class _InvoiceListScreenState extends State<InvoiceListScreen> {
           itemBuilder: (_, i) {
             final s = _statuses[i];
             final selected = _selectedStatus == s;
-            final color = _statusColors[s] ?? AppColor.primaryBackground;
+            // final color = _statusColors[s] ?? AppColor.primaryBackground;
             return GestureDetector(
               onTap: () => _onStatusChanged(s),
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                 decoration: BoxDecoration(
-                  color: selected ? color : Colors.transparent,
+                  // color: selected ? color : Colors.transparent,
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: selected ? color : const Color(0xFFE5E7EB)),
+                  // border: Border.all(color: selected ? color : const Color(0xFFE5E7EB)),
                 ),
                 child: Text(
                   _statusLabels[s] ?? s,
@@ -236,7 +236,7 @@ class _InvoiceListScreenState extends State<InvoiceListScreen> {
   Widget _buildBody() {
     if (_loading) {
       return const Center(
-        child: CircularProgressIndicator(color: AppColor.primaryBackground),
+        child: CircularProgressIndicator(),
       );
     }
     if (_error != null) return _buildError();
@@ -246,7 +246,7 @@ class _InvoiceListScreenState extends State<InvoiceListScreen> {
 
   Widget _buildList() {
     return RefreshIndicator(
-      color: AppColor.primaryBackground,
+      // color: AppColor.primar/yBackground,
       onRefresh: _loadInvoices,
       child: ListView.builder(
         padding: const EdgeInsets.all(16),
@@ -311,10 +311,10 @@ class _InvoiceListScreenState extends State<InvoiceListScreen> {
               onPressed: _loadInvoices,
               icon: const Icon(Icons.refresh_rounded, size: 18),
               label: const Text('Retry'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColor.primaryBackground,
-                foregroundColor: Colors.white,
-              ),
+              // style: ElevatedButton.styleFrom(
+              //   backgroundColor: AppColor.primaryBackground,
+              //   foregroundColor: Colors.white,
+              // ),
             ),
           ],
         ),

@@ -23,9 +23,9 @@ class InvoicePhotoPicker extends StatelessWidget {
           color: Colors.white,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: image == null
-                ? AppColor.borderColor
-                : AppColor.primaryBackground,
+            // color: image == null
+            //     ? AppColor.borderColor
+            //     : AppColor.primaryBackground,
             width: image == null ? 1.5 : 2,
           ),
           boxShadow: [
@@ -48,20 +48,20 @@ class InvoicePhotoPicker extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: AppColor.primaryBackground.withOpacity(0.1),
+            // color: AppColor.primaryBackground.withOpacity(0.1),
             shape: BoxShape.circle,
           ),
           child: const Icon(
             Icons.camera_alt,
             size: 30,
-            color: AppColor.primaryBackground,
+            // color: AppColor.primaryBackground,
           ),
         ),
         const SizedBox(height: 10),
         const Text(
           'Tap to take a photo',
           style: TextStyle(
-            color: AppColor.primaryBackground,
+            // color: AppColor.primaryBackground,
             fontWeight: FontWeight.w600,
             fontSize: 14,
           ),
@@ -69,7 +69,7 @@ class InvoicePhotoPicker extends StatelessWidget {
         const SizedBox(height: 4),
         const Text(
           'Delivery note, receipt or supporting document',
-          style: TextStyle(color: AppColor.secondaryText, fontSize: 12),
+          // style: TextStyle(color: AppColor.secondaryText, fontSize: 12),
         ),
       ],
     );
@@ -95,7 +95,7 @@ class InvoicePhotoPicker extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.all(8),
               decoration: const BoxDecoration(
-                color: AppColor.primaryBackground,
+                // color: AppColor.primaryBackground,
                 shape: BoxShape.circle,
               ),
               child: const Icon(Icons.camera_alt,
@@ -110,7 +110,7 @@ class InvoicePhotoPicker extends StatelessWidget {
             padding:
                 const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
-              color: AppColor.primaryBackground,
+              // color: AppColor.primaryBackground,
               borderRadius: BorderRadius.circular(20),
             ),
             child: const Row(

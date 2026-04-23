@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:graville_operations/core/style/color.dart';
 import 'package:graville_operations/services/api_service.dart';
 
@@ -87,12 +88,12 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: AppColor.primaryBackground.withOpacity(0.1),
+                    // color: AppColor.primaryBackground.withOpacity(0.1),
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(
                     Icons.check_circle,
-                    color: AppColor.primaryBackground,
+                    // color: AppColor.primaryBackground,
                     size: 52,
                   ),
                 ),
@@ -121,7 +122,7 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
                     _clearForm();
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColor.primaryBackground,
+                    // backgroundColor: AppColor.primaryBackground,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
@@ -162,7 +163,7 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
       backgroundColor: const Color(0xFFF5F6F8),
       appBar: AppBar(
         title: const Text('Creating a New User'),
-        backgroundColor: AppColor.primaryBackground,
+        // backgroundColor: AppColor.primaryBackground,
         foregroundColor: Colors.white,
         elevation: 0,
       ),
@@ -178,9 +179,9 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
               const SizedBox(height: 8),
               Container(
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  // color: Colors.white,
                   borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: AppColor.borderColor),
+                  // border: Border.all(color: AppColor.borderColor),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.grey.shade100,
@@ -194,17 +195,17 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
                     value: _selectedRole,
                     isExpanded: true,
                     padding: const EdgeInsets.symmetric(horizontal: 16),
-                    hint: const Row(
+                    hint: Row(
                       children: [
                         Icon(
                           Icons.people,
-                          color: AppColor.primaryBackground,
+                          // color: AppColor.primaryBackground,
                           size: 20,
                         ),
                         SizedBox(width: 12),
                         Text(
                           'Select User Role',
-                          style: TextStyle(color: AppColor.secondaryText),
+                          style: context.textTheme.bodyMedium,
                         ),
                       ],
                     ),
@@ -215,7 +216,7 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
                           children: [
                             Icon(
                               role['icon'] as IconData,
-                              color: AppColor.primaryBackground,
+                              // color: AppColor.primaryBackground,
                               size: 20,
                             ),
                             const SizedBox(width: 12),
@@ -321,14 +322,14 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
                 height: 52,
                 child: ElevatedButton(
                   onPressed: _isSubmitting ? null : _createUser,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColor.primaryBackground,
-                    disabledBackgroundColor:
-                        AppColor.primaryBackground.withOpacity(0.5),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
+                  // style: ElevatedButton.styleFrom(
+                  //   backgroundColor: AppColor.primaryBackground,
+                  //   disabledBackgroundColor:
+                  //       AppColor.primaryBackground.withOpacity(0.5),
+                  //   shape: RoundedRectangleBorder(
+                  //     borderRadius: BorderRadius.circular(12),
+                  //   ),
+                  // ),
                   child: _isSubmitting
                       ? const SizedBox(
                           height: 24,
@@ -361,18 +362,18 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
               // Info note
               Container(
                 padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: AppColor.primaryBackground.withOpacity(0.08),
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(
-                    color: AppColor.primaryBackground.withOpacity(0.2),
-                  ),
-                ),
+                // decoration: BoxDecoration(
+                //   color: AppColor.primaryBackground.withOpacity(0.08),
+                //   borderRadius: BorderRadius.circular(10),
+                //   border: Border.all(
+                //     color: AppColor.primaryBackground.withOpacity(0.2),
+                //   ),
+                // ),
                 child: const Row(
                   children: [
                     Icon(
                       Icons.info_outline,
-                      color: AppColor.primaryBackground,
+                      // color: AppColor.primaryBackground,
                       size: 18,
                     ),
                     SizedBox(width: 10),
@@ -380,7 +381,7 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
                       child: Text(
                         'A temporary password will be generated and sent to the user\'s email.',
                         style: TextStyle(
-                          color: AppColor.primaryBackground,
+                          // color: AppColor.primaryBackground,
                           fontSize: 12,
                         ),
                       ),
@@ -410,18 +411,14 @@ class _SectionLabel extends StatelessWidget {
           width: 4,
           height: 18,
           decoration: BoxDecoration(
-            color: AppColor.primaryBackground,
+            color: context.theme.cardTheme.color,
             borderRadius: BorderRadius.circular(2),
           ),
         ),
         const SizedBox(width: 8),
         Text(
           label,
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 16,
-            color: AppColor.primaryText,
-          ),
+          style: context.textTheme.labelMedium,
         ),
       ],
     );
@@ -453,7 +450,7 @@ class _FormField extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: AppColor.borderColor),
+        // border: Border.all(color: AppColor.border/Color),
         boxShadow: [
           BoxShadow(
             color: Colors.grey.shade100,
@@ -469,9 +466,9 @@ class _FormField extends StatelessWidget {
           labelText: label,
           hintText: hint,
           helperText: helperText,
-          hintStyle: const TextStyle(color: AppColor.secondaryText),
-          labelStyle: const TextStyle(color: AppColor.secondaryText),
-          prefixIcon: Icon(icon, color: AppColor.primaryBackground, size: 20),
+          // hintStyle: const TextStyle(color: AppColor.secondaryText),
+          // labelStyle: const TextStyle(color: AppColor.secondaryText),
+          // prefixIcon: Icon(icon, color: AppColor.primaryBackground, size: 20),
           border: InputBorder.none,
           contentPadding:
               const EdgeInsets.symmetric(horizontal: 16, vertical: 14),

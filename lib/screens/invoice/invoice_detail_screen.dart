@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:graville_operations/core/style/color.dart';
 import 'package:graville_operations/models/invoice/invoice_model.dart';
 import 'package:graville_operations/services/api_service.dart';
@@ -24,7 +25,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
     _invoice = widget.invoice;
   }
 
-  // Update Status 
+  // Update Status
   Future<void> _updateStatus(String newStatus) async {
     setState(() => _updating = true);
     final result = await ApiService.updateInvoiceStatus(_invoice.id, newStatus);
@@ -91,13 +92,14 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
               keyboardType:
                   const TextInputType.numberWithOptions(decimal: true),
               autofocus: true,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Amount Paid',
                 prefixText: 'KES ',
                 border: OutlineInputBorder(),
                 focusedBorder: OutlineInputBorder(
-                  borderSide:
-                      BorderSide(color: AppColor.primaryBackground, width: 2),
+                  borderSide: BorderSide(
+                      color: context.theme.colorScheme.primaryContainer,
+                      width: 2),
                 ),
               ),
             ),
@@ -111,13 +113,12 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColor.primaryBackground,
+              // backgroundColor: AppColor.primaryBackground,
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8)),
             ),
             onPressed: () => Navigator.pop(context, true),
-            child:
-                const Text('Confirm', style: TextStyle(color: Colors.white)),
+            child: const Text('Confirm', style: TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -137,8 +138,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
     }
 
     setState(() => _updating = true);
-    final result =
-        await ApiService.recordInvoicePayment(_invoice.id, amount);
+    final result = await ApiService.recordInvoicePayment(_invoice.id, amount);
     setState(() => _updating = false);
 
     if (!mounted) return;
@@ -193,14 +193,12 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
             const SizedBox(height: 4),
             Text(
               'Current: ${_invoice.status}',
-              style:
-                  const TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
+              style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
             ),
             const SizedBox(height: 12),
             const Divider(height: 1),
             ...options.map((s) {
-              final isCurrentStatus =
-                  s == _invoice.status.toUpperCase();
+              final isCurrentStatus = s == _invoice.status.toUpperCase();
               return ListTile(
                 contentPadding: EdgeInsets.zero,
                 leading: Container(
@@ -215,17 +213,15 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                   s,
                   style: TextStyle(
                     fontSize: 14,
-                    fontWeight: isCurrentStatus
-                        ? FontWeight.bold
-                        : FontWeight.normal,
+                    fontWeight:
+                        isCurrentStatus ? FontWeight.bold : FontWeight.normal,
                     color: isCurrentStatus
-                        ? AppColor.primaryBackground
-                        : const Color(0xFF111827),
+                        ? context.theme.colorScheme.primary
+                        : context.theme.colorScheme.secondary,
                   ),
                 ),
                 trailing: isCurrentStatus
-                    ? const Icon(Icons.check_rounded,
-                        color: AppColor.primaryBackground, size: 18)
+                    ? const Icon(Icons.check_rounded, size: 18)
                     : null,
                 onTap: isCurrentStatus
                     ? null
@@ -259,14 +255,14 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
       backgroundColor: const Color(0xFFF5F6F8),
       appBar: AppBar(
         title: Text(_invoice.invoiceNumber),
-        backgroundColor: AppColor.primaryBackground,
+        // backgroundColor: AppColor.primaryBackground,
         foregroundColor: Colors.white,
         elevation: 0,
       ),
       bottomNavigationBar: _updating
           ? const LinearProgressIndicator(
               minHeight: 3,
-              color: AppColor.primaryBackground,
+              // color: AppColor.primaryBackground,
             )
           : SafeArea(
               child: Padding(
@@ -279,11 +275,11 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                         icon: const Icon(Icons.edit_outlined, size: 18),
                         label: const Text('Update Status'),
                         style: OutlinedButton.styleFrom(
-                          foregroundColor: AppColor.primaryBackground,
+                          // foregroundColor: AppColor.primaryBackground,
                           side: const BorderSide(
-                              color: AppColor.primaryBackground),
-                          padding:
-                              const EdgeInsets.symmetric(vertical: 12),
+                            // color: AppColor.primaryBackground,
+                          ),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10)),
                         ),
@@ -292,15 +288,13 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                     const SizedBox(width: 12),
                     Expanded(
                       child: ElevatedButton.icon(
-                        onPressed:
-                            _invoice.balance > 0 ? _recordPayment : null,
+                        onPressed: _invoice.balance > 0 ? _recordPayment : null,
                         icon: const Icon(Icons.payments_outlined, size: 18),
                         label: const Text('Record Payment'),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColor.primaryBackground,
+                          // backgroundColor: AppColor.primaryBackground,
                           foregroundColor: Colors.white,
-                          padding:
-                              const EdgeInsets.symmetric(vertical: 12),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10)),
                           disabledBackgroundColor: Colors.grey.shade300,
@@ -318,17 +312,14 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
           children: [
             _buildHeroCard(paidPercent),
             const SizedBox(height: 16),
-
             _InvoiceSection(
               title: 'Invoice Details',
               icon: Icons.receipt_long_rounded,
               children: [
-                _DetailRow(
-                    label: 'Invoice No.', value: _invoice.invoiceNumber),
+                _DetailRow(label: 'Invoice No.', value: _invoice.invoiceNumber),
                 _DetailRow(label: 'LPO No.', value: _invoice.lpoNumber),
                 _DetailRow(
-                    label: 'Delivery No.',
-                    value: _invoice.deliveryNumber),
+                    label: 'Delivery No.', value: _invoice.deliveryNumber),
                 _DetailRow(
                     label: 'Invoice Date',
                     value: formatInvoiceDate(_invoice.invoiceDate)),
@@ -338,28 +329,23 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
               ],
             ),
             const SizedBox(height: 12),
-
             _InvoiceSection(
               title: 'Supplier & Submission',
               icon: Icons.business_rounded,
               children: [
+                _DetailRow(label: 'Supplier', value: _invoice.supplierName),
                 _DetailRow(
-                    label: 'Supplier', value: _invoice.supplierName),
-                _DetailRow(
-                    label: 'Submitted By',
-                    value: _invoice.submittedBy ?? '—'),
+                    label: 'Submitted By', value: _invoice.submittedBy ?? '—'),
                 _DetailRow(label: 'Site', value: _invoice.site ?? '—'),
                 if (_invoice.notes != null && _invoice.notes!.isNotEmpty)
                   _DetailRow(label: 'Notes', value: _invoice.notes!),
               ],
             ),
             const SizedBox(height: 12),
-
             if (_invoice.items.isNotEmpty) ...[
               _buildItemsSection(),
               const SizedBox(height: 12),
             ],
-
             _InvoiceSection(
               title: 'Payment Summary',
               icon: Icons.payments_rounded,
@@ -407,7 +393,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: AppColor.primaryBackground,
+        // color: AppColor.primaryBackground,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
@@ -424,8 +410,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                   const SizedBox(width: 4),
                   Text(
                     formatInvoiceDate(_invoice.invoiceDate),
-                    style: const TextStyle(
-                        color: Colors.white70, fontSize: 12),
+                    style: const TextStyle(color: Colors.white70, fontSize: 12),
                   ),
                 ],
               ),
@@ -452,8 +437,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
             child: LinearProgressIndicator(
               value: paidPercent,
               backgroundColor: Colors.white24,
-              valueColor:
-                  const AlwaysStoppedAnimation<Color>(Colors.white),
+              valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
               minHeight: 6,
             ),
           ),
@@ -463,13 +447,11 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
             children: [
               Text(
                 '${(paidPercent * 100).toStringAsFixed(0)}% paid',
-                style:
-                    const TextStyle(color: Colors.white70, fontSize: 11),
+                style: const TextStyle(color: Colors.white70, fontSize: 11),
               ),
               Text(
                 '${((1 - paidPercent) * 100).toStringAsFixed(0)}% remaining',
-                style:
-                    const TextStyle(color: Colors.white54, fontSize: 11),
+                style: const TextStyle(color: Colors.white54, fontSize: 11),
               ),
             ],
           ),
@@ -506,25 +488,19 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
       children: [
         const Row(
           children: [
-            Expanded(
-                flex: 3,
-                child:
-                    Text('Particular', style: _headerStyle)),
+            Expanded(flex: 3, child: Text('Particular', style: _headerStyle)),
             Expanded(
                 flex: 1,
                 child: Text('Qty',
-                    textAlign: TextAlign.center,
-                    style: _headerStyle)),
+                    textAlign: TextAlign.center, style: _headerStyle)),
             Expanded(
                 flex: 2,
                 child: Text('Unit Price',
-                    textAlign: TextAlign.center,
-                    style: _headerStyle)),
+                    textAlign: TextAlign.center, style: _headerStyle)),
             Expanded(
                 flex: 2,
                 child: Text('Total',
-                    textAlign: TextAlign.right,
-                    style: _headerStyle)),
+                    textAlign: TextAlign.right, style: _headerStyle)),
           ],
         ),
         const SizedBox(height: 8),
@@ -539,8 +515,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                         flex: 3,
                         child: Text(item.particular,
                             style: const TextStyle(
-                                fontSize: 13,
-                                color: Color(0xFF111827))),
+                                fontSize: 13, color: Color(0xFF111827))),
                       ),
                       Expanded(
                         flex: 1,
@@ -550,8 +525,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                               : item.quantity.toStringAsFixed(2),
                           textAlign: TextAlign.center,
                           style: const TextStyle(
-                              fontSize: 13,
-                              color: Color(0xFF374151)),
+                              fontSize: 13, color: Color(0xFF374151)),
                         ),
                       ),
                       Expanded(
@@ -560,8 +534,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                           'KES ${item.unitPrice.toStringAsFixed(0)}',
                           textAlign: TextAlign.center,
                           style: const TextStyle(
-                              fontSize: 13,
-                              color: Color(0xFF374151)),
+                              fontSize: 13, color: Color(0xFF374151)),
                         ),
                       ),
                       Expanded(
@@ -572,15 +545,14 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                           style: const TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.bold,
-                            color: AppColor.primaryBackground,
+                            // color: AppColor.primaryBackground,
                           ),
                         ),
                       ),
                     ],
                   ),
                 ),
-                const Divider(
-                    height: 1, color: Color(0xFFF3F4F6)),
+                const Divider(height: 1, color: Color(0xFFF3F4F6)),
               ],
             )),
         Padding(
@@ -589,14 +561,13 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const Text('Total',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, fontSize: 14)),
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
               Text(
                 formatInvoiceAmount(_invoice.totalAmount),
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 14,
-                  color: AppColor.primaryBackground,
+                  // color: AppColor.primaryBackground,
                 ),
               ),
             ],
@@ -638,9 +609,7 @@ class _PaymentChip extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Icon(icon,
-              size: 16,
-              color: dimmed ? Colors.white54 : Colors.white70),
+          Icon(icon, size: 16, color: dimmed ? Colors.white54 : Colors.white70),
           const SizedBox(width: 8),
           Expanded(
             child: Column(
@@ -705,7 +674,7 @@ class _InvoiceSection extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(16, 14, 16, 10),
             child: Row(
               children: [
-                Icon(icon, size: 16, color: AppColor.primaryBackground),
+                Icon(icon, size: 16),
                 const SizedBox(width: 8),
                 Text(
                   title,
@@ -739,8 +708,7 @@ class _DetailRow extends StatelessWidget {
   final String value;
   final TextStyle? valueStyle;
 
-  const _DetailRow(
-      {required this.label, required this.value, this.valueStyle});
+  const _DetailRow({required this.label, required this.value, this.valueStyle});
 
   @override
   Widget build(BuildContext context) {
@@ -753,8 +721,7 @@ class _DetailRow extends StatelessWidget {
             width: 110,
             child: Text(
               label,
-              style: const TextStyle(
-                  fontSize: 13, color: Color(0xFF6B7280)),
+              style: const TextStyle(fontSize: 13, color: Color(0xFF6B7280)),
             ),
           ),
           Expanded(

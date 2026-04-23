@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:graville_operations/core/style/color.dart';
 import 'package:graville_operations/services/api_service.dart';
 
@@ -36,8 +37,7 @@ class _UsersListScreenState extends State<UsersListScreen> {
         _filteredUsers = _users;
       } else {
         _filteredUsers = _users.where((u) {
-          final name =
-              '${u['first_name']} ${u['last_name']}'.toLowerCase();
+          final name = '${u['first_name']} ${u['last_name']}'.toLowerCase();
           final email = (u['email'] ?? '').toLowerCase();
           final role = (u['role'] ?? '').toLowerCase().replaceAll('_', ' ');
           return name.contains(query) ||
@@ -93,7 +93,7 @@ class _UsersListScreenState extends State<UsersListScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('User deleted successfully'),
-            backgroundColor: AppColor.primaryBackground,
+            // backgroundColor: AppColor.primaryBackground,
           ),
         );
         _loadUsers();
@@ -111,17 +111,17 @@ class _UsersListScreenState extends State<UsersListScreen> {
   Color _roleColor(String role) {
     switch (role.toUpperCase()) {
       case 'ADMIN':
-        return Colors.red.shade700;
+        return context.theme.colorScheme.secondary;
       case 'FIELD_ENGINEER':
-        return AppColor.primaryBackground;
+        return context.theme.colorScheme.primaryContainer;
       case 'AUDITOR':
-        return Colors.orange;
+        return context.theme.colorScheme.tertiary;
       case 'FOREMAN':
-        return Colors.purple;
+        return context.theme.colorScheme.inversePrimary;
       case 'FINANCE':
-        return Colors.blue;
+        return context.theme.colorScheme.inverseSurface;
       default:
-        return Colors.grey;
+        return context.theme.colorScheme.primaryFixed;
     }
   }
 
@@ -160,14 +160,14 @@ class _UsersListScreenState extends State<UsersListScreen> {
         slivers: [
           // App Bar
           SliverAppBar(
-            backgroundColor: AppColor.primaryBackground,
+            // backgroundColor: AppColor.primaryBackground,
             foregroundColor: Colors.white,
             expandedHeight: 130,
             pinned: true,
             floating: false,
             flexibleSpace: FlexibleSpaceBar(
               background: Container(
-                color: AppColor.primaryBackground,
+                // color: AppColor.primaryBackground,
                 padding: const EdgeInsets.fromLTRB(24, 60, 24, 16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -205,7 +205,7 @@ class _UsersListScreenState extends State<UsersListScreen> {
           // Search Bar
           SliverToBoxAdapter(
             child: Container(
-              color: AppColor.primaryBackground,
+              // color: AppColor.primaryBackground,
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
               child: Container(
                 decoration: BoxDecoration(
@@ -217,17 +217,19 @@ class _UsersListScreenState extends State<UsersListScreen> {
                   decoration: InputDecoration(
                     hintText: 'Search by name, email or role...',
                     hintStyle: const TextStyle(
-                      color: AppColor.secondaryText,
+                      // color: AppColor.secondaryText,
                       fontSize: 14,
                     ),
                     prefixIcon: const Icon(
                       Icons.search,
-                      color: AppColor.primaryBackground,
+                      // color: AppColor.primaryBackground,
                     ),
                     suffixIcon: _searchController.text.isNotEmpty
                         ? IconButton(
-                            icon: const Icon(Icons.clear,
-                                color: AppColor.secondaryText),
+                            icon: const Icon(
+                              Icons.clear,
+                              // color: AppColor.secondaryText,
+                            ),
                             onPressed: () {
                               _searchController.clear();
                               _onSearch();
@@ -247,9 +249,7 @@ class _UsersListScreenState extends State<UsersListScreen> {
           _isLoading
               ? const SliverFillRemaining(
                   child: Center(
-                    child: CircularProgressIndicator(
-                      color: AppColor.primaryBackground,
-                    ),
+                    child: CircularProgressIndicator(),
                   ),
                 )
               : _filteredUsers.isEmpty
@@ -316,18 +316,17 @@ class _UsersListScreenState extends State<UsersListScreen> {
                                   style: const TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 15,
-                                    color: AppColor.primaryText,
+                                    // color: AppColor.primaryText,
                                   ),
                                 ),
                                 subtitle: Column(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     const SizedBox(height: 2),
                                     Text(
                                       user['email'] ?? '',
                                       style: const TextStyle(
-                                        color: AppColor.secondaryText,
+                                        // color: AppColor.secondaryText,
                                         fontSize: 13,
                                       ),
                                     ),
@@ -336,10 +335,9 @@ class _UsersListScreenState extends State<UsersListScreen> {
                                       padding: const EdgeInsets.symmetric(
                                           horizontal: 8, vertical: 2),
                                       decoration: BoxDecoration(
-                                        color: _roleColor(role)
-                                            .withOpacity(0.1),
-                                        borderRadius:
-                                            BorderRadius.circular(8),
+                                        color:
+                                            _roleColor(role).withOpacity(0.1),
+                                        borderRadius: BorderRadius.circular(8),
                                       ),
                                       child: Text(
                                         _roleLabel(role),

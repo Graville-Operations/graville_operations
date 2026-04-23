@@ -6,9 +6,7 @@ import 'package:graville_operations/global.dart';
 import 'core/routes/routes.dart';
 import 'core/style/theme.dart';
 
-
-
-void main() async{
+void main() async {
   await Global.init();
   runApp(const MyApp());
 }
@@ -24,13 +22,16 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-        debugShowCheckedModeBanner: false,
-        theme: AppTheme.light,
-        initialRoute: AppRoutes.initial,
-        getPages: AppPages.routes,
-        builder: EasyLoading.init(
-          builder: (context, child) => child!,
-        ),
+      debugShowCheckedModeBanner: false,
+      theme: AppTheme.light,
+      darkTheme: AppTheme.dark,
+      // themeMode: ThemeMode.system,
+      initialRoute: AppRoutes.initial,
+      getPages: AppPages.routes,
+      builder: (context, child) {
+        EasyLoading.init()(context, child);
+        return child!;
+      },
     );
   }
 }

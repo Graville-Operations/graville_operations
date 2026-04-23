@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:graville_operations/core/style/color.dart';
 import 'package:graville_operations/services/api_service.dart';
@@ -50,139 +51,140 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
     super.dispose();
   }
 
-  // ─── Data Methods 
+  // ─── Data Methods
 
- void _loadUserInfo() async {
-  final result = await ApiService.getRefactorMe();
-  if (result['success']) {
-    final data = result['data'];
-    setState(() {
-      _userName = '${data['first_name'] ?? ''} ${data['last_name'] ?? ''}'.trim();
-      _userSite = data['company'] ?? 'Not Assigned';
-    });
-  }
-}
-
-Future<void> _submitInvoice() async {
-  if (!_formKey.currentState!.validate()) return;
-
-  if (_invoiceItems.isEmpty) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Please add at least one invoice item'),
-        backgroundColor: Colors.red,
-      ),
-    );
-    return;
-  }
-
-  if (_selectedDate == null) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Please select the invoice date'),
-        backgroundColor: Colors.red,
-      ),
-    );
-    return;
-  }
-
-  setState(() => _isSubmitting = true);
-
-  try {
-    final payload = {
-      'invoice_number': _invoiceNumberController.text.trim(),
-      'lpo_number': _lpoNumberController.text.trim(),
-      'delivery_number': _deliveryNumberController.text.trim(),
-      'supplier_name': _supplierNameController.text.trim(),
-      'invoice_date':
-          '${_selectedDate!.year}-${_selectedDate!.month.toString().padLeft(2, '0')}-${_selectedDate!.day.toString().padLeft(2, '0')}',
-      'items': _invoiceItems
-          .map((item) => {
-                'particular': item['particular'],
-                'quantity': item['quantity'],
-                'unit_price': item['unit_price'],
-                // total_price intentionally excluded — computed server-side
-              })
-          .toList(),
-      'notes': null,
-    };
-
-    final result = await ApiService.createInvoice(payload);
-
-    if (!mounted) return;
-    setState(() => _isSubmitting = false);
-
+  void _loadUserInfo() async {
+    final result = await ApiService.getRefactorMe();
     if (result['success']) {
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (_) => AlertDialog(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: AppColor.primaryBackground.withOpacity(0.1),
-                  shape: BoxShape.circle,
+      final data = result['data'];
+      setState(() {
+        _userName =
+            '${data['first_name'] ?? ''} ${data['last_name'] ?? ''}'.trim();
+        _userSite = data['company'] ?? 'Not Assigned';
+      });
+    }
+  }
+
+  Future<void> _submitInvoice() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    if (_invoiceItems.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please add at least one invoice item'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    if (_selectedDate == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please select the invoice date'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    setState(() => _isSubmitting = true);
+
+    try {
+      final payload = {
+        'invoice_number': _invoiceNumberController.text.trim(),
+        'lpo_number': _lpoNumberController.text.trim(),
+        'delivery_number': _deliveryNumberController.text.trim(),
+        'supplier_name': _supplierNameController.text.trim(),
+        'invoice_date':
+            '${_selectedDate!.year}-${_selectedDate!.month.toString().padLeft(2, '0')}-${_selectedDate!.day.toString().padLeft(2, '0')}',
+        'items': _invoiceItems
+            .map((item) => {
+                  'particular': item['particular'],
+                  'quantity': item['quantity'],
+                  'unit_price': item['unit_price'],
+                  // total_price intentionally excluded — computed server-side
+                })
+            .toList(),
+        'notes': null,
+      };
+
+      final result = await ApiService.createInvoice(payload);
+
+      if (!mounted) return;
+      setState(() => _isSubmitting = false);
+
+      if (result['success']) {
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (_) => AlertDialog(
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    // color: AppColor.primaryBackground.withOpacity(0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.check_circle,
+                    // color: AppColor.primaryBackground, size: 52,
+                  ),
                 ),
-                child: const Icon(Icons.check_circle,
-                    color: AppColor.primaryBackground, size: 52),
-              ),
-              const SizedBox(height: 16),
-              const Text('Invoice Submitted!',
-                  style:
-                      TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 8),
-              Text(
-                'Invoice #${_invoiceNumberController.text} has been sent to admin and finance for approval.',
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                    color: AppColor.secondaryText, fontSize: 13),
+                const SizedBox(height: 16),
+                const Text('Invoice Submitted!',
+                    style:
+                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 8),
+                Text(
+                    'Invoice #${_invoiceNumberController.text} has been sent to admin and finance for approval.',
+                    textAlign: TextAlign.center,
+                    style: context.textTheme.bodySmall),
+              ],
+            ),
+            actions: [
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    Navigator.pop(context);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    // backgroundColor: AppColor.primaryBackground,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10)),
+                  ),
+                  child:
+                      const Text('Done', style: TextStyle(color: Colors.white)),
+                ),
               ),
             ],
           ),
-          actions: [
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  Navigator.pop(context);
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColor.primaryBackground,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10)),
-                ),
-                child: const Text('Done',
-                    style: TextStyle(color: Colors.white)),
-              ),
-            ),
-          ],
-        ),
-      );
-    } else {
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(result['message'] ?? 'Failed to submit invoice'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _isSubmitting = false);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(result['message'] ?? 'Failed to submit invoice'),
+          content: Text('Error: ${e.toString()}'),
           backgroundColor: Colors.red,
         ),
       );
     }
-  } catch (e) {
-    if (!mounted) return;
-    setState(() => _isSubmitting = false);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Error: ${e.toString()}'),
-        backgroundColor: Colors.red,
-      ),
-    );
   }
-}
 
   void _addInvoiceItem() {
     showDialog(
@@ -244,8 +246,8 @@ Future<void> _submitInvoice() async {
       builder: (context, child) => Theme(
         data: Theme.of(context).copyWith(
           colorScheme: const ColorScheme.light(
-            primary: AppColor.primaryBackground,
-          ),
+              // primary: AppColor.primaryBackground,
+              ),
         ),
         child: child!,
       ),
@@ -253,27 +255,29 @@ Future<void> _submitInvoice() async {
     if (picked != null) setState(() => _selectedDate = picked);
   }
 
-  // ─── Private Builder Methods 
+  // ─── Private Builder Methods
 
   Widget _buildOperatorInfo() {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColor.primaryBackground.withOpacity(0.08),
+        // color: AppColor.primaryBackground.withOpacity(0.08),
         borderRadius: BorderRadius.circular(12),
-        border:
-            Border.all(color: AppColor.primaryBackground.withOpacity(0.2)),
+        // border:
+        //     Border.all(color: AppColor.primaryBackground.withOpacity(0.2)),
       ),
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: AppColor.primaryBackground.withOpacity(0.15),
+              // color: AppColor.primaryBackground.withOpacity(0.15),
               shape: BoxShape.circle,
             ),
-            child: const Icon(Icons.engineering,
-                color: AppColor.primaryBackground, size: 24),
+            child: const Icon(
+              Icons.engineering,
+              // color: AppColor.primaryBackground, size: 24
+            ),
           ),
           const SizedBox(width: 14),
           Expanded(
@@ -285,19 +289,20 @@ Future<void> _submitInvoice() async {
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 15,
-                    color: AppColor.primaryText,
+                    // color: AppColor.primaryText,
                   ),
                 ),
                 const SizedBox(height: 2),
                 Row(
                   children: [
-                    const Icon(Icons.location_on,
-                        size: 13, color: AppColor.primaryBackground),
+                    const Icon(
+                      Icons.location_on,
+                      // size: 13, color: AppColor.primaryBackground
+                    ),
                     const SizedBox(width: 4),
                     Text(
                       _userSite.isNotEmpty ? _userSite : 'Loading site...',
-                      style: const TextStyle(
-                          color: AppColor.secondaryText, fontSize: 13),
+                      style: const TextStyle(fontSize: 13),
                     ),
                   ],
                 ),
@@ -313,12 +318,11 @@ Future<void> _submitInvoice() async {
     return GestureDetector(
       onTap: _selectDate,
       child: Container(
-        padding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: AppColor.borderColor),
+          // border: Border.all(color: AppColor.borderColor),
           boxShadow: [
             BoxShadow(
               color: Colors.grey.shade100,
@@ -329,8 +333,7 @@ Future<void> _submitInvoice() async {
         ),
         child: Row(
           children: [
-            const Icon(Icons.calendar_today,
-                color: AppColor.primaryBackground, size: 18),
+            const Icon(Icons.calendar_today, size: 18),
             const SizedBox(width: 8),
             Expanded(
               child: Text(
@@ -339,8 +342,8 @@ Future<void> _submitInvoice() async {
                     : '${_selectedDate!.day}/${_selectedDate!.month}/${_selectedDate!.year}',
                 style: TextStyle(
                   color: _selectedDate == null
-                      ? AppColor.secondaryText
-                      : AppColor.primaryText,
+                      ? context.theme.colorScheme.secondaryFixed
+                      : context.theme.colorScheme.primaryFixed,
                   fontSize: 14,
                 ),
               ),
@@ -362,10 +365,10 @@ Future<void> _submitInvoice() async {
             GestureDetector(
               onTap: _addInvoiceItem,
               child: Container(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 14, vertical: 6),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                 decoration: BoxDecoration(
-                  color: AppColor.primaryBackground,
+                  // color: AppColor.primaryBackground,
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: const Row(
@@ -404,12 +407,11 @@ Future<void> _submitInvoice() async {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColor.borderColor),
+        // border: Border.all(color: AppColor.borderColor),
       ),
       child: Column(
         children: [
-          Icon(Icons.add_box_outlined,
-              size: 40, color: Colors.grey.shade300),
+          Icon(Icons.add_box_outlined, size: 40, color: Colors.grey.shade300),
           const SizedBox(height: 8),
           Text(
             'No items added yet',
@@ -444,45 +446,40 @@ Future<void> _submitInvoice() async {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             decoration: BoxDecoration(
-              color: AppColor.primaryBackground.withOpacity(0.08),
+              // color: AppColor.primaryBackground.withOpacity(0.08),
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(12),
                 topRight: Radius.circular(12),
               ),
             ),
-            child: const Row(
+            child: Row(
               children: [
                 Expanded(
-                    flex: 3,
-                    child: Text('Particulars',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 12,
-                            color: AppColor.primaryBackground))),
+                  flex: 3,
+                  child: Text(
+                    'Particulars',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12,
+                      // color: AppColor.primaryBackground,
+                    ),
+                  ),
+                ),
                 Expanded(
                     flex: 1,
                     child: Text('Qty',
                         textAlign: TextAlign.center,
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 12,
-                            color: AppColor.primaryBackground))),
+                        style: context.textTheme.bodySmall,),),
                 Expanded(
                     flex: 2,
                     child: Text('Unit Price',
                         textAlign: TextAlign.center,
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 12,
-                            color: AppColor.primaryBackground))),
+                        style: context.textTheme.bodySmall,),),
                 Expanded(
                     flex: 2,
                     child: Text('Total',
                         textAlign: TextAlign.right,
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 12,
-                            color: AppColor.primaryBackground))),
+                        style: context.textTheme.bodySmall,),),
                 SizedBox(width: 32),
               ],
             ),
@@ -494,16 +491,15 @@ Future<void> _submitInvoice() async {
               children: [
                 const Divider(height: 1),
                 Padding(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 16, vertical: 10),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                   child: Row(
                     children: [
                       Expanded(
                         flex: 3,
                         child: Text(
                           item['particular'] ?? '',
-                          style: const TextStyle(
-                              fontSize: 13, color: AppColor.primaryText),
+                          style: context.textTheme.bodySmall,
                         ),
                       ),
                       Expanded(
@@ -527,16 +523,12 @@ Future<void> _submitInvoice() async {
                         child: Text(
                           'KES ${(item['total_price'] as double).toStringAsFixed(0)}',
                           textAlign: TextAlign.right,
-                          style: const TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.bold,
-                            color: AppColor.primaryBackground,
-                          ),
+                          style: context.textTheme.bodySmall,
                         ),
                       ),
                       PopupMenuButton<String>(
                         icon: const Icon(Icons.more_vert,
-                            size: 18, color: AppColor.secondaryText),
+                           ),
                         onSelected: (v) {
                           if (v == 'edit') {
                             _editInvoiceItem(index);
@@ -555,8 +547,7 @@ Future<void> _submitInvoice() async {
                           const PopupMenuItem(
                               value: 'delete',
                               child: Row(children: [
-                                Icon(Icons.delete,
-                                    size: 16, color: Colors.red),
+                                Icon(Icons.delete, size: 16, color: Colors.red),
                                 SizedBox(width: 8),
                                 Text('Remove',
                                     style: TextStyle(color: Colors.red)),
@@ -577,10 +568,7 @@ Future<void> _submitInvoice() async {
   Widget _buildTotalAmount() {
     return Container(
       decoration: BoxDecoration(
-        color: AppColor.primaryBackground.withOpacity(0.06),
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(
-            color: AppColor.primaryBackground.withOpacity(0.3)),
         boxShadow: [
           BoxShadow(
             color: Colors.grey.shade100,
@@ -592,48 +580,35 @@ Future<void> _submitInvoice() async {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       child: Row(
         children: [
-          const Icon(Icons.payments,
-              color: AppColor.primaryBackground, size: 20),
+          const Icon(Icons.payments, size: 20),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   'Total Amount (KES)',
-                  style: TextStyle(
-                    color: AppColor.secondaryText,
-                    fontSize: 12,
-                  ),
+                  style:context.textTheme.bodySmall,
                 ),
                 const SizedBox(height: 2),
                 Text(
                   _totalAmountController.text.isEmpty
                       ? '0.00'
                       : _totalAmountController.text,
-                  style: const TextStyle(
-                    color: AppColor.primaryBackground,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: context.textTheme.bodySmall,
                 ),
               ],
             ),
           ),
           Container(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
-              color: AppColor.primaryBackground.withOpacity(0.1),
+              // color: AppColor.primaryBackground.withOpacity(0.1),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: const Text(
+            child: Text(
               'Auto',
-              style: TextStyle(
-                color: AppColor.primaryBackground,
-                fontSize: 11,
-                fontWeight: FontWeight.bold,
-              ),
+              style: context.textTheme.bodySmall,
             ),
           ),
         ],
@@ -648,9 +623,8 @@ Future<void> _submitInvoice() async {
       child: ElevatedButton(
         onPressed: _isSubmitting ? null : _submitInvoice,
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColor.primaryBackground,
-          disabledBackgroundColor:
-              AppColor.primaryBackground.withOpacity(0.5),
+          backgroundColor: context.theme.colorScheme.primary,
+          disabledBackgroundColor: context.theme.colorScheme.primary.withAlpha(100),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
@@ -681,7 +655,7 @@ Future<void> _submitInvoice() async {
     );
   }
 
-  // ─── Build 
+  // ─── Build
 
   @override
   Widget build(BuildContext context) {
@@ -689,7 +663,6 @@ Future<void> _submitInvoice() async {
       backgroundColor: const Color(0xFFF5F6F8),
       appBar: AppBar(
         title: const Text('Submit Invoice'),
-        backgroundColor: AppColor.primaryBackground,
         foregroundColor: Colors.white,
         elevation: 0,
       ),
@@ -700,7 +673,6 @@ Future<void> _submitInvoice() async {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-
               // ─── Operator Info
               _buildOperatorInfo(),
               const SizedBox(height: 24),
@@ -809,21 +781,19 @@ Future<void> _submitInvoice() async {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: AppColor.primaryBackground.withOpacity(0.08),
+                  // color: AppColor.primaryBackground.withOpacity(0.08),
                   borderRadius: BorderRadius.circular(10),
-                  border: Border.all(
-                      color: AppColor.primaryBackground.withOpacity(0.2)),
+                  // border: Border.all(
+                  //     color: AppColor.primaryBackground.withOpacity(0.2)),
                 ),
                 child: const Row(
                   children: [
-                    Icon(Icons.info_outline,
-                        color: AppColor.primaryBackground, size: 18),
+                    Icon(Icons.info_outline,size: 18),
                     SizedBox(width: 10),
                     Expanded(
                       child: Text(
                         'This invoice will be sent to the admin and finance team for review and approval.',
-                        style: TextStyle(
-                            color: AppColor.primaryBackground, fontSize: 12),
+                        style: TextStyle(fontSize: 12),
                       ),
                     ),
                   ],
@@ -839,7 +809,7 @@ Future<void> _submitInvoice() async {
   }
 }
 
-// ─── Add Item Dialog 
+// ─── Add Item Dialog
 
 class _AddItemDialog extends StatefulWidget {
   final Map<String, dynamic>? existingItem;
@@ -864,8 +834,7 @@ class _AddItemDialogState extends State<_AddItemDialog> {
     if (widget.existingItem != null) {
       _particularController.text = widget.existingItem!['particular'] ?? '';
       _quantityController.text = '${widget.existingItem!['quantity'] ?? ''}';
-      _unitPriceController.text =
-          '${widget.existingItem!['unit_price'] ?? ''}';
+      _unitPriceController.text = '${widget.existingItem!['unit_price'] ?? ''}';
       _totalPrice = widget.existingItem!['total_price'] ?? 0;
     }
     _quantityController.addListener(_calculate);
@@ -895,13 +864,12 @@ class _AddItemDialogState extends State<_AddItemDialog> {
     return InputDecoration(
       labelText: label,
       hintText: hint,
-      prefixIcon:
-          Icon(icon, color: AppColor.primaryBackground, size: 20),
+      prefixIcon: Icon(icon, size: 20),
       border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(10),
         borderSide:
-            const BorderSide(color: AppColor.primaryBackground, width: 2),
+            const BorderSide( width: 2),
       ),
     );
   }
@@ -909,8 +877,7 @@ class _AddItemDialogState extends State<_AddItemDialog> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      shape:
-          RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
         padding: const EdgeInsets.all(20),
         child: Form(
@@ -927,7 +894,6 @@ class _AddItemDialogState extends State<_AddItemDialog> {
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: AppColor.primaryText,
                     ),
                   ),
                   IconButton(
@@ -939,7 +905,6 @@ class _AddItemDialogState extends State<_AddItemDialog> {
                 ],
               ),
               const SizedBox(height: 16),
-
               TextFormField(
                 controller: _particularController,
                 decoration: _dialogFieldDecoration(
@@ -947,11 +912,9 @@ class _AddItemDialogState extends State<_AddItemDialog> {
                   hint: 'e.g. Ballast, Cement, Steel Rods',
                   icon: Icons.category,
                 ),
-                validator: (v) =>
-                    v == null || v.isEmpty ? 'Required' : null,
+                validator: (v) => v == null || v.isEmpty ? 'Required' : null,
               ),
               const SizedBox(height: 12),
-
               Row(
                 children: [
                   Expanded(
@@ -990,46 +953,36 @@ class _AddItemDialogState extends State<_AddItemDialog> {
                 ],
               ),
               const SizedBox(height: 12),
-
               Container(
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: AppColor.primaryBackground.withOpacity(0.08),
+                  // color: AppColor.primaryBackground.withOpacity(0.08),
                   borderRadius: BorderRadius.circular(10),
-                  border: Border.all(
-                      color: AppColor.primaryBackground.withOpacity(0.2)),
+                  // border: Border.all(
+                  //     color: AppColor.primaryBackground.withOpacity(0.2)),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Row(
+                     Row(
                       children: [
                         Icon(Icons.calculate,
-                            color: AppColor.primaryBackground, size: 18),
+                             size: 18),
                         SizedBox(width: 8),
                         Text(
                           'Total Price',
-                          style: TextStyle(
-                            color: AppColor.primaryBackground,
-                            fontWeight: FontWeight.w600,
-                          ),
+                          style: context.textTheme.bodySmall
                         ),
                       ],
                     ),
                     Text(
                       'KES ${_totalPrice.toStringAsFixed(2)}',
-                      style: const TextStyle(
-                        color: AppColor.primaryBackground,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
+                      style: context.textTheme.bodySmall
                     ),
                   ],
                 ),
               ),
-
               const SizedBox(height: 20),
-
               SizedBox(
                 width: double.infinity,
                 height: 48,
@@ -1039,15 +992,14 @@ class _AddItemDialogState extends State<_AddItemDialog> {
                       widget.onAdd({
                         'particular': _particularController.text.trim(),
                         'quantity': double.parse(_quantityController.text),
-                        'unit_price':
-                            double.parse(_unitPriceController.text),
+                        'unit_price': double.parse(_unitPriceController.text),
                         'total_price': _totalPrice,
                       });
                       Navigator.pop(context);
                     }
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColor.primaryBackground,
+                    // backgroundColor: AppColor.primaryBackground,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
@@ -1069,10 +1021,11 @@ class _AddItemDialogState extends State<_AddItemDialog> {
   }
 }
 
-// ─── Section Label 
+// ─── Section Label
 
 class _SectionLabel extends StatelessWidget {
   final String label;
+
   const _SectionLabel({required this.label});
 
   @override
@@ -1083,7 +1036,7 @@ class _SectionLabel extends StatelessWidget {
           width: 4,
           height: 18,
           decoration: BoxDecoration(
-            color: AppColor.primaryBackground,
+            // color: AppColor.primaryBackground,
             borderRadius: BorderRadius.circular(2),
           ),
         ),
@@ -1093,7 +1046,7 @@ class _SectionLabel extends StatelessWidget {
           style: const TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 16,
-            color: AppColor.primaryText,
+            // color: AppColor.primaryText,
           ),
         ),
       ],
@@ -1126,7 +1079,7 @@ class _FormField extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: AppColor.borderColor),
+        // border: Border.all(color: AppColor.borderColor),
         boxShadow: [
           BoxShadow(
             color: Colors.grey.shade100,
@@ -1141,10 +1094,9 @@ class _FormField extends StatelessWidget {
         decoration: InputDecoration(
           labelText: label,
           hintText: hint,
-          hintStyle: const TextStyle(color: AppColor.secondaryText),
-          labelStyle: const TextStyle(color: AppColor.secondaryText),
-          prefixIcon:
-              Icon(icon, color: AppColor.primaryBackground, size: 20),
+          // hintStyle: const TextStyle(color: AppColor.secondaryText),
+          // labelStyle: const TextStyle(color: AppColor.secondaryText),
+          // prefixIcon: Icon(icon, color: AppColor.primaryBackground, size: 20),
           border: InputBorder.none,
           contentPadding:
               const EdgeInsets.symmetric(horizontal: 16, vertical: 14),

@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart' hide Worker;
 import 'package:graville_operations/application/custom_navigator.dart';
 import 'package:graville_operations/core/commons/widgets/bulk_checkin_sheet.dart';
 import 'package:graville_operations/core/commons/widgets/custom_dropdown.dart';
@@ -92,7 +93,7 @@ Future<void> _openBulkCheckIn() async {
         .toList();
 
     if (eligible.isEmpty) {
-      _snack('All workers are already checked in today.', Colors.orange.shade700);
+      _snack('All workers are already checked in today.', context.theme.colorScheme.errorContainer);
       return;
     }
 
@@ -171,11 +172,10 @@ Future<void> _openBulkCheckIn() async {
       backgroundColor: const Color(0xFFF5F6F8),
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: const Color(0xFFF5F6F8),
-        title: const Row(children: [
-          Icon(Icons.home_work_rounded, color: Colors.blue),
+        title:  Row(children: [
+          Icon(Icons.home_work_rounded),
           SizedBox(width: 10),
-          Text('Workers', style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600)),
+          Text('Workers', style: context.textTheme.titleMedium),
         ]),
         //   actions: [
         //     IconButton(icon: const Icon(Icons.refresh, color: Colors.blue),
@@ -244,15 +244,14 @@ class _SiteSelector extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      const Text('Construction Site',
-          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.black87)),
+      Text('Construction Site',
+          style: context.textTheme.bodySmall),
       const SizedBox(height: 6),
       Container(
         padding: const EdgeInsets.symmetric(horizontal: 12),
         decoration: BoxDecoration(
-          color: const Color(0xFFF5F7F9),
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: Colors.grey.shade200),
+          // border: Border.all(color: Colors.grey.shade200),
         ),
         child: CustomDropdown<String>(
           value: value, items: sites, displayMapper: (s) => s,
