@@ -1,44 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:graville_operations/core/commons/widgets/custom_dropdown.dart';
 import 'package:graville_operations/core/commons/widgets/sections/form_section.dart';
-import 'package:graville_operations/models/material/transport_mode.dart';
+import 'package:graville_operations/models/material/destination_site.dart';
 import 'package:graville_operations/services/transfer_material_service.dart';
 
-class TransportInfo extends StatefulWidget {
-  final TransportMode? selectedMode;
-  final ValueChanged<TransportMode?> onChanged;
-  final List<TransportMode> items; 
-  final TextEditingController othersController;
-  final VoidCallback? onAddNew; 
+class SourceSiteInfo extends StatefulWidget {
+  final DestinationSite? selectedSite;
+  final ValueChanged<DestinationSite?> onChanged;
+  final List<DestinationSite> items;
 
-  const TransportInfo({
+  const SourceSiteInfo({
     super.key,
-    required this.selectedMode,
+    required this.selectedSite,
     required this.onChanged,
     required this.items,
-    required this.othersController,
-    this.onAddNew,
   });
 
   @override
-  State<TransportInfo> createState() => _TransportInfoState();
+  State<SourceSiteInfo> createState() => _SourceSiteInfoState();
 }
 
-class _TransportInfoState extends State<TransportInfo> {
-  List<TransportMode> _modes = [];
+class _SourceSiteInfoState extends State<SourceSiteInfo> {
+  List<DestinationSite> _sites = [];
   bool _loading = true;
 
   @override
   void initState() {
     super.initState();
-    _loadModes();
+    _load();
   }
 
-  Future<void> _loadModes() async {
-    final result = await TransferMaterialService.fetchTransportModes();
+  Future<void> _load() async {
+    final result = await TransferMaterialService.fetchSites();
     if (mounted) {
       setState(() {
-        _modes = result;
+        _sites   = result;
         _loading = false;
       });
     }
@@ -47,15 +43,15 @@ class _TransportInfoState extends State<TransportInfo> {
   @override
   Widget build(BuildContext context) {
     return FormSection(
-      title: 'Mode of Transport',
-      icon: Icons.local_shipping,
+      title: 'Source Site',
+      icon: Icons.location_on_outlined,
       required: true,
       child: _loading
           ? _LoadingField()
-          : CustomDropdown<TransportMode>(
-              hint: 'Select mode of transport',
-              value: widget.selectedMode,
-              items: _modes,
+          : CustomDropdown<DestinationSite>(
+              hint: 'Select source site',
+              value: widget.selectedSite,
+              items: _sites,
               displayMapper: (item) => item.name,
               onChanged: widget.onChanged,
             ),
