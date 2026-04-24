@@ -52,25 +52,137 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
 
   // ─── Data Methods 
 
-  void _loadUserInfo() async {
-    final userId = await ApiService.getUserId();
-    if (userId != null) {
-      final result = await ApiService.getRefactorMe();
-      if (result['success']) {
-        final data = result['data'];
-        setState(() {
-          _userName =
-              '${data['first_name'] ?? ''} ${data['last_name'] ?? ''}'.trim();
-          final fieldOperator = data['field_operator'];
-          if (fieldOperator != null && fieldOperator['site'] != null) {
-            _userSite = fieldOperator['site']['name'] ?? 'Not Assigned';
-          } else {
-            _userSite = 'Not Assigned';
-          }
-        });
-      }
-    }
+ void _loadUserInfo() async {
+  final result = await ApiService.getRefactorMe();
+  if (result['success']) {
+    final data = result['data'];
+    setState(() {
+      _userName = '${data['first_name'] ?? ''} ${data['last_name'] ?? ''}'.trim();
+      _userSite = data['company'] ?? 'Not Assigned';
+    });
   }
+}
+
+Future<void> _submitInvoice() async {
+  if (!_formKey.currentState!.validate()) return;
+
+  if (_invoiceItems.isEmpty) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Please add at least one invoice item'),
+        backgroundColor: Colors.red,
+      ),
+    );
+    return;
+  }
+
+  if (_selectedDate == null) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Please select the invoice date'),
+        backgroundColor: Colors.red,
+      ),
+    );
+    return;
+  }
+
+  setState(() => _isSubmitting = true);
+
+  try {
+    final payload = {
+      'invoice_number': _invoiceNumberController.text.trim(),
+      'lpo_number': _lpoNumberController.text.trim(),
+      'delivery_number': _deliveryNumberController.text.trim(),
+      'supplier_name': _supplierNameController.text.trim(),
+      'invoice_date':
+          '${_selectedDate!.year}-${_selectedDate!.month.toString().padLeft(2, '0')}-${_selectedDate!.day.toString().padLeft(2, '0')}',
+      'items': _invoiceItems
+          .map((item) => {
+                'particular': item['particular'],
+                'quantity': item['quantity'],
+                'unit_price': item['unit_price'],
+                // total_price intentionally excluded — computed server-side
+              })
+          .toList(),
+      'notes': null,
+    };
+
+    final result = await ApiService.createInvoice(payload);
+
+    if (!mounted) return;
+    setState(() => _isSubmitting = false);
+
+    if (result['success']) {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (_) => AlertDialog(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: AppColor.primaryBackground.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.check_circle,
+                    color: AppColor.primaryBackground, size: 52),
+              ),
+              const SizedBox(height: 16),
+              const Text('Invoice Submitted!',
+                  style:
+                      TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 8),
+              Text(
+                'Invoice #${_invoiceNumberController.text} has been sent to admin and finance for approval.',
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                    color: AppColor.secondaryText, fontSize: 13),
+              ),
+            ],
+          ),
+          actions: [
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  Navigator.pop(context);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColor.primaryBackground,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10)),
+                ),
+                child: const Text('Done',
+                    style: TextStyle(color: Colors.white)),
+              ),
+            ),
+          ],
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(result['message'] ?? 'Failed to submit invoice'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  } catch (e) {
+    if (!mounted) return;
+    setState(() => _isSubmitting = false);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Error: ${e.toString()}'),
+        backgroundColor: Colors.red,
+      ),
+    );
+  }
+}
 
   void _addInvoiceItem() {
     showDialog(
@@ -139,94 +251,6 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
       ),
     );
     if (picked != null) setState(() => _selectedDate = picked);
-  }
-
-  Future<void> _submitInvoice() async {
-    if (!_formKey.currentState!.validate()) return;
-
-    if (_invoiceItems.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please add at least one invoice item'),
-          backgroundColor: Colors.red,
-        ),
-      );
-      return;
-    }
-
-    if (_selectedDate == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please select the invoice date'),
-          backgroundColor: Colors.red,
-        ),
-      );
-      return;
-    }
-
-    setState(() => _isSubmitting = true);
-    await Future.delayed(const Duration(seconds: 2));
-    setState(() => _isSubmitting = false);
-
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (_) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: AppColor.primaryBackground.withOpacity(0.1),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.check_circle,
-                color: AppColor.primaryBackground,
-                size: 52,
-              ),
-            ),
-            const SizedBox(height: 16),
-            const Text(
-              'Invoice Submitted!',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Invoice #${_invoiceNumberController.text} has been sent to admin and finance for approval.',
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: AppColor.secondaryText,
-                fontSize: 13,
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context);
-                Navigator.pop(context);
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColor.primaryBackground,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-              child: const Text('Done',
-                  style: TextStyle(color: Colors.white)),
-            ),
-          ),
-        ],
-      ),
-    );
   }
 
   // ─── Private Builder Methods 

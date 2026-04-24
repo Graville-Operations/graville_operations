@@ -1,7 +1,7 @@
 class AppRoutes {
   static const initial = '/';
   static const application = '/application';
-  //static const loginScreen = '/login';
+  static const login = '/login';
   static const signup = '/signup';
   static const projectDashboard = '/projects/dashboard';
   static const financeDashboard = '/finance/dashboard';
@@ -13,6 +13,7 @@ class AppRoutes {
   static const createUser = '/users/new';
   static const userRoles = '/users/roles';
   static const financeInvoices = '/finance/invoices';
+  static const createInvoice = '/finance/templates';
 
   static const menuDepartments = "/departments/menus";
   // Auth
@@ -55,4 +56,15 @@ class AppRoutes {
   static const String todayAttendance = '/workers/attendance/today';
   static const String verifyAttendance = '/workers/attendance/verify';
   static const String weekAttendance = '/workers/attendance/week';
+  static const String checkIn              = '/workers/attendance/check-in';
+  static const String checkInBulk         = '/workers/attendance/check-in/bulk';
+  static const String todayAttendance     = '/workers/attendance/today';
+  static const String verifyAttendance    = '/workers/attendance/verify';
+  static const String weekAttendance      = '/workers/attendance/week';
+
+  static const String getInvoices = '/invoices/';
+  static const String createInvoices = '/invoices/create';
+  static String updateInvoiceStatus(int id) => '/invoices/$id/status';
+  static String updateInvoicePayment(int id) => '/invoices/$id/payment';
+
 }
