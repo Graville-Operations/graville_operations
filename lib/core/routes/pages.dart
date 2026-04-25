@@ -11,7 +11,6 @@ import 'package:graville_operations/screens/auth/login/view.dart';
 import 'package:graville_operations/screens/finance/templates/finance_templates_screen.dart';
 import 'package:graville_operations/screens/finance_dashboard/finance_dashboard.dart';
 import 'package:graville_operations/screens/invoice/invoice_list_screen.dart';
-import 'package:graville_operations/screens/invoice/invoice_screen.dart';
 import 'package:graville_operations/screens/menus/menus.dart';
 import 'package:graville_operations/screens/projects/dashboard/assign_user_screen.dart';
 import 'package:graville_operations/screens/projects/dashboard/binding.dart';
