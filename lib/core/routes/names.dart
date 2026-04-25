@@ -13,7 +13,7 @@ class AppRoutes {
   static const createUser = '/users/new';
   static const userRoles = '/users/roles';
   static const financeInvoices = '/finance/invoices';
-  static const createInvoice = '/finance/templates';
+  static const financeTemplates = '/finance/templates';
 
   static const menuDepartments = "/departments/menus";
   // Auth
