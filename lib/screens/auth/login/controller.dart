@@ -35,14 +35,14 @@ class LoginController extends GetxController {
       );
       var result = await AuthApi.login(request);
       EasyLoading.show(status: 'Updating profile info .....');
-      if(result.accessToken.isNotEmpty){
+      if (result.accessToken.isNotEmpty) {
         await UserStore.to.setToken(result.accessToken);
         await MenuApi.getMyMenu();
         await AuthApi.me();
         EasyLoading.showSuccess('Logged in Successfully');
         Get.offAllNamed(AppRoutes.application);
         return "Success";
-      }else{
+      } else {
         return "Error logging you in";
       }
     } catch (e) {
