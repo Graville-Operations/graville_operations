@@ -10,6 +10,7 @@ import 'package:graville_operations/screens/home/controller.dart';
 import 'package:graville_operations/screens/home/widgets/app_drawer.dart';
 import 'package:graville_operations/screens/material/receive_material.dart';
 import 'package:graville_operations/screens/material/transfer_material.dart';
+import 'package:graville_operations/screens/material/transfers_list_screen.dart';
 import 'package:graville_operations/screens/sites/site_list/sites_list.dart';
 import 'package:graville_operations/screens/store/add_material.dart';
 import 'package:graville_operations/screens/store/update_inventory.dart';
@@ -89,11 +90,20 @@ class HomeScreen extends GetView<HomeScreenController> {
                         context.push(const TransferMaterialScreen()),
                   ),
                 ),
+                 const SizedBox(height: 12),
+                Tooltip(
+                  message: "Transfer material",
+                  child: CustomCircleButton(
+                    icon: Icons.transfer_within_a_station,
+                    onPressed: () =>
+                        context.push(const TransfersListScreen()),
+                  ),
+                ),
                 const SizedBox(height: 12),
                 Tooltip(
                   message: "Create task",
                   child: CustomCircleButton(
-                    icon: Icons.add,
+                    icon: Icons.add_task,
                     onPressed: () => context.push(const CreateTaskScreen()),
                   ),
                 ),
@@ -277,17 +287,37 @@ class HomeScreen extends GetView<HomeScreenController> {
                                     child: Stack(
                                       alignment: Alignment.center,
                                       children: [
-                                        CircularProgressIndicator(
-                                          value: 0.68,
-                                          strokeWidth: 8,
-                                          color: Colors.orange,
-                                          backgroundColor: Colors.grey.shade300,
-                                        ),
-                                        const Text(
-                                          "68%",
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.bold),
-                                        ),
+                                        Builder(builder: (_) {
+                                          final avg = controller.state.tasksLoading.value || controller.state.recentTasks.isEmpty
+                                              ? 0.0
+                                              : controller.state.recentTasks.fold<int>(0, (sum, t) => sum + t.completion) /
+                                                controller.state.recentTasks.length;
+                                          final display = avg.round();
+                                          return Stack(
+                                            alignment: Alignment.center,
+                                            children: [
+                                              CircularProgressIndicator(
+                                                value: avg / 100,
+                                                strokeWidth: 8,
+                                                color: avg >= 100
+                                                    ? const Color(0xff1db954)
+                                                    : avg >= 60
+                                                        ? Colors.orange
+                                                        : const Color(0xff5b7cfa),
+                                                backgroundColor: Colors.grey.shade300,
+                                              ),
+                                             controller.state.tasksLoading.value
+                                                ? const SizedBox(
+                                                    width: 16, height: 16,
+                                                    child: CircularProgressIndicator(strokeWidth: 2),
+                                                  )
+                                                : Text(
+                                                    "$display%",
+                                                    style: const TextStyle(fontWeight: FontWeight.bold),
+                                                  ),
+                                            ],
+                                          );
+                                        }),
                                       ],
                                     ),
                                   ),
@@ -369,7 +399,7 @@ class HomeScreen extends GetView<HomeScreenController> {
                                         style: TextStyle(fontSize: 12, color: Colors.grey)),
                                     const Spacer(),
                                     Text(
-                                      "${(controller.state.overallCompletion * 100).round()}%",
+                                    "${(controller.state.overallCompletion.value * 100).round()}%",
                                       style: const TextStyle(
                                           fontSize: 12, fontWeight: FontWeight.bold),
                                     ),
