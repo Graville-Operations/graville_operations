@@ -16,6 +16,10 @@ class AppRoutes {
   static const financeTemplates = '/finance/templates';
 
   static const menuDepartments = "/departments/menus";
+
+  // Base
+  static const String baseUrl = 'http://192.168.1.73:8000/api/v1';
+
   // Auth
   static const String adminExists = '/refactor/admin/exists';
   static const String adminSignup = '/refactor/admin/signup';
@@ -56,15 +60,18 @@ class AppRoutes {
   static const String todayAttendance = '/workers/attendance/today';
   static const String verifyAttendance = '/workers/attendance/verify';
   static const String weekAttendance = '/workers/attendance/week';
-  static const String checkIn              = '/workers/attendance/check-in';
-  static const String checkInBulk         = '/workers/attendance/check-in/bulk';
-  static const String todayAttendance     = '/workers/attendance/today';
-  static const String verifyAttendance    = '/workers/attendance/verify';
-  static const String weekAttendance      = '/workers/attendance/week';
 
+  // Groups
+  static const String getAllGroups = '/group';
+  static const String createGroup = '/group/create';
+  static String getGroupById(int id) => '/group/$id';
+  static String assignGroupMenus(int id) => '/group/$id/menus';
+  static String assignUserToGroup(int groupId, String userId) =>
+      '/group$groupId/users/$userId';
+
+  // Menus
   static const String getInvoices = '/invoices/';
   static const String createInvoices = '/invoices/create';
   static String updateInvoiceStatus(int id) => '/invoices/$id/status';
   static String updateInvoicePayment(int id) => '/invoices/$id/payment';
-
 }

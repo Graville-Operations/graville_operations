@@ -15,6 +15,7 @@ import 'package:graville_operations/screens/invoice/invoice_screen.dart';
 import 'package:graville_operations/screens/menus/menus.dart';
 import 'package:graville_operations/screens/projects/dashboard/assign_user_screen.dart';
 import 'package:graville_operations/screens/projects/dashboard/binding.dart';
+import 'package:graville_operations/screens/projects/dashboard/group_list_screen.dart';
 import 'package:graville_operations/screens/projects/dashboard/view.dart';
 import 'package:graville_operations/screens/sites/create/view.dart';
 import 'package:graville_operations/screens/menus/binding.dart';
@@ -76,6 +77,12 @@ class AppPages {
       page: () => const UsersListScreen(),
     ),
     GetPage(
+      name: AppRoutes.userDepartment,
+      page: () => AssignUserToGroupScreen(),
+    ),
+
+    // ─── Finance menu routes
+    GetPage(
       name: AppRoutes.financeDashboard,
       page: () => const FinanceDashboardApp(),
     ),
@@ -86,7 +93,11 @@ class AppPages {
     GetPage(
       name: AppRoutes.menuDepartments,
       page: () => const MenusScreen(),
-       binding: MenusBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.subMenusScreens,
+      page: () => const GroupsListScreen(),
+      binding: MenusBinding(),
     ),
     GetPage(
       name: AppRoutes.financeTemplates,

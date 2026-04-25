@@ -12,7 +12,6 @@ class LoginController extends GetxController {
   var state = LoginState();
   Key? get formKey => null;
 
-
   // void goToSignUp() {
   //   Get.toNamed(AppRoutes.signup);
   // }
