@@ -89,7 +89,7 @@ class _ReceiveMaterialScreenState extends State<ReceiveMaterialScreen> {
 
     if (_sourceType == ReceiveSourceType.supplier) {
       result = await ReceiveMaterialService.receiveFromSupplier(
-        inventoryId:  int.parse(_selectedItem!.id),
+        materialId:  int.parse(_selectedItem!.id),
         quantity:     int.parse(_quantityController.text.trim()),
         amountPaid:   double.parse(_amountController.text.trim()),
         supplierName: _supplierController.text.trim(),
@@ -99,7 +99,7 @@ class _ReceiveMaterialScreenState extends State<ReceiveMaterialScreen> {
       );
     } else {
       result = await ReceiveMaterialService.receiveFromSite(
-        inventoryId: int.parse(_selectedItem!.id),
+        materialId: int.parse(_selectedItem!.id),
         quantity:    int.parse(_quantityController.text.trim()),
         fromSiteId:  int.parse(_selectedFromSite!.id),
         amountPaid:  _amountController.text.trim().isEmpty

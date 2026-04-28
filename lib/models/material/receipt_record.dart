@@ -1,6 +1,6 @@
 class ReceiptRecord {
   final int id;
-  final int inventoryId;
+  final int materialId;
   final String? materialName;
   final String? category;
   final String? unit;
@@ -16,7 +16,7 @@ class ReceiptRecord {
 
   const ReceiptRecord({
     required this.id,
-    required this.inventoryId,
+    required this.materialId,
     this.materialName,
     this.category,
     this.unit,
@@ -34,7 +34,7 @@ class ReceiptRecord {
   factory ReceiptRecord.fromJson(Map<String, dynamic> json) {
     return ReceiptRecord(
       id:               json['id']                as int,
-      inventoryId:      json['inventory_id']      as int,
+      materialId:      json['material_id']      as int,
       materialName:     json['material_name']     as String?,
       category:         json['category']          as String?,
       unit:             json['unit']              as String?,

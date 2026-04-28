@@ -17,17 +17,17 @@ class InventoryItem {
     this.description,
   });
 
-factory InventoryItem.fromJson(Map<String, dynamic> json) {
-  return InventoryItem(
-    id:          json['id'].toString(),
-    name:        json['name']                    as String? ?? '',
-    category:    json['category']                as String? ?? '',
-    unit:        (json['unit'] ?? json['unit_type']) as String? ?? '',
-    quantity:    (json['quantity'] as num?)?.toDouble() ?? 0.0,
-    unitPrice:   (json['unit_price'] as num?)?.toDouble() ?? 0.0,
-    description: json['description']             as String?,
-  );
-}
+  factory InventoryItem.fromJson(Map<String, dynamic> json) {
+    return InventoryItem(
+      id:          json['id'].toString(),
+      name:        json['name']        as String? ?? '',
+      category:    json['category']    as String? ?? '',
+      unit:        json['unit']        as String? ?? '',
+      quantity:    (json['quantity']   as num?)?.toDouble() ?? 0.0,
+      unitPrice:   (json['unit_price'] as num?)?.toDouble() ?? 0.0,
+      description: json['description'] as String?,
+    );
+  }
 
   @override
   bool operator ==(Object other) =>

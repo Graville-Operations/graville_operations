@@ -77,13 +77,6 @@ class _ReceiptsListScreenState extends State<ReceiptsListScreen> {
                         color: Colors.black)),
               ],
             ),
-            actions: [
-              IconButton(
-                icon: const Icon(Icons.refresh, color: Colors.black54),
-                onPressed: _load,
-                tooltip: 'Refresh',
-              ),
-            ],
             bottom: PreferredSize(
               preferredSize: const Size.fromHeight(108),
               child: Column(
@@ -130,7 +123,7 @@ class _ReceiptsListScreenState extends State<ReceiptsListScreen> {
                       _FilterChip(
                         label: 'From Site',
                         selected: _sourceFilter == 'SITE',
-                        color: Colors.orange,
+                        color: Colors.blue,
                         onTap: () => _applyFilters(_search, 'SITE'),
                       ),
                     ]),
@@ -312,7 +305,7 @@ class _ReceiptCard extends StatelessWidget {
                       color: sourceColor),
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: 50),
               Expanded(
                 child: Text(sourceLabel,
                     style: const TextStyle(fontSize: 12),
@@ -328,15 +321,15 @@ class _ReceiptCard extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(14, 8, 14, 12),
             child: Row(children: [
               _Chip(
-                icon: Icons.numbers,
+                icon: Icons.shopping_bag,
                 label: '${record.quantityReceived} ${record.unit ?? ''}',
                 color: Colors.blue,
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: 50),
               _Chip(
-                icon: Icons.monetization_on_outlined,
+                icon: Icons.money,
                 label: 'KES ${record.amountPaid.toStringAsFixed(0)}',
-                color: Colors.orange,
+                color: Colors.blue,
               ),
             ]),
           ),
@@ -452,9 +445,6 @@ class _ReceiptDetailSheet extends StatelessWidget {
                       fontSize: 17, fontWeight: FontWeight.w700),
                 ),
               ),
-              Text('#${record.id}',
-                  style: TextStyle(
-                      color: Colors.grey.shade400, fontSize: 13)),
             ]),
           ),
           const Divider(height: 24),
