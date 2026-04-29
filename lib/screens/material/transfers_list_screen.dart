@@ -188,25 +188,9 @@ class _SummaryStrip extends StatelessWidget {
     final totalQty   = transfers.fold<double>(0, (s, t) => s + t.quantity);
 
     return Container(
-      color: Colors.white,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      //color: Colors.white,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
       margin: const EdgeInsets.only(bottom: 4),
-      child: Row(
-        children: [
-          _Stat(label: 'Transfers', value: '${transfers.length}',
-              icon: Icons.swap_horiz_rounded, color: Colors.blue),
-          const SizedBox(width: 12),
-          _Stat(label: 'Total Qty', value: totalQty.toStringAsFixed(1),
-              icon: Icons.inventory_2_outlined, color: Colors.blue),
-          const SizedBox(width: 12),
-          _Stat(
-            label: 'Total Value',
-            value: 'KSH ${_fmt(totalValue)}',
-            icon: Icons.money,
-            color: Colors.blue,
-          ),
-        ],
-      ),
     );
   }
 
@@ -478,11 +462,6 @@ class _TransferDetailSheet extends StatelessWidget {
                       style: const TextStyle(
                           fontSize: 17, fontWeight: FontWeight.w700),
                     ),
-                  ),
-                  Text(
-                    '#${record.id}',
-                    style: TextStyle(
-                        color: Colors.grey.shade400, fontSize: 13),
                   ),
                 ],
               ),
