@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:graville_operations/core/style/color.dart';
+import 'package:graville_operations/screens/finance/templates/external_works/external_drop_screen.dart';
 import 'package:graville_operations/screens/finance/templates/external_works/external_pick_screen.dart';
-import 'internal_works/pick_materials_screen.dart';
-import '../../../screens/invoice/invoice_screen.dart';
+import 'package:graville_operations/screens/finance/templates/internal_works/drop_materials_screen.dart';
+import 'package:graville_operations/screens/finance/templates/internal_works/pick_materials_screen.dart';
+import 'package:graville_operations/screens/invoice/invoice_screen.dart';
 
 class FinanceTemplatesScreen extends StatelessWidget {
   const FinanceTemplatesScreen({super.key});
@@ -31,8 +33,6 @@ class FinanceTemplatesScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 14),
-
-            // ─── 2-column grid
             GridView.count(
               crossAxisCount: 2,
               shrinkWrap: true,
@@ -41,15 +41,16 @@ class FinanceTemplatesScreen extends StatelessWidget {
               mainAxisSpacing: 12,
               childAspectRatio: 0.75,
               children: [
+                // ─── Internal Pick
                 _TemplateCard(
-                  title: 'Internal Works',
-                  subtitle: 'Pick & Drop',
+                  title: 'Internal Pick',
+                  subtitle: 'Pick from supplier',
                   gradient: const LinearGradient(
                     colors: [Color(0xFF1E40AF), Color(0xFF3B82F6)],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
-                  icon: Icons.swap_horiz_rounded,
+                  icon: Icons.upload_rounded,
                   patternIcon: Icons.local_shipping_outlined,
                   onTap: () => Navigator.push(
                     context,
@@ -58,17 +59,37 @@ class FinanceTemplatesScreen extends StatelessWidget {
                     ),
                   ),
                 ),
+
+                // ─── Internal Drop
                 _TemplateCard(
-                  title: 'External Works',
-                  subtitle: 'Hired Vehicle',
+                  title: 'Internal Drop',
+                  subtitle: 'Drop at site',
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF1E3A5F), Color(0xFF2563EB)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  icon: Icons.download_rounded,
+                  patternIcon: Icons.warehouse_outlined,
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const DropMaterialsScreen(),
+                    ),
+                  ),
+                ),
+
+                // ─── External Pick
+                _TemplateCard(
+                  title: 'External Pick',
+                  subtitle: 'Hired vehicle pick',
                   gradient: const LinearGradient(
                     colors: [Color(0xFF92400E), Color(0xFFF59E0B)],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
-                  icon: Icons.construction_rounded,
+                  icon: Icons.upload_rounded,
                   patternIcon: Icons.engineering_outlined,
-                  
                   onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -76,9 +97,30 @@ class FinanceTemplatesScreen extends StatelessWidget {
                     ),
                   ),
                 ),
+
+                // ─── External Drop
+                _TemplateCard(
+                  title: 'External Drop',
+                  subtitle: 'Hired vehicle drop',
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF78350F), Color(0xFFD97706)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  icon: Icons.download_rounded,
+                  patternIcon: Icons.construction_rounded,
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const ExternalDropScreen(),
+                    ),
+                  ),
+                ),
+
+                // ─── Invoice
                 _TemplateCard(
                   title: 'Invoice',
-                  subtitle: 'Supplier Invoice',
+                  subtitle: 'Supplier invoice',
                   gradient: const LinearGradient(
                     colors: [Color(0xFF065F46), Color(0xFF10B981)],
                     begin: Alignment.topLeft,
@@ -142,12 +184,12 @@ class _TemplateCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(16),
             child: Stack(
               children: [
-                // ─── Gradient background (top ~70%)
+                // ─── Gradient background
                 Container(
                   decoration: BoxDecoration(gradient: gradient),
                 ),
 
-                // ─── Decorative background circles (pattern)
+                // ─── Ghost pattern icons
                 Positioned(
                   top: -18,
                   right: -18,
@@ -183,9 +225,7 @@ class _TemplateCard extends StatelessWidget {
                   right: 0,
                   child: Container(
                     padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
-                    decoration: const BoxDecoration(
-                      color: Colors.white,
-                    ),
+                    color: Colors.white,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -237,9 +277,9 @@ class _TemplateCard extends StatelessWidget {
                   ),
                 ),
 
-                // ─── Main icon centered in the banner
+                // ─── Main icon centered in banner
                 Positioned.fill(
-                  bottom: 68, // above the white strip
+                  bottom: 68,
                   child: Center(
                     child: Container(
                       width: 56,
@@ -261,7 +301,7 @@ class _TemplateCard extends StatelessWidget {
                   ),
                 ),
 
-                // ─── "Use template" tap ripple
+                // ─── Ripple
                 Positioned.fill(
                   child: Material(
                     color: Colors.transparent,

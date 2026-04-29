@@ -4,7 +4,6 @@ import 'package:graville_operations/models/material/app_material.dart';
 import 'package:graville_operations/models/material/destination_site.dart';
 import 'package:graville_operations/models/material/transport_mode.dart';
 import 'package:graville_operations/models/material/transfer_record.dart';
-import 'package:graville_operations/models/material/transport_mode.dart';
 import 'package:graville_operations/services/api_service.dart';
 
 class TransferMaterialService {
