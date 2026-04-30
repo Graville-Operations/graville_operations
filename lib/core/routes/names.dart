@@ -13,7 +13,7 @@ class AppRoutes {
   static const createUser = '/users/new';
   static const userRoles = '/users/roles';
   static const financeInvoices = '/finance/invoices';
-  static const createInvoice = '/finance/templates';
+  static const financeTemplates = '/finance/templates';
 
   static const menuDepartments = "/departments/menus";
 
@@ -74,4 +74,12 @@ class AppRoutes {
   static const String createInvoices = '/invoices/create';
   static String updateInvoiceStatus(int id) => '/invoices/$id/status';
   static String updateInvoicePayment(int id) => '/invoices/$id/payment';
+
+  // Works — Pick & Drop
+static const String createPick       = '/works/pick';
+static const String getAllPicks       = '/works/picks';
+static const String getPendingPicks  = '/works/picks/pending';
+static String getPickById(int id)    => '/works/picks/$id';
+static String confirmDrop(int id)    => '/works/picks/$id/drop';
+static String cancelPick(int id)     => '/works/picks/$id/cancel';
 }

@@ -24,4 +24,21 @@ class TransportMode {
       driverName: json['driver_name'] as String?,
     );
   }
+  Map<String, dynamic> toJson() => {
+        'id':          id,
+        'name':        name,
+        if (category   != null) 'category':    category,
+        if (noPlate    != null) 'no_plate':    noPlate,
+        if (driverName != null) 'driver_name': driverName,
+      };
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is TransportMode &&
+          runtimeType == other.runtimeType &&
+          id == other.id;
+
+  @override
+  int get hashCode => id.hashCode;
 }
