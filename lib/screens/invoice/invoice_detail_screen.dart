@@ -24,7 +24,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
     _invoice = widget.invoice;
   }
 
-  // Update Status 
+  // ─── Update Status 
   Future<void> _updateStatus(String newStatus) async {
     setState(() => _updating = true);
     final result = await ApiService.updateInvoiceStatus(_invoice.id, newStatus);
@@ -59,13 +59,13 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
           backgroundColor: const Color(0xFF1B8A5A),
         ),
       );
-      Navigator.pop(context, true); // signal list to refresh
+      Navigator.pop(context, true);
     } else {
       _showError(result['message'] ?? 'Failed to update status');
     }
   }
 
-  // Record Payment
+  // ─── Record Payment 
   Future<void> _recordPayment() async {
     final controller = TextEditingController();
 
@@ -137,8 +137,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
     }
 
     setState(() => _updating = true);
-    final result =
-        await ApiService.recordInvoicePayment(_invoice.id, amount);
+    final result = await ApiService.recordInvoicePayment(_invoice.id, amount);
     setState(() => _updating = false);
 
     if (!mounted) return;
@@ -158,12 +157,23 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
     }
   }
 
-  // Status Picker Bottom Sheet
+  // ─── Status Picker Bottom Sheet
   void _showStatusPicker() {
+    // ─── Block if already fully paid
+    if (_invoice.status.toUpperCase() == 'PAID') {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Cannot change status of a fully paid invoice'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    // ─── PAID is excluded — set automatically by recording full payment
     const options = [
       'APPROVED',
       'PARTIALLY_PAID',
-      'PAID',
       'REJECTED',
       'CANCELLED',
     ];
@@ -171,7 +181,6 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
     const optionColors = {
       'APPROVED': Color(0xFF2563EB),
       'PARTIALLY_PAID': Color(0xFFD97706),
-      'PAID': Color(0xFF1B8A5A),
       'REJECTED': Color(0xFFDC2626),
       'CANCELLED': Color(0xFF6B7280),
     };
@@ -193,8 +202,32 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
             const SizedBox(height: 4),
             Text(
               'Current: ${_invoice.status}',
-              style:
-                  const TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
+              style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
+            ),
+            const SizedBox(height: 4),
+            // ─── Hint that PAID is automatic
+            Container(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(
+                color: const Color(0xFFECFDF5),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: const Color(0xFF6EE7B7)),
+              ),
+              child: const Row(
+                children: [
+                  Icon(Icons.info_outline_rounded,
+                      size: 14, color: Color(0xFF059669)),
+                  SizedBox(width: 6),
+                  Expanded(
+                    child: Text(
+                      'PAID status is set automatically when full payment is recorded.',
+                      style: TextStyle(
+                          fontSize: 11, color: Color(0xFF065F46)),
+                    ),
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: 12),
             const Divider(height: 1),
@@ -248,7 +281,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
     );
   }
 
-  // Build
+  // ─── Build
   @override
   Widget build(BuildContext context) {
     final paidPercent = _invoice.totalAmount > 0
@@ -275,17 +308,23 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                   children: [
                     Expanded(
                       child: OutlinedButton.icon(
-                        onPressed: _showStatusPicker,
+                        // ─── Grey out button if PAID
+                        onPressed: _invoice.status.toUpperCase() == 'PAID'
+                            ? null
+                            : _showStatusPicker,
                         icon: const Icon(Icons.edit_outlined, size: 18),
                         label: const Text('Update Status'),
                         style: OutlinedButton.styleFrom(
                           foregroundColor: AppColor.primaryBackground,
-                          side: const BorderSide(
-                              color: AppColor.primaryBackground),
-                          padding:
-                              const EdgeInsets.symmetric(vertical: 12),
+                          side: BorderSide(
+                            color: _invoice.status.toUpperCase() == 'PAID'
+                                ? Colors.grey.shade300
+                                : AppColor.primaryBackground,
+                          ),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10)),
+                          disabledForegroundColor: Colors.grey.shade400,
                         ),
                       ),
                     ),
@@ -299,8 +338,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColor.primaryBackground,
                           foregroundColor: Colors.white,
-                          padding:
-                              const EdgeInsets.symmetric(vertical: 12),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10)),
                           disabledBackgroundColor: Colors.grey.shade300,
@@ -508,23 +546,19 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
           children: [
             Expanded(
                 flex: 3,
-                child:
-                    Text('Particular', style: _headerStyle)),
+                child: Text('Particular', style: _headerStyle)),
             Expanded(
                 flex: 1,
                 child: Text('Qty',
-                    textAlign: TextAlign.center,
-                    style: _headerStyle)),
+                    textAlign: TextAlign.center, style: _headerStyle)),
             Expanded(
                 flex: 2,
                 child: Text('Unit Price',
-                    textAlign: TextAlign.center,
-                    style: _headerStyle)),
+                    textAlign: TextAlign.center, style: _headerStyle)),
             Expanded(
                 flex: 2,
                 child: Text('Total',
-                    textAlign: TextAlign.right,
-                    style: _headerStyle)),
+                    textAlign: TextAlign.right, style: _headerStyle)),
           ],
         ),
         const SizedBox(height: 8),
@@ -539,8 +573,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                         flex: 3,
                         child: Text(item.particular,
                             style: const TextStyle(
-                                fontSize: 13,
-                                color: Color(0xFF111827))),
+                                fontSize: 13, color: Color(0xFF111827))),
                       ),
                       Expanded(
                         flex: 1,
@@ -550,8 +583,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                               : item.quantity.toStringAsFixed(2),
                           textAlign: TextAlign.center,
                           style: const TextStyle(
-                              fontSize: 13,
-                              color: Color(0xFF374151)),
+                              fontSize: 13, color: Color(0xFF374151)),
                         ),
                       ),
                       Expanded(
@@ -560,8 +592,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                           'KES ${item.unitPrice.toStringAsFixed(0)}',
                           textAlign: TextAlign.center,
                           style: const TextStyle(
-                              fontSize: 13,
-                              color: Color(0xFF374151)),
+                              fontSize: 13, color: Color(0xFF374151)),
                         ),
                       ),
                       Expanded(
@@ -579,8 +610,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                     ],
                   ),
                 ),
-                const Divider(
-                    height: 1, color: Color(0xFFF3F4F6)),
+                const Divider(height: 1, color: Color(0xFFF3F4F6)),
               ],
             )),
         Padding(
@@ -589,8 +619,8 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const Text('Total',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, fontSize: 14)),
+                  style:
+                      TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
               Text(
                 formatInvoiceAmount(_invoice.totalAmount),
                 style: const TextStyle(
@@ -613,7 +643,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
   );
 }
 
-//  Payment Chip
+// ─── Payment Chip 
 
 class _PaymentChip extends StatelessWidget {
   final String label;
@@ -671,7 +701,7 @@ class _PaymentChip extends StatelessWidget {
   }
 }
 
-// Section Card
+// ─── Section Card 
 
 class _InvoiceSection extends StatelessWidget {
   final String title;
@@ -732,7 +762,7 @@ class _InvoiceSection extends StatelessWidget {
   }
 }
 
-// Detail Row
+// ─── Detail Row ──────────────────────────────────────────────────
 
 class _DetailRow extends StatelessWidget {
   final String label;

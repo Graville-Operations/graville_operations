@@ -419,24 +419,49 @@ static Future<Map<String, dynamic>> recordInvoicePayment(
     return {'success': false, 'message': e.toString()};
   }
 }
-  // static Future<Map<String, dynamic>> updatePersonalSettings(
-  //     int userId, Map<String, dynamic> settings) async {
-  //   try {
-  //     final response = await HttpUtil().put(
-  //       ApiEndpoints.personalSettings(userId),
-  //       options: await _authJsonOptions(),
-  //       data: settings,
-  //     );
-  //     final data = _decodeResponse(response);
-  //     return {
-  //       'success': data != null,
-  //       'data': data,
-  //       'message': data['detail'] ?? 'Settings updated successfully'
-  //     };
-  //   } catch (e) {
-  //     return {'success': false, 'message': e.toString()};
-  //   }
-  // }
+
+static Future<Map<String, dynamic>> createPickRecord(
+    Map<String, dynamic> payload) async {
+  try {
+    final response = await HttpUtil().post(
+      AppRoutes.createPick,
+      options: await _authJsonOptions(),
+      data: payload,
+    );
+    final data = _decodeResponse(response);
+    return {'success': true, 'data': data};
+  } catch (e) {
+    return {'success': false, 'message': e.toString()};
+  }
+}
+
+static Future<Map<String, dynamic>> getPendingPicks() async {
+  try {
+    final response = await HttpUtil().get(
+      AppRoutes.getPendingPicks,
+      options: await _authJsonOptions(),
+    );
+    final data = _decodeResponse(response);
+    return {'success': true, 'data': data};
+  } catch (e) {
+    return {'success': false, 'message': e.toString()};
+  }
+}
+
+static Future<Map<String, dynamic>> confirmDrop(
+    int pickId, String? dropPhotoUrl) async {
+  try {
+    final response = await HttpUtil().put(
+      AppRoutes.confirmDrop(pickId),
+      options: await _authJsonOptions(),
+      data: {'drop_photo_url': dropPhotoUrl},
+    );
+    final data = _decodeResponse(response);
+    return {'success': true, 'data': data};
+  } catch (e) {
+    return {'success': false, 'message': e.toString()};
+  }
+}
 
   static Future<Map<String, dynamic>> authenticatedGet(String endpoint) async {
     try {

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:graville_operations/core/style/color.dart';
+import 'package:graville_operations/services/api_service.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
-import 'external_drop_screen.dart';
 
 class ExternalPickScreen extends StatefulWidget {
   const ExternalPickScreen({super.key});
@@ -17,7 +17,7 @@ class _ExternalPickScreenState extends State<ExternalPickScreen> {
   final _siteController = TextEditingController();
   final List<_MaterialEntry> _materials = [_MaterialEntry()];
   File? _vehiclePhoto;
-  File? _attachmentPhoto;
+  bool _submitting = false;
   final _picker = ImagePicker();
 
   @override
@@ -30,19 +30,13 @@ class _ExternalPickScreenState extends State<ExternalPickScreen> {
     super.dispose();
   }
 
-  Future<void> _pickPhoto({required bool isVehicle}) async {
+  Future<void> _pickPhoto() async {
     final picked = await _picker.pickImage(
       source: ImageSource.camera,
       imageQuality: 80,
     );
     if (picked != null) {
-      setState(() {
-        if (isVehicle) {
-          _vehiclePhoto = File(picked.path);
-        } else {
-          _attachmentPhoto = File(picked.path);
-        }
-      });
+      setState(() => _vehiclePhoto = File(picked.path));
     }
   }
 
@@ -62,36 +56,48 @@ class _ExternalPickScreenState extends State<ExternalPickScreen> {
         return sum + (qty * price);
       });
 
-  void _submit() {
+  Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
     if (_vehiclePhoto == null) {
       _showError('Please take a photo of the loaded vehicle');
       return;
     }
 
+    setState(() => _submitting = true);
+
+    // TODO: upload photo and pass URL — passing null for now
     final payload = {
+      'work_type': 'EXTERNAL',
       'company': _companyController.text.trim(),
       'site_name': _siteController.text.trim(),
-      'materials': _materials
+      'notes': null,
+      'items': _materials
           .map((e) => {
-                'name': e.nameController.text.trim(),
-                'quantity': double.tryParse(e.quantityController.text) ?? 0,
-                'amount': double.tryParse(e.amountController.text) ?? 0,
-                'total': (double.tryParse(e.quantityController.text) ?? 0) *
-                    (double.tryParse(e.amountController.text) ?? 0),
+                'material_name': e.nameController.text.trim(),
+                'quantity':
+                    double.tryParse(e.quantityController.text) ?? 0,
+                'unit_price':
+                    double.tryParse(e.amountController.text) ?? 0,
               })
           .toList(),
-      'total_amount': _totalAmount,
-      'vehicle_photo': _vehiclePhoto!.path,
-      'attachment_photo': _attachmentPhoto?.path,
     };
 
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => ExternalDropScreen(pickData: payload),
-      ),
-    );
+    final result = await ApiService.createPickRecord(payload);
+    setState(() => _submitting = false);
+
+    if (!mounted) return;
+
+    if (result['success']) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('External pick record submitted successfully'),
+          backgroundColor: Color(0xFF1B8A5A),
+        ),
+      );
+      Navigator.pop(context);
+    } else {
+      _showError(result['message'] ?? 'Failed to submit pick record');
+    }
   }
 
   void _showError(String msg) {
@@ -105,7 +111,7 @@ class _ExternalPickScreenState extends State<ExternalPickScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F6F8),
       appBar: AppBar(
-        title: const Text('External Works — Pick'),
+        title: const Text('External Pick'),
         backgroundColor: AppColor.primaryBackground,
         foregroundColor: Colors.white,
         elevation: 0,
@@ -143,7 +149,7 @@ class _ExternalPickScreenState extends State<ExternalPickScreen> {
             ),
             const SizedBox(height: 12),
 
-            // ─── Materials with amount
+            // ─── Materials with unit price
             _SectionCard(
               title: 'Materials',
               icon: Icons.inventory_2_rounded,
@@ -152,12 +158,10 @@ class _ExternalPickScreenState extends State<ExternalPickScreen> {
                 icon: const Icon(Icons.add, size: 16),
                 label: const Text('Add'),
                 style: TextButton.styleFrom(
-                  foregroundColor: AppColor.primaryBackground,
-                ),
+                    foregroundColor: AppColor.primaryBackground),
               ),
               child: Column(
                 children: [
-                  // Header labels
                   const Padding(
                     padding: EdgeInsets.only(bottom: 8),
                     child: Row(
@@ -169,14 +173,14 @@ class _ExternalPickScreenState extends State<ExternalPickScreen> {
                         SizedBox(width: 8),
                         Expanded(
                             flex: 2,
-                            child: Text('Qty',
-                                style: _headerStyle)),
+                            child:
+                                Text('Qty', style: _headerStyle)),
                         SizedBox(width: 8),
                         Expanded(
                             flex: 2,
                             child: Text('Unit Price',
                                 style: _headerStyle)),
-                        SizedBox(width: 32), // space for remove btn
+                        SizedBox(width: 32),
                       ],
                     ),
                   ),
@@ -190,19 +194,15 @@ class _ExternalPickScreenState extends State<ExternalPickScreen> {
                       onChanged: () => setState(() {}),
                     ),
                   ),
-                  // ─── Total
                   const Divider(height: 20),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
-                        'Total Amount',
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF111827),
-                        ),
-                      ),
+                      const Text('Total Amount',
+                          style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF111827))),
                       Text(
                         'KES ${_totalAmount.toStringAsFixed(2)}',
                         style: const TextStyle(
@@ -222,28 +222,25 @@ class _ExternalPickScreenState extends State<ExternalPickScreen> {
             _PhotoCard(
               title: 'Vehicle Photo',
               subtitle: 'Photo of materials loaded in vehicle',
-              required: true,
               photo: _vehiclePhoto,
-              onTake: () => _pickPhoto(isVehicle: true),
+              onTake: _pickPhoto,
               onRemove: () => setState(() => _vehiclePhoto = null),
-            ),
-            const SizedBox(height: 12),
-
-            // ─── Attachment (optional)
-            _PhotoCard(
-              title: 'Attachment',
-              subtitle: 'Optional supporting document / photo',
-              required: false,
-              photo: _attachmentPhoto,
-              onTake: () => _pickPhoto(isVehicle: false),
-              onRemove: () => setState(() => _attachmentPhoto = null),
             ),
             const SizedBox(height: 24),
 
+            // ─── Submit
             ElevatedButton.icon(
-              onPressed: _submit,
-              icon: const Icon(Icons.arrow_forward_rounded),
-              label: const Text('Proceed to Drop'),
+              onPressed: _submitting ? null : _submit,
+              icon: _submitting
+                  ? const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(
+                          color: Colors.white, strokeWidth: 2),
+                    )
+                  : const Icon(Icons.check_circle_outline_rounded),
+              label: Text(
+                  _submitting ? 'Submitting...' : 'Submit Pick Record'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColor.primaryBackground,
                 foregroundColor: Colors.white,
@@ -264,11 +261,9 @@ class _ExternalPickScreenState extends State<ExternalPickScreen> {
     required String label,
     String? hint,
     String? Function(String?)? validator,
-    TextInputType? keyboardType,
   }) {
     return TextFormField(
       controller: controller,
-      keyboardType: keyboardType,
       validator: validator,
       style: const TextStyle(fontSize: 13),
       decoration: InputDecoration(
@@ -298,7 +293,7 @@ class _ExternalPickScreenState extends State<ExternalPickScreen> {
   );
 }
 
-// ─── Material Entry Model ─────────────────────────────────────────
+// Material Entry
 
 class _MaterialEntry {
   final nameController = TextEditingController();
@@ -311,8 +306,6 @@ class _MaterialEntry {
     amountController.dispose();
   }
 }
-
-// ─── Material Row ─────────────────────────────────────────────────
 
 class _MaterialRow extends StatelessWidget {
   final _MaterialEntry entry;
@@ -351,8 +344,8 @@ class _MaterialRow extends StatelessWidget {
             flex: 2,
             child: TextFormField(
               controller: entry.quantityController,
-              keyboardType:
-                  const TextInputType.numberWithOptions(decimal: true),
+              keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true),
               style: const TextStyle(fontSize: 13),
               decoration: _fieldDecoration('Qty'),
               validator: (v) =>
@@ -365,8 +358,8 @@ class _MaterialRow extends StatelessWidget {
             flex: 2,
             child: TextFormField(
               controller: entry.amountController,
-              keyboardType:
-                  const TextInputType.numberWithOptions(decimal: true),
+              keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true),
               style: const TextStyle(fontSize: 13),
               decoration: _fieldDecoration('KES'),
               validator: (v) =>
@@ -399,8 +392,8 @@ class _MaterialRow extends StatelessWidget {
           OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(10),
-        borderSide:
-            const BorderSide(color: AppColor.primaryBackground, width: 2),
+        borderSide: const BorderSide(
+            color: AppColor.primaryBackground, width: 2),
       ),
       contentPadding:
           const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
@@ -408,13 +401,9 @@ class _MaterialRow extends StatelessWidget {
   }
 }
 
-// ─── Photo Card ───────────────────────────────────────────────────
-// (same reusable widget as internal works)
-
 class _PhotoCard extends StatelessWidget {
   final String title;
   final String subtitle;
-  final bool required;
   final File? photo;
   final VoidCallback onTake;
   final VoidCallback onRemove;
@@ -422,7 +411,6 @@ class _PhotoCard extends StatelessWidget {
   const _PhotoCard({
     required this.title,
     required this.subtitle,
-    required this.required,
     required this.photo,
     required this.onTake,
     required this.onRemove,
@@ -457,24 +445,10 @@ class _PhotoCard extends StatelessWidget {
                         fontSize: 13,
                         fontWeight: FontWeight.bold,
                         color: Color(0xFF111827))),
-                if (required)
-                  const Text(' *',
-                      style: TextStyle(
-                          color: Color(0xFFDC2626),
-                          fontWeight: FontWeight.bold))
-                else
-                  Container(
-                    margin: const EdgeInsets.only(left: 8),
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 6, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade100,
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: const Text('Optional',
-                        style: TextStyle(
-                            fontSize: 10, color: Color(0xFF6B7280))),
-                  ),
+                const Text(' *',
+                    style: TextStyle(
+                        color: Color(0xFFDC2626),
+                        fontWeight: FontWeight.bold)),
               ],
             ),
           ),
@@ -489,8 +463,8 @@ class _PhotoCard extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: const Color(0xFFF5F6F8),
                         borderRadius: BorderRadius.circular(10),
-                        border:
-                            Border.all(color: const Color(0xFFE5E7EB)),
+                        border: Border.all(
+                            color: const Color(0xFFE5E7EB)),
                       ),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -553,7 +527,8 @@ class _PhotoCard extends StatelessWidget {
                                 horizontal: 10, vertical: 6),
                             decoration: BoxDecoration(
                                 color: Colors.black54,
-                                borderRadius: BorderRadius.circular(8)),
+                                borderRadius:
+                                    BorderRadius.circular(8)),
                             child: const Row(
                               children: [
                                 Icon(Icons.refresh_rounded,
@@ -577,7 +552,7 @@ class _PhotoCard extends StatelessWidget {
   }
 }
 
-// ─── Section Card ─────────────────────────────────────────────────
+// Section Card
 
 class _SectionCard extends StatelessWidget {
   final String title;

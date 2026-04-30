@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:graville_operations/application/custom_navigator.dart';
 import 'package:graville_operations/core/commons/assets/images.dart';
 import 'package:graville_operations/core/commons/widgets/custom_circle_button.dart';
-import 'package:graville_operations/core/commons/widgets/progress_bar.dart';
 import 'package:graville_operations/core/commons/widgets/section_card.dart';
 import 'package:graville_operations/core/commons/widgets/stat_card.dart';
 import 'package:graville_operations/screens/home/controller.dart';
