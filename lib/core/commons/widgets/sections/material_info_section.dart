@@ -8,11 +8,13 @@ import 'package:graville_operations/services/transfer_material_service.dart';
 class MaterialInfoSection extends StatefulWidget {
   final AppMaterial? selectedMaterial;
   final ValueChanged<AppMaterial?> onChanged;
+  final List<AppMaterial>? items;
 
   const MaterialInfoSection({
     super.key,
     required this.selectedMaterial,
     required this.onChanged,
+    this.items, 
   });
 
   @override
@@ -21,23 +23,29 @@ class MaterialInfoSection extends StatefulWidget {
 
 class _MaterialInfoSectionState extends State<MaterialInfoSection> {
   List<AppMaterial> _materials = [];
-  bool _loading = true;
+  bool _loading = false;
 
   @override
   void initState() {
     super.initState();
-    _loadMaterials();
+    if (widget.items == null) {
+      _fetchMaterials();
+    }
   }
 
-  Future<void> _loadMaterials() async {
+  Future<void> _fetchMaterials() async {
+    setState(() => _loading = true);
     final result = await TransferMaterialService.fetchMaterials();
     if (mounted) {
       setState(() {
         _materials = result;
-        _loading = false;
+        _loading   = false;
       });
     }
   }
+
+  List<AppMaterial> get _effectiveItems =>
+      widget.items ?? _materials;
 
   @override
   Widget build(BuildContext context) {
@@ -52,11 +60,11 @@ class _MaterialInfoSectionState extends State<MaterialInfoSection> {
           icon: Icons.inventory,
           required: true,
           child: _loading
-              ? const _LoadingField()
+              ? _LoadingField()
               : CustomDropdown<AppMaterial>(
                   hint: 'Select material',
                   value: widget.selectedMaterial,
-                  items: _materials,
+                  items: _effectiveItems,
                   displayMapper: (item) => item.name,
                   onChanged: widget.onChanged,
                 ),
@@ -64,7 +72,6 @@ class _MaterialInfoSectionState extends State<MaterialInfoSection> {
         FormSection(
           title: 'Material Category',
           icon: Icons.category,
-          required: false,
           child: CustomTextInput(
             controller: categoryController,
             hintText: '',
@@ -77,8 +84,6 @@ class _MaterialInfoSectionState extends State<MaterialInfoSection> {
 }
 
 class _LoadingField extends StatelessWidget {
-  const _LoadingField();
-
   @override
   Widget build(BuildContext context) {
     return Container(

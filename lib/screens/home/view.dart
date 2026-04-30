@@ -3,13 +3,14 @@ import 'package:get/get.dart';
 import 'package:graville_operations/application/custom_navigator.dart';
 import 'package:graville_operations/core/commons/assets/images.dart';
 import 'package:graville_operations/core/commons/widgets/custom_circle_button.dart';
-import 'package:graville_operations/core/commons/widgets/progress_bar.dart';
 import 'package:graville_operations/core/commons/widgets/section_card.dart';
 import 'package:graville_operations/core/commons/widgets/stat_card.dart';
 import 'package:graville_operations/screens/home/controller.dart';
 import 'package:graville_operations/screens/home/widgets/app_drawer.dart';
+import 'package:graville_operations/screens/material/receipts_list_screen.dart';
 import 'package:graville_operations/screens/material/receive_material.dart';
 import 'package:graville_operations/screens/material/transfer_material.dart';
+import 'package:graville_operations/screens/material/transfers_list_screen.dart';
 import 'package:graville_operations/screens/sites/site_list/sites_list.dart';
 import 'package:graville_operations/screens/store/add_material.dart';
 import 'package:graville_operations/screens/store/update_inventory.dart';
@@ -73,6 +74,15 @@ class HomeScreen extends GetView<HomeScreenController> {
                 ),
                 const SizedBox(height: 12),
                 Tooltip(
+                  message: "Receive material list",
+                  child: CustomCircleButton(
+                    icon: Icons.list,
+                    onPressed: () =>
+                        context.push(const ReceiptsListScreen()),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Tooltip(
                   message: "Update inventory",
                   child: CustomCircleButton(
                     icon: Icons.store,
@@ -89,11 +99,20 @@ class HomeScreen extends GetView<HomeScreenController> {
                         context.push(const TransferMaterialScreen()),
                   ),
                 ),
+                 const SizedBox(height: 12),
+                Tooltip(
+                  message: "Transfer material",
+                  child: CustomCircleButton(
+                    icon: Icons.transfer_within_a_station,
+                    onPressed: () =>
+                        context.push(const TransfersListScreen()),
+                  ),
+                ),
                 const SizedBox(height: 12),
                 Tooltip(
                   message: "Create task",
                   child: CustomCircleButton(
-                    icon: Icons.add,
+                    icon: Icons.add_task,
                     onPressed: () => context.push(const CreateTaskScreen()),
                   ),
                 ),
