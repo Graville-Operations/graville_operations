@@ -14,6 +14,7 @@ import 'package:graville_operations/screens/material/transfers_list_screen.dart'
 import 'package:graville_operations/screens/sites/site_list/sites_list.dart';
 import 'package:graville_operations/screens/store/add_material.dart';
 import 'package:graville_operations/screens/store/update_inventory.dart';
+import 'package:graville_operations/screens/store/widgets/add_tool.dart';
 import 'package:graville_operations/screens/task_screen/alltasks.dart';
 import 'package:graville_operations/screens/task_screen/task_details.dart';
 import 'package:graville_operations/screens/task_screen/task_screen.dart';
@@ -61,6 +62,14 @@ class HomeScreen extends GetView<HomeScreenController> {
                   child: CustomCircleButton(
                     icon: Icons.build,
                     onPressed: () => context.push(const AddMaterialScreen()),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Tooltip(
+                  message: "Add tool",
+                  child: CustomCircleButton(
+                    icon: Icons.inventory_2,
+                    onPressed: () => context.push(const AddToolScreen()),
                   ),
                 ),
                 const SizedBox(height: 12),

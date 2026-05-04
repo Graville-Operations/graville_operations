@@ -3,8 +3,8 @@ class InventoryItem {
   final String name;
   final String category;
   final String unit;
-  final double quantity;
-  final double unitPrice;
+  final double? quantity;
+  final double? unitPrice;
   final String? description;
 
   const InventoryItem({
@@ -12,8 +12,8 @@ class InventoryItem {
     required this.name,
     required this.category,
     required this.unit,
-    required this.quantity,
-    required this.unitPrice,
+    this.quantity,
+    this.unitPrice,
     this.description,
   });
 
@@ -23,8 +23,8 @@ class InventoryItem {
       name:        json['name']        as String? ?? '',
       category:    json['category']    as String? ?? '',
       unit:        json['unit']        as String? ?? '',
-      quantity:    (json['quantity']   as num?)?.toDouble() ?? 0.0,
-      unitPrice:   (json['unit_price'] as num?)?.toDouble() ?? 0.0,
+      quantity:    (json['quantity']   as num?)?.toDouble(),
+      unitPrice:   (json['unit_price'] as num?)?.toDouble(),
       description: json['description'] as String?,
     );
   }
