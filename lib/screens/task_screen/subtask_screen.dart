@@ -10,15 +10,15 @@ import 'package:graville_operations/core/remote/api/task_api.dart';
 import 'package:graville_operations/core/remote/dto/requests/create_tasks.dart';
 
 
-class CreateTaskScreen extends StatefulWidget {
+class CreatesubTaskScreen extends StatefulWidget {
   final int? fieldoperatorid;
-  const CreateTaskScreen({super.key, this.fieldoperatorid});
+  const CreatesubTaskScreen({super.key, this.fieldoperatorid});
 
   @override
-  State<CreateTaskScreen> createState() => CreateTaskScreenState();
+  State<CreatesubTaskScreen> createState() => CreatesubTaskScreenState();
 }
 
-class CreateTaskScreenState extends State<CreateTaskScreen> {
+class CreatesubTaskScreenState extends State<CreatesubTaskScreen> {
   final formKey = GlobalKey<FormState>();
   final titleController = TextEditingController();
   final descriptionController = TextEditingController();
@@ -253,7 +253,7 @@ class CreateTaskScreenState extends State<CreateTaskScreen> {
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
-          'Create Task',
+          'Create SubTask',
           style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
@@ -267,13 +267,13 @@ class CreateTaskScreenState extends State<CreateTaskScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const Text('Task Title',
+              const Text('SubTask Title',
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
               const SizedBox(height: 8),
               TextFormField(
                 controller: titleController,
                 decoration: InputDecoration(
-                  hintText: 'Enter task title',
+                  hintText: 'Enter subTask title',
                   border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12)),
                   filled: true,
@@ -285,7 +285,7 @@ class CreateTaskScreenState extends State<CreateTaskScreen> {
 
               const SizedBox(height: 16),
 
-              const Text('Task Description',
+              const Text('SubTask Description',
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
               const SizedBox(height: 8),
               TextFormField(
@@ -418,7 +418,7 @@ class CreateTaskScreenState extends State<CreateTaskScreen> {
               const SizedBox(height: 24),
 
               CustomButton(
-                label: 'Create Task',
+                label: 'Create SubTask',
                 backgroundColor: Colors.orange,
                 textColor: Colors.white,
                 onPressed: submitTask,
