@@ -13,7 +13,9 @@ import 'package:graville_operations/screens/material/transfer_material.dart';
 import 'package:graville_operations/screens/material/transfers_list_screen.dart';
 import 'package:graville_operations/screens/sites/site_list/sites_list.dart';
 import 'package:graville_operations/screens/store/add_material.dart';
+import 'package:graville_operations/screens/store/store_checkin_screen.dart';
 import 'package:graville_operations/screens/store/update_inventory.dart';
+import 'package:graville_operations/screens/store/widgets/add_tool.dart';
 import 'package:graville_operations/screens/task_screen/alltasks.dart';
 import 'package:graville_operations/screens/task_screen/task_details.dart';
 import 'package:graville_operations/screens/task_screen/task_screen.dart';
@@ -61,6 +63,14 @@ class HomeScreen extends GetView<HomeScreenController> {
                   child: CustomCircleButton(
                     icon: Icons.build,
                     onPressed: () => context.push(const AddMaterialScreen()),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Tooltip(
+                  message: "Add tool",
+                  child: CustomCircleButton(
+                    icon: Icons.inventory_2,
+                    onPressed: () => context.push(const AddToolScreen()),
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -117,6 +127,16 @@ class HomeScreen extends GetView<HomeScreenController> {
                   ),
                 ),
                 const SizedBox(height: 12),
+                Tooltip(
+                  message: "Check in store",
+                  child: CustomCircleButton(
+                    icon: Icons.check_circle,
+                    onPressed: () => context.push(const StoreCheckInScreen(
+                      storeId: 1,
+                    )),
+                  ),
+                ),
+                const SizedBox(height: 12),
               ],
               FloatingActionButton(
                 backgroundColor: Colors.black,
@@ -139,8 +159,12 @@ class HomeScreen extends GetView<HomeScreenController> {
                 snap: true,
                 pinned: true,
                 leading: GestureDetector(
-                  onTap: () => controller.state.scaffoldKey.currentState?.openDrawer(),
-                  child: Icon(Icons.menu,color: context.theme.iconTheme.color,),
+                  onTap: () =>
+                      controller.state.scaffoldKey.currentState?.openDrawer(),
+                  child: Icon(
+                    Icons.menu,
+                    color: context.theme.iconTheme.color,
+                  ),
                 ),
                 automaticallyImplyLeading: false,
                 toolbarHeight: 80,
@@ -297,10 +321,19 @@ class HomeScreen extends GetView<HomeScreenController> {
                                       alignment: Alignment.center,
                                       children: [
                                         Builder(builder: (_) {
-                                          final avg = controller.state.tasksLoading.value || controller.state.recentTasks.isEmpty
+                                          final avg = controller.state
+                                                      .tasksLoading.value ||
+                                                  controller
+                                                      .state.recentTasks.isEmpty
                                               ? 0.0
-                                              : controller.state.recentTasks.fold<int>(0, (sum, t) => sum + t.completion) /
-                                                controller.state.recentTasks.length;
+                                              : controller.state.recentTasks
+                                                      .fold<int>(
+                                                          0,
+                                                          (sum, t) =>
+                                                              sum +
+                                                              t.completion) /
+                                                  controller
+                                                      .state.recentTasks.length;
                                           final display = avg.round();
                                           return Stack(
                                             alignment: Alignment.center,
@@ -312,18 +345,26 @@ class HomeScreen extends GetView<HomeScreenController> {
                                                     ? const Color(0xff1db954)
                                                     : avg >= 60
                                                         ? Colors.orange
-                                                        : const Color(0xff5b7cfa),
-                                                backgroundColor: Colors.grey.shade300,
+                                                        : const Color(
+                                                            0xff5b7cfa),
+                                                backgroundColor:
+                                                    Colors.grey.shade300,
                                               ),
-                                             controller.state.tasksLoading.value
-                                                ? const SizedBox(
-                                                    width: 16, height: 16,
-                                                    child: CircularProgressIndicator(strokeWidth: 2),
-                                                  )
-                                                : Text(
-                                                    "$display%",
-                                                    style: const TextStyle(fontWeight: FontWeight.bold),
-                                                  ),
+                                              controller
+                                                      .state.tasksLoading.value
+                                                  ? const SizedBox(
+                                                      width: 16,
+                                                      height: 16,
+                                                      child:
+                                                          CircularProgressIndicator(
+                                                              strokeWidth: 2),
+                                                    )
+                                                  : Text(
+                                                      "$display%",
+                                                      style: const TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold),
+                                                    ),
                                             ],
                                           );
                                         }),
@@ -348,12 +389,15 @@ class HomeScreen extends GetView<HomeScreenController> {
                               const Icon(Icons.task, size: 18),
                               const SizedBox(width: 8),
                               const Text("Task Progress",
-                                  style: TextStyle(fontWeight: FontWeight.bold)),
+                                  style:
+                                      TextStyle(fontWeight: FontWeight.bold)),
                               const Spacer(),
-                              if (!controller.state.tasksLoading.value && controller.state.recentTasks.length > 5)
+                              if (!controller.state.tasksLoading.value &&
+                                  controller.state.recentTasks.length > 5)
                                 GestureDetector(
                                   onTap: () => Navigator.of(context).push(
-                                    MaterialPageRoute(builder: (_) => const AllTasksScreen()),
+                                    MaterialPageRoute(
+                                        builder: (_) => const AllTasksScreen()),
                                   ),
                                   child: const Text("View All",
                                       style: TextStyle(
@@ -365,152 +409,161 @@ class HomeScreen extends GetView<HomeScreenController> {
                             ],
                           ),
                           const SizedBox(height: 15),
-
                           if (controller.state.tasksLoading.value)
-                            ...List.generate(3, (_) => Padding(
-                              padding: const EdgeInsets.only(bottom: 12),
-                              child: Container(
-                                height: 40,
-                                decoration: BoxDecoration(
-                                  color: Colors.grey.shade200,
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                              ),
-                            ))
-
-                          else if (controller.state.taskFetchError.value.isNotEmpty)
+                            ...List.generate(
+                                3,
+                                (_) => Padding(
+                                      padding:
+                                          const EdgeInsets.only(bottom: 12),
+                                      child: Container(
+                                        height: 40,
+                                        decoration: BoxDecoration(
+                                          color: Colors.grey.shade200,
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                        ),
+                                      ),
+                                    ))
+                          else if (controller
+                              .state.taskFetchError.value.isNotEmpty)
                             Row(
                               children: [
                                 const Text("Failed to load",
-                                    style: TextStyle(color: Colors.grey, fontSize: 12)),
+                                    style: TextStyle(
+                                        color: Colors.grey, fontSize: 12)),
                                 TextButton(
                                   onPressed: controller.loadStats,
                                   child: const Text("Retry",
                                       style: TextStyle(
-                                          color: Color(0xff5b7cfa), fontSize: 12)),
+                                          color: Color(0xff5b7cfa),
+                                          fontSize: 12)),
                                 ),
                               ],
                             )
-
                           else if (controller.state.recentTasks.isEmpty)
-                              const Padding(
-                                padding: EdgeInsets.symmetric(vertical: 12),
-                                child: Center(
-                                  child: Text("No tasks yet",
-                                      style: TextStyle(color: Colors.grey)),
+                            const Padding(
+                              padding: EdgeInsets.symmetric(vertical: 12),
+                              child: Center(
+                                child: Text("No tasks yet",
+                                    style: TextStyle(color: Colors.grey)),
+                              ),
+                            )
+                          else ...[
+                            Row(
+                              children: [
+                                const Text("Overall",
+                                    style: TextStyle(
+                                        fontSize: 12, color: Colors.grey)),
+                                const Spacer(),
+                                Text(
+                                  "${(controller.state.overallCompletion.value * 100).round()}%",
+                                  style: const TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold),
                                 ),
-                              )
-
-                            else ...[
-                                Row(
-                                  children: [
-                                    const Text("Overall",
-                                        style: TextStyle(fontSize: 12, color: Colors.grey)),
-                                    const Spacer(),
-                                    Text(
-                                    "${(controller.state.overallCompletion.value * 100).round()}%",
-                                      style: const TextStyle(
-                                          fontSize: 12, fontWeight: FontWeight.bold),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 6),
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(4),
-                                  child: LinearProgressIndicator(
-                                    value: controller.state.overallCompletion.value,
-                                    minHeight: 6,
-                                    backgroundColor: Colors.grey.shade200,
-                                    valueColor:
-                                    const AlwaysStoppedAnimation<Color>(Color(0xff5b7cfa)),
-                                  ),
-                                ),
-                                const SizedBox(height: 16),
-                                const Divider(),
-                                const SizedBox(height: 8),
-                                ...controller.state.homeTasks.map((task) {
-                                  final color = task.completion >= 100
-                                      ? const Color(0xff1db954)
-                                      : task.completion >= 60
+                              ],
+                            ),
+                            const SizedBox(height: 6),
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(4),
+                              child: LinearProgressIndicator(
+                                value: controller.state.overallCompletion.value,
+                                minHeight: 6,
+                                backgroundColor: Colors.grey.shade200,
+                                valueColor: const AlwaysStoppedAnimation<Color>(
+                                    Color(0xff5b7cfa)),
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            const Divider(),
+                            const SizedBox(height: 8),
+                            ...controller.state.homeTasks.map((task) {
+                              final color = task.completion >= 100
+                                  ? const Color(0xff1db954)
+                                  : task.completion >= 60
                                       ? Colors.orange
                                       : const Color(0xff5b7cfa);
-                                  return GestureDetector(
-                                    onTap: () => Navigator.of(context).push(
-                                      MaterialPageRoute(
-                                        builder: (_) => TaskDetailScreen(task: task),
-                                      ),
-                                    ),
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(bottom: 14),
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                              return GestureDetector(
+                                onTap: () => Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (_) =>
+                                        TaskDetailScreen(task: task),
+                                  ),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.only(bottom: 14),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
                                         children: [
-                                          Row(
-                                            children: [
-                                              Expanded(
-                                                child: Text(
-                                                  task.title,
-                                                  style: const TextStyle(
-                                                      fontSize: 13,
-                                                      fontWeight: FontWeight.w500),
-                                                  maxLines: 1,
-                                                  overflow: TextOverflow.ellipsis,
-                                                ),
-                                              ),
-                                              const SizedBox(width: 8),
-                                              Text(
-                                                "${task.completion}%",
-                                                style: TextStyle(
-                                                  fontSize: 12,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: color,
-                                                ),
-                                              ),
-                                              const Icon(Icons.chevron_right,
-                                                  size: 14, color: Colors.grey),
-                                            ],
-                                          ),
-                                          const SizedBox(height: 6),
-                                          ClipRRect(
-                                            borderRadius: BorderRadius.circular(4),
-                                            child: LinearProgressIndicator(
-                                              value: task.completion / 100,
-                                              minHeight: 5,
-                                              backgroundColor: Colors.grey.shade100,
-                                              valueColor:
-                                              AlwaysStoppedAnimation<Color>(color),
+                                          Expanded(
+                                            child: Text(
+                                              task.title,
+                                              style: const TextStyle(
+                                                  fontSize: 13,
+                                                  fontWeight: FontWeight.w500),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
                                             ),
                                           ),
+                                          const SizedBox(width: 8),
+                                          Text(
+                                            "${task.completion}%",
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.bold,
+                                              color: color,
+                                            ),
+                                          ),
+                                          const Icon(Icons.chevron_right,
+                                              size: 14, color: Colors.grey),
                                         ],
                                       ),
-                                    ),
-                                  );
-                                }),
-                                if (controller.state.recentTasks.length > 5)
-                                  GestureDetector(
-                                    onTap: () => Navigator.of(context).push(
-                                      MaterialPageRoute(
-                                          builder: (_) => const AllTasksScreen()),
-                                    ),
-                                    child: Container(
-                                      width: double.infinity,
-                                      padding: const EdgeInsets.symmetric(vertical: 10),
-                                      decoration: BoxDecoration(
-                                        color: Colors.grey.shade50,
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                      child: Text(
-                                        "View all ${controller.state.recentTasks.length} tasks →",
-                                        textAlign: TextAlign.center,
-                                        style: const TextStyle(
-                                          color: Color(0xff5b7cfa),
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.w600,
+                                      const SizedBox(height: 6),
+                                      ClipRRect(
+                                        borderRadius: BorderRadius.circular(4),
+                                        child: LinearProgressIndicator(
+                                          value: task.completion / 100,
+                                          minHeight: 5,
+                                          backgroundColor: Colors.grey.shade100,
+                                          valueColor:
+                                              AlwaysStoppedAnimation<Color>(
+                                                  color),
                                         ),
                                       ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            }),
+                            if (controller.state.recentTasks.length > 5)
+                              GestureDetector(
+                                onTap: () => Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                      builder: (_) => const AllTasksScreen()),
+                                ),
+                                child: Container(
+                                  width: double.infinity,
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 10),
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey.shade50,
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Text(
+                                    "View all ${controller.state.recentTasks.length} tasks →",
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(
+                                      color: Color(0xff5b7cfa),
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w600,
                                     ),
                                   ),
-                              ],
+                                ),
+                              ),
+                          ],
                         ],
                       ),
                     ),
