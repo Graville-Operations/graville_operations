@@ -462,6 +462,18 @@ static Future<Map<String, dynamic>> confirmDrop(
     return {'success': false, 'message': e.toString()};
   }
 }
+static Future<Map<String, dynamic>> getAllPicks() async {
+  try {
+    final response = await HttpUtil().get(
+      AppRoutes.getAllPicks,
+      options: await _authJsonOptions(),
+    );
+    final data = _decodeResponse(response);
+    return {'success': true, 'data': data};
+  } catch (e) {
+    return {'success': false, 'message': e.toString()};
+  }
+}
 
   static Future<Map<String, dynamic>> authenticatedGet(String endpoint) async {
     try {

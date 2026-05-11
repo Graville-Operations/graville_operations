@@ -4,6 +4,7 @@ import 'package:graville_operations/screens/finance/templates/external_works/ext
 import 'package:graville_operations/screens/finance/templates/external_works/external_pick_screen.dart';
 import 'package:graville_operations/screens/finance/templates/internal_works/drop_materials_screen.dart';
 import 'package:graville_operations/screens/finance/templates/internal_works/pick_materials_screen.dart';
+import 'package:graville_operations/screens/finance/works/works_list_screen.dart';
 import 'package:graville_operations/screens/invoice/invoice_screen.dart';
 
 class FinanceTemplatesScreen extends StatelessWidget {
@@ -60,7 +61,6 @@ class FinanceTemplatesScreen extends StatelessWidget {
                   ),
                 ),
 
-                // ─── Internal Drop
                 _TemplateCard(
                   title: 'Internal Drop',
                   subtitle: 'Drop at site',
@@ -98,7 +98,6 @@ class FinanceTemplatesScreen extends StatelessWidget {
                   ),
                 ),
 
-                // ─── External Drop
                 _TemplateCard(
                   title: 'External Drop',
                   subtitle: 'Hired vehicle drop',
@@ -132,6 +131,24 @@ class FinanceTemplatesScreen extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                       builder: (_) => const InvoiceScreen(),
+                    ),
+                  ),
+                ),
+
+                _TemplateCard(
+                  title: 'Works Records',
+                  subtitle: 'View all pick & drop',
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF1F2937), Color(0xFF4B5563)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  icon: Icons.history_rounded,
+                  patternIcon: Icons.list_alt_outlined,
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const WorksListScreen(),
                     ),
                   ),
                 ),
@@ -218,13 +235,13 @@ class _TemplateCard extends StatelessWidget {
                   ),
                 ),
 
-                // ─── White bottom label strip
                 Positioned(
                   bottom: 0,
                   left: 0,
                   right: 0,
                   child: Container(
-                    padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
+                    padding:
+                        const EdgeInsets.fromLTRB(12, 10, 12, 12),
                     color: Colors.white,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -259,7 +276,8 @@ class _TemplateCard extends StatelessWidget {
                                     horizontal: 5, vertical: 2),
                                 decoration: BoxDecoration(
                                   color: const Color(0xFFFEF3C7),
-                                  borderRadius: BorderRadius.circular(4),
+                                  borderRadius:
+                                      BorderRadius.circular(4),
                                 ),
                                 child: const Text(
                                   'Soon',
@@ -277,7 +295,6 @@ class _TemplateCard extends StatelessWidget {
                   ),
                 ),
 
-                // ─── Main icon centered in banner
                 Positioned.fill(
                   bottom: 68,
                   child: Center(
